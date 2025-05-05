@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mirea.dms.auth.dto.AuthDto;
 import ru.mirea.dms.auth.service.AuthService;
 
 import java.util.Map;
@@ -21,10 +23,9 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<Map<String, Object>> getAccessToken(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<Map<String, Object>> getAccessToken(@RequestBody AuthDto dto) {
         try {
-            logger.info("Creds: {}:{}", username, password);
-            Map<String, Object> tokenResponse = authService.getAccessToken(username, password);
+            Map<String, Object> tokenResponse = authService.getAccessToken(dto.getUsername(), dto.getPassword());
             return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
             logger.error(e.getMessage());
