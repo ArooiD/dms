@@ -2,6 +2,7 @@ name: "dms"
 services:
   proxy:
     container_name: proxy
+    image: dms-proxy
     build: ./proxy
     ports:
       - "80:80"
@@ -15,10 +16,8 @@ services:
 
   web:
     container_name: web
+    image: dms-web
     build: ./web
-    image: web
-    expose:
-      - "3000:3000"
     networks:
       - app
     depends_on:
@@ -28,8 +27,8 @@ services:
 
   storage:
     container_name: storage
+    image: dms-storage
     build: ./storage
-    image: storage
     env_file:
       - .env
     networks:
@@ -40,8 +39,8 @@ services:
 
   search:
     container_name: search
+    image: dms-search
     build: ./search
-    image: search
     env_file:
       - .env
     networks:
@@ -51,8 +50,8 @@ services:
 
   ocr:
     container_name: ocr
+    image: dms-ocr
     build: ./ocr
-    image: ocr
     env_file:
       - .env
     networks:
@@ -60,14 +59,42 @@ services:
     depends_on:
       - postgres
 
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:25.0.0
+    platform: linux/amd64
+    command:
+      - start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: $DB_USR
+      KC_DB_PASSWORD: $DB_PWD
+      KEYCLOAK_ADMIN: $KC_USR
+      KEYCLOAK_ADMIN_PASSWORD: $KC_PASS
+      KC_PROXY: edge
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_PROXY_HEADERS: forwarded
+      KC_HTTPS_CLIENT_AUTH: none
+      KC_HEALTH_ENABLED: true
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    networks:
+      - app
+    restart: always
+
   postgres:
     container_name: postgres
-    image: postgres:15
+    build: psql
+    image: dms-psql
     restart: always
     environment:
       POSTGRES_USER: ${DB_USR}
       POSTGRES_PASSWORD: ${DB_PWD}
-      POSTGRES_DB: dms
     ports:
       - "5432:5432"
     volumes:
@@ -82,6 +109,8 @@ services:
       MINIO_ROOT_USER: "${M_USR}"
       MINIO_ROOT_PASSWORD: "${M_PWD}"
     command: server /data --console-address ":9090"
+    volumes:
+      - ./files:/data
     ports:
       - "9090:9090"
     networks:

@@ -27,8 +27,6 @@ services:
       - ./web/package.json:/app/package.json
       - ./deps/web:/app/node_modules
     command: sh -c "npm install && HOST=0.0.0.0 CHOKIDAR_USEPOLLING=true npm run start"
-#    expose:
-#      - "3000:3000"
     networks:
       - app
     depends_on:
@@ -125,6 +123,8 @@ services:
     environment:
       MINIO_ROOT_USER: "${M_USR}"
       MINIO_ROOT_PASSWORD: "${M_PWD}"
+    volumes:
+      - ./files:/data
     command: server /data --console-address ":9090"
     ports:
       - "9090:9090"
