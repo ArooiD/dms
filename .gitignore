@@ -1,7 +1,8 @@
 /minio-data/
 /postgres-data/
-data
+old
 node_modules
 .idea
 package-lock.json
 deps
+data

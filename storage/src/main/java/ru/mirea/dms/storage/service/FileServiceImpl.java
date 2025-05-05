@@ -1,5 +1,7 @@
 package ru.mirea.dms.storage.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mirea.dms.storage.dto.FileInfo;
 import io.minio.*;
 import io.minio.messages.Item;
@@ -16,15 +18,15 @@ import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
-
+    private final Logger logger;
     private final MinioClient minio;
     private final String bucket;
 
     public FileServiceImpl(MinioClient minio,
                            @Value("${minio.bucket}") String bucket) throws Exception {
+        this.logger = LoggerFactory.getLogger(this.getClass());
         this.minio = minio;
         this.bucket = bucket;
-
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
             minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());

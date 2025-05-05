@@ -1,6 +1,8 @@
 // controller/SearchController.java
 package ru.mirea.dms.search.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.mirea.dms.search.model.DocumentMeta;
 import ru.mirea.dms.search.service.SearchService;
@@ -11,19 +13,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/search")
 public class SearchController {
-    private final SearchService svc;
+    private final SearchService searchService;
+    private final Logger logger;
 
-    public SearchController(SearchService svc) {
-        this.svc = svc;
+    public SearchController(SearchService searchService) {
+        this.searchService = searchService;
+        this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
     @PostMapping("/metadata")
     public DocumentMeta upsert(@RequestBody DocumentMeta meta) {
-        return svc.save(meta);
+        return searchService.save(meta);
     }
 
     @GetMapping
     public List<DocumentMeta> query(@RequestParam("q") String q) {
-        return svc.search(q);
+        return searchService.search(q);
     }
 }

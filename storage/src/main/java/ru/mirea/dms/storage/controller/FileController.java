@@ -1,5 +1,7 @@
 package ru.mirea.dms.storage.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import ru.mirea.dms.storage.dto.FileInfo;
 import ru.mirea.dms.storage.service.FileService;
@@ -16,10 +18,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file")
 public class FileController {
-
+    private final Logger logger;
     private final FileService fileService;
 
     public FileController(FileService fileService) {
+        this.logger = LoggerFactory.getLogger(this.getClass());
         this.fileService = fileService;
     }
 

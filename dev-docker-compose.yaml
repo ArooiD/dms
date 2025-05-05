@@ -106,12 +106,12 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:15
+    build: psql
+    image: dms-psql
     restart: always
     environment:
       POSTGRES_USER: ${DB_USR}
       POSTGRES_PASSWORD: ${DB_PWD}
-      POSTGRES_DB: dms
     ports:
       - "5432:5432"
     volumes:
