@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.time.ZoneOffset;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,83 +17,93 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
 
-  private final MinioClient minio;
-  private final String bucket;
+    private final MinioClient minio;
+    private final String bucket;
 
-  public FileServiceImpl(MinioClient minio,
-                         @Value("${minio.bucket}") String bucket) throws Exception {
-    this.minio  = minio;
-    this.bucket = bucket;
+    public FileServiceImpl(MinioClient minio,
+                           @Value("${minio.bucket}") String bucket) throws Exception {
+        this.minio = minio;
+        this.bucket = bucket;
 
-    boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
-    if (!exists) {
-      minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!exists) {
+            minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        }
     }
-  }
 
-  @Override
-  public FileInfo upload(MultipartFile file) throws Exception {
-    String objectName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-    PutObjectArgs args = PutObjectArgs.builder()
-      .bucket(bucket)
-      .object(objectName)
-      .stream(file.getInputStream(), file.getSize(), -1)
-      .contentType(file.getContentType())
-      .build();
-    minio.putObject(args);
-
-    StatObjectResponse stat = minio.statObject(StatObjectArgs.builder().bucket(bucket).object(objectName).build());
-    ZonedDateTime odtStat = stat.lastModified();
-    Instant zdtStat = odtStat.toInstant();
-
-    FileInfo info = new FileInfo();
-    info.setObjectName(objectName);
-    info.setSize(file.getSize());
-    info.setContentType(file.getContentType());
-    info.setLastModified(zdtStat);
-    return info;
-  }
-
-  @Override
-  public InputStream download(String objectName) throws Exception {
-    return minio.getObject(GetObjectArgs.builder()
-      .bucket(bucket).object(objectName).build());
-  }
-
-  @Override
-  public FileInfo update(String objectName, MultipartFile file) throws Exception {
-    PutObjectArgs args = PutObjectArgs.builder()
-      .bucket(bucket)
-      .object(objectName)
-      .stream(file.getInputStream(), file.getSize(), -1)
-      .contentType(file.getContentType())
-      .build();
-    minio.putObject(args);
-    return upload(file);
-  }
-
-  @Override
-  public void delete(String objectName) throws Exception {
-    minio.removeObject(RemoveObjectArgs.builder()
-      .bucket(bucket).object(objectName).build());
-  }
-
-  @Override
-  public List<FileInfo> listAll() throws Exception {
-    List<FileInfo> all = new ArrayList<>();
-    Iterable<Result<Item>> results = minio.listObjects(
-      ListObjectsArgs.builder().bucket(bucket).build());
-    for (Result<Item> r : results) {
-      Item item = r.get();
-      FileInfo info = new FileInfo();
-      ZonedDateTime odtStat = item.lastModified();
-      Instant instItem = odtStat.toInstant();
-      info.setObjectName(item.objectName());
-      info.setSize(item.size());
-      info.setContentType(null);
-      info.setLastModified(instItem);
-      all.add(info);
+    @Override
+    public FileInfo upload(UUID userId, MultipartFile file) throws Exception {
+        String originalFileName = file.getOriginalFilename();
+        String objectName = userId + "/" + originalFileName;
+        PutObjectArgs args = PutObjectArgs.builder()
+                .bucket(bucket)
+                .object(objectName)
+                .stream(file.getInputStream(), file.getSize(), -1)
+                .contentType(file.getContentType())
+                .build();
+        minio.putObject(args);
+        StatObjectResponse stat = minio.statObject(
+                StatObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .build()
+        );
+        ZonedDateTime odtStat = stat.lastModified();
+        Instant zdtStat = odtStat.toInstant();
+        FileInfo info = new FileInfo();
+        info.setObjectName(objectName);
+        info.setSize(file.getSize());
+        info.setContentType(file.getContentType());
+        info.setLastModified(zdtStat);
+        return info;
     }
-    return all;
-  }
+
+
+    @Override
+    public InputStream download(UUID userId, String objectName) throws Exception {
+        return minio.getObject(GetObjectArgs.builder()
+                .bucket(bucket).object(userId + "/" + objectName).build());
+    }
+
+    @Override
+    public FileInfo update(UUID userId, String objectName, MultipartFile file) throws Exception {
+        PutObjectArgs args = PutObjectArgs.builder()
+                .bucket(bucket)
+                .object(userId + "/" + objectName)
+                .stream(file.getInputStream(), file.getSize(), -1)
+                .contentType(file.getContentType())
+                .build();
+        minio.putObject(args);
+        return upload(userId, file);
+    }
+
+    @Override
+    public void delete(UUID userId, String objectName) throws Exception {
+        minio.removeObject(RemoveObjectArgs.builder()
+                .bucket(bucket).object(userId + "/" + objectName).build());
+    }
+
+    @Override
+    public List<FileInfo> listAll(UUID userId) throws Exception {
+        List<FileInfo> all = new ArrayList<>();
+        Iterable<Result<Item>> results = minio.listObjects(
+                ListObjectsArgs.builder()
+                        .bucket(bucket)
+                        .prefix(userId.toString() + "/")
+                        .recursive(true)
+                        .build()
+        );
+        for (Result<Item> r : results) {
+            Item item = r.get();
+            ZonedDateTime odtStat = item.lastModified();
+            Instant instItem = odtStat.toInstant();
+            FileInfo info = new FileInfo();
+            info.setObjectName(item.objectName());
+            info.setSize(item.size());
+            info.setContentType(null);
+            info.setLastModified(instItem);
+            all.add(info);
+        }
+        return all;
+    }
 }

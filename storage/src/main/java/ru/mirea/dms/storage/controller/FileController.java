@@ -1,55 +1,59 @@
 package ru.mirea.dms.storage.controller;
 
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import ru.mirea.dms.storage.dto.FileInfo;
 import ru.mirea.dms.storage.service.FileService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/file")
 public class FileController {
 
-  private final FileService fileService;
-  public FileController(FileService fileService) {
-    this.fileService = fileService;
-  }
+    private final FileService fileService;
 
-  @PostMapping
-  public FileInfo upload(@RequestParam("file") MultipartFile file) throws Exception {
-    return fileService.upload(file);
-  }
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
 
-  @GetMapping
-  public List<FileInfo> list() throws Exception {
-    return fileService.listAll();
-  }
+    @GetMapping("/")
+    public List<FileInfo> list(JwtAuthenticationToken auth) throws Exception {
+        UUID userId = UUID.fromString(auth.getToken().getSubject());
+        return fileService.listAll(userId);
+    }
 
-  @GetMapping("/{objectName}")
-  public ResponseEntity<InputStreamResource> download(
-      @PathVariable String objectName) throws Exception {
+    @PostMapping("/")
+    public FileInfo upload(JwtAuthenticationToken auth, @RequestParam("file") MultipartFile file) throws Exception {
+        UUID userId = UUID.fromString(auth.getToken().getSubject());
+        return fileService.upload(userId, file);
+    }
 
-    InputStream is = fileService.download(objectName);
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + objectName + "\"")
-        .body(new InputStreamResource(is));
-  }
+    @GetMapping("/{name}")
+    public ResponseEntity<InputStreamResource> download(JwtAuthenticationToken auth, @PathVariable(name = "name") String name) throws Exception {
+        UUID userId = UUID.fromString(auth.getToken().getSubject());
+        InputStream is = fileService.download(userId, name);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
+                .body(new InputStreamResource(is));
+    }
 
-  @PutMapping("/{objectName}")
-  public FileInfo update(@PathVariable String objectName,
-                         @RequestParam("file") MultipartFile file) throws Exception {
-    return fileService.update(objectName, file);
-  }
+    @PutMapping("/{name}")
+    public FileInfo update(JwtAuthenticationToken auth, @PathVariable(name = "name") String name, @RequestParam("file") MultipartFile file) throws Exception {
+        UUID userId = UUID.fromString(auth.getToken().getSubject());
+        return fileService.update(userId, name, file);
+    }
 
-  @DeleteMapping("/{objectName}")
-  public ResponseEntity<Void> delete(@PathVariable String objectName) throws Exception {
-    fileService.delete(objectName);
-    return ResponseEntity.noContent().build();
-  }
+    @DeleteMapping("/{name}")
+    public ResponseEntity<Void> delete(JwtAuthenticationToken auth, @PathVariable(name = "name") String objectName) throws Exception {
+        UUID userId = UUID.fromString(auth.getToken().getSubject());
+        fileService.delete(userId, objectName);
+        return ResponseEntity.noContent().build();
+    }
 }
