@@ -1,2 +1,7 @@
 /minio-data/
 /postgres-data/
+data
+node_modules
+.idea
+package-lock.json
+deps

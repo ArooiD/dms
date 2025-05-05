@@ -11,17 +11,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/search")
 public class SearchController {
-
     private final SearchService svc;
-    public SearchController(SearchService svc) { this.svc = svc; }
 
-    /* POST /api/search/metadata */
+    public SearchController(SearchService svc) {
+        this.svc = svc;
+    }
+
     @PostMapping("/metadata")
     public DocumentMeta upsert(@RequestBody DocumentMeta meta) {
         return svc.save(meta);
     }
 
-    /* GET /api/search?q=... */
     @GetMapping
     public List<DocumentMeta> query(@RequestParam("q") String q) {
         return svc.search(q);

@@ -51,7 +51,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/upload" replace />} />
             <Route path="/upload" element={<Placeholder title="Загрузка документов" />} />
-            <Route path="/search" element={<Placeholder title="Поиск" />} />
+            <Route path="/search" element={<Placeholder title="Поиск !!!!" />} />
             <Route path="/ocr" element={<Placeholder title="OCR" />} />
             <Route path="/metadata" element={<Placeholder title="Метаданные" />} />
           </Routes>

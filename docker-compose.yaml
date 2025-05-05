@@ -1,39 +1,28 @@
+name: "dms"
 services:
-  builder:
-    profiles: ["build"]
-    image: maven:3.8.5-openjdk-17-slim
-    container_name: dms_builder
-    volumes:
-      - ./:/usr/src/dms
-      - m2-repo:/root/.m2
-    working_dir: /usr/src/dms
-    command: >
-      sh -c "
-        cd storage && mvn clean install &&
-        cd ../search  && mvn clean install
-      "
-    restart: "no"
+  proxy:
+    container_name: proxy
+    build: ./proxy
+    ports:
+      - "80:80"
+    networks:
+      - app
+    depends_on:
+      - ocr
+      - web
+      - search
+      - storage
 
   web:
     container_name: web
     build: ./web
     image: web
-    ports:
-      - "8080:3000"
+    expose:
+      - "3000:3000"
     networks:
       - app
     depends_on:
-      - postgres
-      - minio
-
-  gateway:
-    container_name: gateway
-    build: ./gateway
-    ports:
-      - "3457:8000"
-    networks:
-      - app
-    depends_on:
+      - ocr
       - search
       - storage
 
@@ -41,8 +30,8 @@ services:
     container_name: storage
     build: ./storage
     image: storage
-    ports:
-      - "8081:8080"
+    env_file:
+      - .env
     networks:
       - app
     depends_on:
@@ -53,8 +42,8 @@ services:
     container_name: search
     build: ./search
     image: search
-    ports:
-      - "8082:8080"
+    env_file:
+      - .env
     networks:
       - app
     depends_on:
@@ -64,8 +53,8 @@ services:
     container_name: ocr
     build: ./ocr
     image: ocr
-    ports:
-      - "8083:5000"
+    env_file:
+      - .env
     networks:
       - app
     depends_on:
@@ -76,59 +65,27 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_USER: ${DB_USR}
+      POSTGRES_PASSWORD: ${DB_PWD}
       POSTGRES_DB: dms
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
     networks:
       - app
-
-    # <--- DISABLE the default pg_isready healthcheck to stop the FATAL logs
-    healthcheck:
-      disable: true
-
-    entrypoint:
-      - sh
-      - -c
-      - |
-        set -e
-
-        if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
-          exec docker-entrypoint.sh postgres
-        fi
-
-        docker-entrypoint.sh postgres &
-        pid="$$!"
-
-        until pg_isready -U "$$POSTGRES_USER"; do
-          sleep 0.1
-        done
-
-        psql -v ON_ERROR_STOP=1 \
-             -U "$$POSTGRES_USER" \
-             -c "ALTER USER \"$$POSTGRES_USER\" WITH PASSWORD '$$POSTGRES_PASSWORD';"
-
-        wait "$$pid"
 
   minio:
     container_name: minio
     image: minio/minio:latest
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      MINIO_ROOT_USER: "${M_USR}"
+      MINIO_ROOT_PASSWORD: "${M_PWD}"
     command: server /data --console-address ":9090"
     ports:
-      - "9005:9000"
       - "9090:9090"
     networks:
       - app
-
-volumes:
-  m2-repo:
-  postgres-data:
 
 networks:
   app:

@@ -1,5 +1,5 @@
 // repo/DocumentMetaRepository.java
-package ru.mirea.dms.search.repo;
+package ru.mirea.dms.search.repository;
 
 import org.springframework.data.jpa.repository.*;
 import ru.mirea.dms.search.model.DocumentMeta;
