@@ -26,13 +26,13 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping("/")
+    @GetMapping(value = {"", "/"})
     public List<FileInfo> list(JwtAuthenticationToken auth) throws Exception {
         UUID userId = UUID.fromString(auth.getToken().getSubject());
         return fileService.listAll(userId);
     }
 
-    @PostMapping("/")
+    @PostMapping(value = {"", "/"})
     public FileInfo upload(JwtAuthenticationToken auth, @RequestParam("file") MultipartFile file) throws Exception {
         UUID userId = UUID.fromString(auth.getToken().getSubject());
         return fileService.upload(userId, file);
