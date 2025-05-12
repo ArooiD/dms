@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.dms.auth.dto.AuthDto;
 import ru.mirea.dms.auth.service.AuthService;
@@ -23,9 +22,9 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<Map<String, Object>> getAccessToken(@RequestBody AuthDto dto) {
+    public ResponseEntity<Map> getAccessToken(@RequestBody AuthDto dto) {
         try {
-            Map<String, Object> tokenResponse = authService.getAccessToken(dto.getUsername(), dto.getPassword());
+            Map tokenResponse = authService.getAccessToken(dto.getUsername(), dto.getPassword());
             return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
             logger.error(e.getMessage());
