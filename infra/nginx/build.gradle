@@ -1,0 +1,29 @@
+plugins {
+    id 'base'
+}
+
+tasks.register('bootDocker', Exec) {
+    group = 'application'
+    description = 'Запускает docker-compose сервис infra.nginx'
+    workingDir = file(rootDir)
+    commandLine = ['docker-compose', 'up', '-d', 'infra.nginx']
+    doFirst {
+        println "Запускаем docker-compose из: $workingDir"
+        println "Команда: ${commandLine.join(' ')}"
+    }
+}
+
+tasks.register('buildContainer', Exec) {
+    group = 'build'
+    description = 'Запускает docker-compose сервис infra.nginx'
+    workingDir = file(rootDir)
+    commandLine = ['docker-compose', 'build', 'infra.nginx']
+    doFirst {
+        println "Запускаем docker-compose из: $workingDir"
+        println "Команда: ${commandLine.join(' ')}"
+    }
+}
+
+tasks.named('bootDocker') {
+    dependsOn(tasks.named('buildContainer'))
+}

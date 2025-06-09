@@ -1,0 +1,138 @@
+name: "designvault_core"
+services:
+  core.gateway:
+    container_name: core.gateway
+    image: registry.istokmw.tech/designvault/core-gateway:latest
+    build: ../core/gateway
+    volumes:
+      - ../core/gateway:/app
+    ports:
+      - "8001:8000"
+    networks:
+      - designvault_network
+    restart: always
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+
+  core.identity:
+    container_name: core.identity
+    image: registry.istokmw.tech/designvault/core-identity:latest
+    build: ../core/identity
+    volumes:
+      - ../core/identity:/app
+    ports:
+      - "8002:8000"
+    networks:
+      - designvault_network
+    restart: always
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+
+  core.ocr:
+    container_name: core.ocr
+    image: registry.istokmw.tech/designvault/core-ocr:latest
+    build: ../core/ocr
+    volumes:
+      - ../core/ocr/app:/app
+    ports:
+      - "8003:8000"
+    networks:
+      - designvault_network
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+    healthcheck:
+      test: [ "CMD", "python", "healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+
+  core.search:
+    container_name: core.search
+    image: registry.istokmw.tech/designvault/core-search:latest
+    build: ../core/search
+    volumes:
+      - ../core/search:/app
+    ports:
+      - "8004:8000"
+    networks:
+      - designvault_network
+    restart: always
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+
+
+  core.storage:
+    container_name: core.storage
+    image: registry.istokmw.tech/designvault/core-storage:latest
+    build: ../core/storage
+    volumes:
+      - ../core/storage:/app
+    ports:
+      - "8005:8000"
+    networks:
+      - designvault_network
+    restart: always
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+#
+  core.transform:
+    container_name: core.transform
+    image: registry.istokmw.tech/designvault/core-transform:latest
+    build: ../core/transform
+    volumes:
+      - ../core/transform/app:/app
+    ports:
+      - "8006:8000"
+    networks:
+      - designvault_network
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+    healthcheck:
+      test: [ "CMD", "python", "healthcheck.py" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      infra.psql:
+        condition: service_healthy
+      infra.rabbitmq:
+        condition: service_healthy
+
+
+  core.web:
+    container_name: core.web
+    image: registry.istokmw.tech/designvault/core-web:latest
+    build: ../core/web
+    ports:
+      - "3000:3000"
+    networks:
+      - designvault_network
+    volumes:
+      - ../core/web/node_modules:/app/node_modules
+      - ../core/web/src:/app/src
+      - ../core/web/public:/app/public
+
+networks:
+  designvault_network:
+    name: designvault_network

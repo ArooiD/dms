@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'ru.mirea.designvault'
+version = '0.0.1'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-core:6.4.4'
+    implementation 'org.springframework.security:spring-security-config:6.3.5'
+    implementation 'org.springframework.security:spring-security-web:6.3.5'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:6.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'com.nimbusds:c2id-server-jwkset-gen:1.14'
+}
+
+springBoot {
+    mainClass = 'ru.mirea.designvault.gateway.GatewayApplication'
+}

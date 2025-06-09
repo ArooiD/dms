@@ -1,0 +1,4 @@
+name: "designvault"
+include:
+  - ./compose/infra.yml
+  - ./compose/core.yml

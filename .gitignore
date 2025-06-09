@@ -1,5 +1,3 @@
-/minio-data/
-/postgres-data/
 old
 node_modules
 .idea
@@ -8,3 +6,7 @@ deps
 data
 files
 target
+.gradle
+build
+.data
+infra/nginx/ssl/localhost

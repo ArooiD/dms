@@ -1,0 +1,133 @@
+name: "designvault_infra"
+services:
+  infra.nginx:
+    container_name: infra.nginx
+    image: registry.istokmw.tech/designvault/infra-nginx:latest
+    build: ../infra/nginx
+    environment:
+      - DOMAIN=$DOMAIN
+      - SSL=$USE_SSL
+    healthcheck:
+      test: [ "CMD", "curl", "-fsSLk", "https://localhost/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: always
+    depends_on:
+      - core.gateway
+      - core.web
+    volumes:
+      - ../infra/nginx/ssl/$DOMAIN/:/etc/ssl/
+      - ../infra/nginx/templates:/etc/nginx/templates
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - designvault_network
+
+  infra.psql:
+    container_name: infra.psql
+    image: registry.istokmw.tech/designvault/infra-psql:latest
+    build: ../infra/psql
+    environment:
+      POSTGRES_USER: ${DB_USR}
+      POSTGRES_PASSWORD: ${DB_PWD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: always
+    volumes:
+      - ../.data/psql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - designvault_network
+
+  infra.kcsql:
+    container_name: infra.kcsql
+    image: registry.istokmw.tech/designvault/infra-kcsql:latest
+    build: ../infra/kcsql
+    environment:
+      POSTGRES_USER: ${DB_USR}
+      POSTGRES_PASSWORD: ${DB_PWD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: always
+    volumes:
+      - ../.data/kcsql:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - designvault_network
+
+  infra.minio:
+    container_name: infra.minio
+    image: registry.istokmw.tech/designvault/infra-minio:latest
+    build: ../infra/minio
+    environment:
+      MINIO_ROOT_USER: ${M_USR}
+      MINIO_ROOT_PASSWORD: ${M_PWD}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: always
+    volumes:
+      - ../.data/minio:/data
+    ports:
+      - "9090:9090"
+    networks:
+      - designvault_network
+
+  infra.rabbitmq:
+    container_name: infra.rabbitmq
+    image: registry.istokmw.tech/designvault/infra-rabbitmq:latest
+    build: ../infra/rabbitmq
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: always
+    volumes:
+      - ../.data/rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - designvault_network
+
+  infra.keycloak:
+    container_name: infra.keycloak
+    image: registry.istokmw.tech/designvault/infra-keycloak:latest
+    build: ../infra/keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    healthcheck:
+      test: [ 'CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live' ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    depends_on:
+      infra.kcsql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - designvault_network
+
+networks:
+  designvault_network:
+    name: designvault_network

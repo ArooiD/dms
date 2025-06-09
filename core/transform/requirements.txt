@@ -1,0 +1,12 @@
+Flask
+fastapi
+starlette
+uvicorn[standard]
+sentence-transformers
+psycopg2-binary
+pika
+torch
+numpy
+watchgod
+pydantic
+httpx

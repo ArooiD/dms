@@ -1,0 +1,17 @@
+rootProject.name = 'DesignVault'
+
+
+include(":infra:nginx")
+include(":infra:psql")
+include(":infra:kcsql")
+include(":infra:minio")
+include(":infra:rabbitmq")
+include(":infra:keycloak")
+
+include(":core:gateway")
+include(":core:identity")
+include(":core:ocr")
+include(":core:search")
+include(":core:storage")
+include(":core:transform")
+include(":core:web")
