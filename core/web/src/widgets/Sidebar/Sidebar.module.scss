@@ -1,0 +1,22 @@
+
+
+.container {
+  padding: 0 16px 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+
+  .top {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .logo {
+      max-height: 48px;
+      height: 100%;
+      width: 100%;
+    }
+  }
+}

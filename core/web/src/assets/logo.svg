@@ -1,0 +1,15 @@
+<svg width="65" height="50" viewBox="0 0 65 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="14.5" y1="1" x2="14.5" y2="49" stroke="blue"/>
+    <line x1="14.2906" y1="25.4069" x2="0.290619" y2="35.4069" stroke="blue"/>
+    <line x1="13.6336" y1="49.3402" x2="0.633604" y2="35.3402" stroke="blue"/>
+    <line x1="25.5" y1="2.18557e-08" x2="25.5" y2="49" stroke="blue"/>
+    <line x1="24.7519" y1="4.56588" x2="31.7519" y2="0.565878" stroke="blue"/>
+    <line x1="32.5" y1="1" x2="32.5" y2="49" stroke="blue"/>
+    <line x1="31.7764" y1="4.55279" x2="39.7764" y2="0.552786" stroke="blue"/>
+    <line x1="40.5" y1="1" x2="40.5" y2="49" stroke="blue"/>
+    <line x1="64" y1="1.5" x2="48" y2="1.5" stroke="blue"/>
+    <line x1="48.5" y1="1" x2="48.5" y2="22" stroke="blue"/>
+    <line x1="48" y1="21.5" x2="64" y2="21.5" stroke="blue"/>
+    <line x1="64.5" y1="22" x2="64.5" y2="49" stroke="blue"/>
+    <line x1="64" y1="49.5" x2="48" y2="49.5" stroke="blue"/>
+</svg>
