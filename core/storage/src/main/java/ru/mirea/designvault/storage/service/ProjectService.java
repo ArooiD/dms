@@ -1,6 +1,7 @@
 package ru.mirea.designvault.storage.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mirea.designvault.storage.dto.ProjectDto;
 import ru.mirea.designvault.storage.model.Project;
 import ru.mirea.designvault.storage.repository.ProjectRepository;
@@ -31,6 +32,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional
     public Object deleteProject(UUID uid, UUID pid) {
         return projectRepository.deleteProjectByPidAndUid(pid, uid);
     }
