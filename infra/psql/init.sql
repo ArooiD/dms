@@ -37,6 +37,6 @@ ALTER TABLE ONLY public.ocr_text
 
 CREATE INDEX idx_docmeta_fts ON public.document_meta USING btree (fts);
 
-CREATE EXTENSION IF NOT EXISTS vector;
+-- CREATE EXTENSION IF NOT EXISTS vector;
 
 SELECT 'init.sql is executed'
