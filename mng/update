@@ -1,8 +1,7 @@
 #!/bin/bash
 cd /opt/dv
 
-git fetch origin
-git reset --hard origin/dev
+git pull
 
 chmod +x /opt/dvmng/*
 cd core
