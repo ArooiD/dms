@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ProjectService {
     private final RestTemplate restTemplate;
@@ -24,12 +26,12 @@ public class ProjectService {
 
 
     public List<Object> getProjects(UUID uuid) {
+        log.info("Get projects for user {}", uuid);
         URI uri = UriComponentsBuilder
                 .fromPath("/projects/private")
                 .queryParam("uid", uuid)
                 .build()
                 .toUri();
-        List response = restTemplate.getForObject(uri, List.class);
-        return response;
+        return restTemplate.getForObject(uri, List.class);
     }
 }
