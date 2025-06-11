@@ -33,7 +33,7 @@ public class ProjectController {
 
     @GetMapping
     public ProjectInfoDto getProjectInfo() {
-
+        return null;
     }
 
 
