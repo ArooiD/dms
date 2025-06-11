@@ -20,5 +20,6 @@ public class Project {
     private String description;
     private Instant created;
     private Instant modified;
+    private Integer count;
     private String access;
 }
