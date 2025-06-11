@@ -46,7 +46,7 @@ public class ProjectController {
 
     @GetMapping("{slug}/documents")
     public List<Document> getProjectDocument(@PathVariable("slug") String slug) {
-        return new ArrayList<>();
+        return projectService.getProjectDocument(slug);
     }
 
 

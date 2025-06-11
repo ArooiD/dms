@@ -17,4 +17,6 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     Project deleteProjectByPidAndUid(UUID pid, UUID uid);
 
     Project findProjectByPidAndUid(UUID pid, UUID uid);
+
+    Project getProjectBySlug(String slug);
 }
