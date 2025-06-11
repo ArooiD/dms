@@ -1,32 +1,58 @@
 import {theme} from "antd";
 
 
+const COLOR_PALETTE = [
+    '#ffe5ff',
+    '#ebcdfd',
+    '#d3b5e5',
+    '#bb9dcd',
+    '#a385b5',
+    '#200232',
+    '#130025'
+]
+
 const THEME_LIGHT = {
     algorithm: theme.defaultAlgorithm,
     cssVar: true,
     token: {
-        colorTextBase: 'rgb(11,11,12)',
-        bodyBg: 'rgb(245,245,245)',
-        colorBgContainer: 'rgb(255,255,255)',
-        colorPrimaryBg: 'rgb(224,229,240)',
+
     },
     components: {
-        Sider: {
-
-        },
-        Header: {
-
-        },
         Layout: {
-            bodyBg: '#F0F4F7',
-            colorBgContainer: '#ffffff',
-            colorBgElevated: '#f5f5f5',
+            colorBgBase: COLOR_PALETTE[2],
+            colorBgElevated: COLOR_PALETTE[2],
+            siderBg: COLOR_PALETTE[2],
+            headerBg: COLOR_PALETTE[3],
+            bodyBg: COLOR_PALETTE[4],
             algorithm: true,
         },
-        Content: {
-            bodyBg: '#FFFFFF',
+        Button: {
+            colorBgContainer: COLOR_PALETTE[3],
+            defaultBorderColor: COLOR_PALETTE[4],
+            defaultHoverBorderColor: COLOR_PALETTE[1],
+            defaultHoverColor: COLOR_PALETTE[0],
+            colorPrimary: COLOR_PALETTE[1],
+            colorPrimaryActive: COLOR_PALETTE[6],
+            colorPrimaryHover: COLOR_PALETTE[4],
+            algorithm: true,
         },
+        Input: {
+            colorBgContainer: COLOR_PALETTE[3],
+            hoverBorderColor: COLOR_PALETTE[1],
+            algorithm: true,
+        },
+        Modal: {
+            headerBg: COLOR_PALETTE[3],
+            contentBg: COLOR_PALETTE[3],
+            algorithm: true,
+        }
     }
 }
+
+// #ffe5ff
+// #ebcdfd
+// #d3b5e5
+// #bb9dcd
+// #a385b5
 
 export default THEME_LIGHT

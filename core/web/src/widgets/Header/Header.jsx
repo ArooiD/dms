@@ -1,9 +1,11 @@
 
 import h from './Header.module.scss'
-import {Button, Flex, Input} from "antd";
+import {Button, Flex, Input, Typography, Layout} from "antd";
 import {useStores} from "../../utils/hooks/useStores.js";
 import {MoonOutlined, QuestionOutlined, SunOutlined} from "@ant-design/icons";
 import {observer} from "mobx-react-lite";
+import ModalQuestion from "../../components/ModalQuestion/ModalQuestion.jsx";
+import {useState} from "react";
 
 const Header = observer(() => {
     const {
@@ -14,26 +16,37 @@ const Header = observer(() => {
         }
     } = useStores()
 
+    const [openModalQuestion, setOpenModalQuestion] = useState(false)
+    const handleCloseModalQuestion = () => { setOpenModalQuestion(false) }
+
     return (
-        <header className={h.container}>
+        <Layout.Header className={h.container}>
             <Flex>
-                {HEADER_TITLE}
+                <Typography.Text style={{fontWeight: '500', fontSize: '20px'}}>{HEADER_TITLE}</Typography.Text>
             </Flex>
-            <Flex>
-                <Input placeholder={'Поиск'} />
+            <Flex style={{position: 'absolute', left: '50%', transform: 'translate(-50%,0)'}}>
+                <Input size={'large'} placeholder={'Поиск'} />
             </Flex>
             <Flex gap={'small'}>
                 <Button
+                    size={'large'}
                     icon={<QuestionOutlined />}
+                    onClick={() => { setOpenModalQuestion(true) }}
                 />
                 <Button
+                    size={'large'}
                     onClick={() => {
                         toggleTheme()
                     }}
                     icon={IS_THEME_DARK ? <MoonOutlined /> : <SunOutlined />}
                 />
             </Flex>
-        </header>
+
+            <ModalQuestion
+                callback_open={openModalQuestion}
+                callback_close={handleCloseModalQuestion}
+            />
+        </Layout.Header>
     )
 })
 

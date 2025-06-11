@@ -1,0 +1,102 @@
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  background-size: 100% 100%;
+  //background: radial-gradient(circle,rgba(235, 205, 253, 1) 0%, rgba(163, 133, 181, 1) 20%, rgba(115, 85, 133, 1) 35%, rgba(91, 61, 109, 1) 50%, rgba(67, 37, 85, 1) 65%, rgba(32, 2, 50, 1) 80%, rgba(19, 0, 37, 1) 100%);
+  background: radial-gradient(
+                  circle,
+                  rgba(19, 0, 37, 1) 0%,
+                  rgba(32, 2, 50, 1) 20%,
+                  rgba(67, 37, 85, 1) 35%,
+                  rgba(91, 61, 109, 1) 50%,
+                  rgba(115, 85, 133, 1) 65%,
+                  rgba(163, 133, 181, 1) 80%,
+                  rgba(235, 205, 253, 1) 100%
+  ) no-repeat center center;
+  animation: breathe 10s ease-in-out infinite;
+  overflow: clip;
+
+  @keyframes breathe {
+    0%, 100% {
+      background-size: 100% 100%;
+      opacity: 1;
+      background-position: center;
+    }
+    50% {
+      background-size: 150% 150%;
+      opacity: 0.8;
+      background-position: center;
+    }
+  }
+
+  .body {
+    $r: 200;
+    $g: 200;
+    $b: 200;
+
+    width: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    padding: 24px;
+    border-radius: 8px;
+    //backdrop-filter: blur(1px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 10px 1px rgba(255,255,255,0.01);
+    //background:
+    //        radial-gradient(
+    //                        circle,
+    //                        rgba(161, 174, 240, 1) 0%,
+    //                        rgba(128, 121, 232, 1) 50%,
+    //                        rgba(154, 115, 255, 1) 100%
+    //        );
+    //background-color: rgba($r, $g, $b, 0.45);
+    //border: 2px solid rgba($r, $g, $b, 0.2);
+    //box-shadow: 0 0 10px 1px rgba($r, $g, $b, 0.05);
+
+    .Form {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      gap: 8px;
+
+      .FormItem {
+        label {
+          color: white;
+        }
+        input {
+          background: transparent;
+          color: white;
+
+          &:hover {
+            border-color: rgba(255,255,255,0.4)
+          }
+        }
+        :global {
+          .ant-input-password {
+            background: transparent;
+
+            & svg {
+              fill: white;
+            }
+          }
+        }
+      }
+
+      //* {
+      //  color: white;
+      //}
+    }
+  }
+}

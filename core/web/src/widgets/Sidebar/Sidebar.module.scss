@@ -1,11 +1,22 @@
 
 
 .container {
-  padding: 0 16px 24px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   justify-content: space-between;
+  min-width: 240px;
+  max-width: 240px;
+  width: 100%;
+
+  .body {
+    padding: 8px 16px 24px 16px;
+    height: 100%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
 
   .top {
     height: 100%;
@@ -17,6 +28,17 @@
       max-height: 48px;
       height: 100%;
       width: 100%;
+    }
+
+    .projectButton {
+      justify-content: flex-start;
+
+      & > span {
+        text-overflow: ellipsis;
+        overflow: clip;
+        width: 100%;
+        text-align: left;
+      }
     }
   }
 }

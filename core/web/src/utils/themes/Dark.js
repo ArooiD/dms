@@ -1,32 +1,50 @@
 import {theme} from "antd";
 
 
+const COLOR_PALETTE = [
+    '#ebcdfd',
+    '#a385b5',
+    '#735585',
+    '#5b3d6d',
+    '#432555',
+    '#200232',
+    '#130025'
+]
+
 const THEME_DARK = {
     algorithm: theme.darkAlgorithm,
     cssVar: true,
     token: {
-        colorTextBase: 'rgb(250,250,251)',
-        bodyBg: 'rgb(10,22,34)',
-        colorBgContainer: 'rgb(8,26,45)',
-        colorPrimaryBg: 'rgb(8,26,45)',
+
     },
     components: {
-        Sider: {
-
-        },
-        Header: {
-
-        },
         Layout: {
-            bodyBg: '#0a1622',
-            colorBgBase: '#0a1622',
-            colorBgElevated: '#081a2d',
+            colorBgBase: COLOR_PALETTE[2],
+            colorBgElevated: COLOR_PALETTE[2],
+            siderBg: COLOR_PALETTE[2],
+            headerBg: COLOR_PALETTE[3],
+            bodyBg: COLOR_PALETTE[4],
             algorithm: true,
         },
-        Content: {
-            bodyBg: '#FFFFFF',
-            colorBgBase: '#FFFFFF',
-            colorBgElevated: '#FFFFFF',
+        Button: {
+            colorBgContainer: COLOR_PALETTE[3],
+            defaultBorderColor: COLOR_PALETTE[4],
+            defaultHoverBorderColor: COLOR_PALETTE[1],
+            defaultHoverColor: COLOR_PALETTE[0],
+            colorPrimary: COLOR_PALETTE[1],
+            colorPrimaryActive: COLOR_PALETTE[6],
+            colorPrimaryHover: COLOR_PALETTE[4],
+            algorithm: true,
+        },
+        Input: {
+            colorBgContainer: COLOR_PALETTE[3],
+            hoverBorderColor: COLOR_PALETTE[1],
+            algorithm: true,
+        },
+        Modal: {
+            headerBg: COLOR_PALETTE[3],
+            contentBg: COLOR_PALETTE[3],
+            algorithm: true,
         }
     }
 }

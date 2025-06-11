@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_DOMAIN=https://dv.istokmw.tech vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -13,6 +13,8 @@
     "@ant-design/icons": "^6.0.0",
     "@fontsource/roboto": "^5.2.6",
     "antd": "^5.25.4",
+    "cross-env": "^7.0.3",
+    "jwt-decode": "^4.0.0",
     "mobx": "^6.13.7",
     "mobx-react-lite": "^4.1.0",
     "react": "^19.1.0",
