@@ -32,6 +32,10 @@ public class ProjectService {
                 List.class,
                 uid
         );
-        return response;
+
+        return ResponseDto.builder()
+                .count(response.size())
+                .resultSet(response)
+                .build();
     }
 }

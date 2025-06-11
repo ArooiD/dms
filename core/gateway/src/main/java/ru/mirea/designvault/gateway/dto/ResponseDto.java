@@ -11,5 +11,5 @@ import java.util.List;
 public class ResponseDto {
     private int count;
     @Builder.Default
-    private List<ResultItemDto> resultSet = new ArrayList<>();
+    private List<Object> resultSet = new ArrayList<>();
 }
