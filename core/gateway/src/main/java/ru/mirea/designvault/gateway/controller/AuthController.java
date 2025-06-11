@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,8 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<Map> login(@RequestBody AuthDto dto) {
-        return ResponseEntity.ok(authService.getToken(dto));
+    public ResponseEntity<Map> login(HttpSession session, @RequestBody AuthDto dto) {
+        Map token = authService.getToken(dto);
+        return ResponseEntity.ok(token);
     }
 }

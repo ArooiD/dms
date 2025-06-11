@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_DOMAIN=https://dv.istokmw.tech vite",
+    "local": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_DOMAIN=https://dv.istokmw.tech vite",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
