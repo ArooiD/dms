@@ -48,4 +48,14 @@ public class ProjectService {
                 uid
         );
     }
+
+    public Object deleteProject(UUID uid, UUID pid) {
+        restTemplate.delete(
+                "/projects?uid={uid}&pid={pid}",
+                uid,
+                pid
+        );
+        return true;
+    }
+
 }

@@ -30,4 +30,8 @@ public class ProjectService {
         project.setPid(UUID.randomUUID());
         return projectRepository.save(project);
     }
+
+    public Object deleteProject(UUID uid, UUID pid) {
+        return projectRepository.deleteProjectByPidAndUid(pid, uid);
+    }
 }

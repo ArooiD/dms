@@ -29,6 +29,11 @@ public class ProjectController {
         return projectService.createProject(uid, dto);
     }
 
+    @DeleteMapping
+    public Object deleteProject(@RequestParam("uid") UUID uid, @RequestParam("pid") UUID pid) {
+        return projectService.deleteProject(uid, pid);
+    }
+
     @GetMapping("shared")
     public List<Project> getSharedProjects(@RequestParam("uid") UUID uid) {
         return new ArrayList<>();

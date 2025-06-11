@@ -13,4 +13,6 @@ import java.util.UUID;
 public interface ProjectRepository extends CrudRepository<Project, UUID> {
 
     List<Project> findProjectByUidAndAccess(UUID uid, String access);
+
+    Object deleteProjectByPidAndUid(UUID pid, UUID uid);
 }
