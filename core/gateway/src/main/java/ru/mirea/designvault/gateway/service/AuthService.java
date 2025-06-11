@@ -19,6 +19,6 @@ public class AuthService {
     }
 
     public Map getToken(AuthDto dto){
-        return restTemplate.postForObject("token", dto, Map.class);
+        return restTemplate.postForObject("/token", dto, Map.class);
     }
 }
