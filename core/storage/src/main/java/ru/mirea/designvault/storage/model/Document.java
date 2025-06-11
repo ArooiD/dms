@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import ru.mirea.designvault.storage.key.DocumentId;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -26,4 +27,10 @@ public class Document {
     private String filename;
     @Column(name = "ext")
     private String ext;
+    @Column(name = "version")
+    private Integer version;
+    @Column(name = "created")
+    private Instant created;
+    @Column(name = "modified")
+    private Instant modified;
 }
