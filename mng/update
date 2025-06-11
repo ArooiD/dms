@@ -3,6 +3,6 @@ cd /opt/dv
 
 git pull
 
-chmod +x /opt/dvmng/*
+chmod +x /opt/dv/mng/*
 cd core
 gradle classes
