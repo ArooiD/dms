@@ -3,6 +3,7 @@ package ru.mirea.designvault.storage.controller;
 import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.Project;
+import ru.mirea.designvault.storage.service.ProjectService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,15 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/projects") // базовый путь
 public class ProjectController {
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
     @GetMapping("private")
     public List<Project> getPrivateProjects(@RequestParam("uid") UUID uid) {
-        return new ArrayList<>();
+        return projectService.getAllProjects(uid);
     }
 
     @GetMapping("shared")
