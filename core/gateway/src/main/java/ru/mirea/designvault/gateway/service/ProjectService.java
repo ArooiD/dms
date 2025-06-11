@@ -25,11 +25,11 @@ public class ProjectService {
     }
 
 
-    public List<Object> getProjects(UUID uuid) {
-        log.info("Get projects for user {}", uuid);
+    public List<Object> getProjects(UUID uid) {
+        log.info("Get projects for user {}", uid);
         URI uri = UriComponentsBuilder
                 .fromPath("/projects/private")
-                .queryParam("uid", uuid)
+                .queryParam("uid", uid)
                 .build()
                 .toUri();
         return restTemplate.getForObject(uri, List.class);
