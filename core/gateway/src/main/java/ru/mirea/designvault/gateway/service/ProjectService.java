@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.mirea.designvault.gateway.dto.DocumentDto;
 import ru.mirea.designvault.gateway.dto.ProjectDto;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 
@@ -65,6 +66,16 @@ public class ProjectService {
                 ProjectDto.class,
                 uid,
                 pid
+        );
+        return response.getBody();
+    }
+
+    public List<DocumentDto> getProjectDtoDocument(String slug, UUID uid) {
+        ResponseEntity<List> response = restTemplate.getForEntity(
+                "/projects/{slug}?uid={uid}",
+                List.class,
+                slug,
+                uid
         );
         return response.getBody();
     }
