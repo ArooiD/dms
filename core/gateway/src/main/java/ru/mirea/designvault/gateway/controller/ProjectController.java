@@ -21,7 +21,7 @@ public class ProjectController {
     }
 
     @GetMapping()
-    public List<Object> getAllProjects(@AuthenticationPrincipal Jwt token) {
+    public ResponseDto getAllProjects(@AuthenticationPrincipal Jwt token) {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
     }
 }

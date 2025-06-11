@@ -25,7 +25,7 @@ public class ProjectService {
     }
 
 
-    public List<Object> getProjects(UUID uid) {
+    public ResponseDto getProjects(UUID uid) {
         log.info("Get projects for user {}", uid);
         List<Object> response = restTemplate.getForObject(
                 "/projects/private?uid={uid}",
