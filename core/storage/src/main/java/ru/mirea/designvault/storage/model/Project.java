@@ -15,6 +15,9 @@ public class Project {
     @Id
     private UUID pid;
     private UUID uid;
+    private String slug;
+    private String name;
+    private String description;
     private Instant created;
     private Instant modified;
     private String access;
