@@ -5,7 +5,7 @@ services:
     image: registry.istokmw.tech/designvault/infra-nginx:latest
     build: ../infra/nginx
     environment:
-      DOMAIN: $DOMAIN
+      DOMAIN_NAME: $DOMAIN
       SSL: $USE_SSL
     healthcheck:
       test: [ "CMD", "curl", "-fsSLk", "https://localhost/health" ]
