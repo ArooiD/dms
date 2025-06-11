@@ -21,6 +21,7 @@ public class ProjectService {
         return projectRepository.findProjectByUidAndAccess(uid, "private");
     }
 
+    @Transactional
     public Object createProject(UUID uid, ProjectDto dto) {
         Project project = new Project();
         project.setUid(uid);
