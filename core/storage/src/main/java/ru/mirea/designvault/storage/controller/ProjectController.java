@@ -44,17 +44,8 @@ public class ProjectController {
         return new ArrayList<>();
     }
 
-    @GetMapping("/{pid}/documents")
-    public List<Document> getProjectDocument(
-            @PathVariable("pid") UUID pid
-    ) {
-        return new ArrayList<>();
-    }
-
     @GetMapping("{slug}/documents")
-    public List<Document> getProjectDocument(
-            @PathVariable("slug") String slug
-    ) {
+    public List<Document> getProjectDocument(@PathVariable("slug") String slug) {
         return new ArrayList<>();
     }
 
