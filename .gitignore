@@ -9,4 +9,4 @@ target
 .gradle
 build
 .data
-infra/nginx/ssl/localhost
+localhost
