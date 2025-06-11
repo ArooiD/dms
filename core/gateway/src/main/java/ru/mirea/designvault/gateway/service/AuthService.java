@@ -14,7 +14,7 @@ public class AuthService {
 
     public AuthService(RestTemplateBuilder builder) {
         this.restTemplate = builder
-                .rootUri("http://core.identity:8080")
+                .rootUri("http://core.identity:8000")
                 .build();
     }
 
