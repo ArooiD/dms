@@ -27,11 +27,11 @@ public class ProjectService {
 
     public List<Object> getProjects(UUID uid) {
         log.info("Get projects for user {}", uid);
-        URI uri = UriComponentsBuilder
-                .fromPath("/projects/private")
-                .queryParam("uid", uid)
-                .build()
-                .toUri();
-        return restTemplate.getForObject(uri, List.class);
+        List<Object> response = restTemplate.getForObject(
+                "/projects/private?uid={uid}",
+                List.class,
+                uid
+        );
+        return response;
     }
 }
