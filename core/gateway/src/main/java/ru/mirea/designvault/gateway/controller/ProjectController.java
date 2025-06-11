@@ -24,6 +24,11 @@ public class ProjectController {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
     }
 
+    @GetMapping("{pid}")
+    public ProjectDto getProjectById(@AuthenticationPrincipal Jwt token, @PathVariable("pid") UUID pid) {
+        return projectService.getProject(UUID.fromString(token.getSubject()), pid);
+    }
+
     @PostMapping()
     public Object createProject(@AuthenticationPrincipal Jwt token, @RequestBody ProjectDto project) {
         return projectService.createProject(UUID.fromString(token.getSubject()), project);

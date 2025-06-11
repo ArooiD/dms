@@ -2,6 +2,7 @@ package ru.mirea.designvault.gateway.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -58,4 +59,13 @@ public class ProjectService {
         return true;
     }
 
+    public ProjectDto getProject(UUID uid, UUID pid) {
+        ResponseEntity<ProjectDto> response = restTemplate.getForEntity(
+                "/projects?uid={uid}&pid={pid}",
+                ProjectDto.class,
+                uid,
+                pid
+        );
+        return response.getBody();
+    }
 }

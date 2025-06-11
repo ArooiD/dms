@@ -24,6 +24,11 @@ public class ProjectController {
         return projectService.getAllProjects(uid);
     }
 
+    @GetMapping("{pid}")
+    public Project getProject(@PathVariable("pid") UUID pid, @RequestParam("uid") UUID uid) {
+        return projectService.getProject(pid, uid);
+    }
+
     @PostMapping()
     public Object createProject(@RequestParam("uid") UUID uid, @RequestBody ProjectDto dto) {
         return projectService.createProject(uid, dto);

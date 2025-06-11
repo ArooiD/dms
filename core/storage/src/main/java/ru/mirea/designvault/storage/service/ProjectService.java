@@ -37,4 +37,8 @@ public class ProjectService {
     public Object deleteProject(UUID uid, UUID pid) {
         return projectRepository.deleteProjectByPidAndUid(pid, uid);
     }
+
+    public Project getProject(UUID pid, UUID uid) {
+        return projectRepository.findProjectByPidAndUid(pid, uid);
+    }
 }
