@@ -42,7 +42,7 @@ public class ProjectService {
 
     public Object createProject(UUID uid, ProjectDto project) {
         return restTemplate.postForObject(
-                "/projects/private?uid={uid}",
+                "/projects?uid={uid}",
                 project,
                 Object.class,
                 uid
