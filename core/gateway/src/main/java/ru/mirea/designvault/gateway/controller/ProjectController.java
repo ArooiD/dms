@@ -31,8 +31,8 @@ public class ProjectController {
         return projectService.getProject(UUID.fromString(token.getSubject()), pid);
     }
 
-    @GetMapping
-    public ProjectInfoDto getProjectInfo() {
+    @GetMapping("{slug}/info")
+    public ProjectInfoDto getProjectInfo(@AuthenticationPrincipal Jwt token, @PathVariable("slug") String slug) {
         return null;
     }
 
