@@ -28,7 +28,8 @@ const LoginPage = observer(() => {
 
     const performLogin = (values) => {
         setStatus('pending')
-        fetch(`${import.meta.env.VITE_DOMAIN}/api/auth/login`, {
+        const externalHost = import.meta.env.VITE_DOMAIN;
+        fetch(`/api/auth/login`, {
             method: 'POST',
             body: JSON.stringify(values),
             headers: {
