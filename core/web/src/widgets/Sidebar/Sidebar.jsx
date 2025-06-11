@@ -35,8 +35,8 @@ const Sidebar = observer(() => {
 
     useEffect(() => {
         setIsPending(true)
-
-        fetch(`${import.meta.env.VITE_DOMAIN}/api/project`, {
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        fetch(`${externalHost}/api/project`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${getToken()}`

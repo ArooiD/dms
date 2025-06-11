@@ -13,7 +13,7 @@ function transformFolders(fileList) {
     function findOrCreateFolder(folders, folderName) {
         let folder = folders.find(item => item.slug === folderName && item.isFolder);
         if (!folder) {
-            folder = { slug: folderName, isFolder: true, files: [], folders: [] };
+            folder = {slug: folderName, isFolder: true, files: [], folders: []};
             folders.push(folder);
         }
         return folder;
@@ -36,7 +36,7 @@ function transformFolders(fileList) {
 }
 
 const ProjectBrowserPage = observer(() => {
-    const { project_id } = useParams()
+    const {project_id} = useParams()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -48,9 +48,8 @@ const ProjectBrowserPage = observer(() => {
 
     const updateProject = () => {
         setIsPending(true)
-
-
-        fetch(`${import.meta.env.VITE_DOMAIN}/api/project/${project_id}/info`, {
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        fetch(`${externalHost}/api/project/${project_id}/info`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${getToken()}`
@@ -66,7 +65,7 @@ const ProjectBrowserPage = observer(() => {
                 console.log(res)
                 setProjectInfo(res)
 
-                fetch(`${import.meta.env.VITE_DOMAIN}/api/project/${project_id}/documents`, {
+                fetch(`${externalHost}/api/project/${project_id}/documents`, {
                     method: 'GET',
                     headers: {
                         authorization: `Bearer ${getToken()}`
@@ -97,9 +96,7 @@ const ProjectBrowserPage = observer(() => {
     }, [location])
 
     const {
-        systemStore: {
-
-        },
+        systemStore: {},
         userStore: {
             logout,
             getToken
@@ -129,7 +126,7 @@ const ProjectBrowserPage = observer(() => {
     }, [projectDocuments])
 
     useEffect(() => {
-        console.log('table => ',tableDocuments)
+        console.log('table => ', tableDocuments)
     }, [tableDocuments])
 
     useEffect(() => {
@@ -170,7 +167,8 @@ const ProjectBrowserPage = observer(() => {
             </Flex>
             <Flex vertical className={bbp.body} gap={'small'}>
                 <Flex gap={'small'} className={bbp.body_contentHeader}>
-                    <Button onClick={() => goUp()} size={'large'} className={bbp.contentHeader__backButton} icon={<ArrowLeftOutlined />} />
+                    <Button onClick={() => goUp()} size={'large'} className={bbp.contentHeader__backButton}
+                            icon={<ArrowLeftOutlined/>}/>
                     <Flex className={bbp.containerHeader_pathBlock}>
                         <Breadcrumb
                             items={projectPath.map((item) => ({
@@ -179,7 +177,7 @@ const ProjectBrowserPage = observer(() => {
                                 }}>{item.title}</Typography.Text>,
                             }))}
                         />
-                        <Button icon={<CopyOutlined />} className={bbp.pathBlock__copyPathButton} />
+                        <Button icon={<CopyOutlined/>} className={bbp.pathBlock__copyPathButton}/>
                     </Flex>
                     <Button size={'large'}>Создать директорию</Button>
                 </Flex>
@@ -205,9 +203,9 @@ const ProjectBrowserPage = observer(() => {
                             {
                                 key: 'checkbox',
                                 dataIndex: 'checkbox',
-                                title: <Checkbox />,
-                                render: (_,record) => (
-                                    <Checkbox />
+                                title: <Checkbox/>,
+                                render: (_, record) => (
+                                    <Checkbox/>
                                 )
                             },
                             {
@@ -216,7 +214,7 @@ const ProjectBrowserPage = observer(() => {
                                 title: 'Наименование',
                                 render: (name, record) => (
                                     <Flex gap={'small'}>
-                                        {record.isFolder ? <FolderOutlined /> : <FileOutlined />}
+                                        {record.isFolder ? <FolderOutlined/> : <FileOutlined/>}
                                         <Typography.Text>{name}{record.isFolder ? '' : `.${record.ext}`}</Typography.Text>
                                     </Flex>
                                 )
