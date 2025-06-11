@@ -10,3 +10,4 @@ target
 build
 .data
 localhost
+__pycache__
