@@ -1,16 +1,35 @@
 package ru.mirea.designvault.gateway.service;
 
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class ProjectService {
+    private final RestTemplate restTemplate;
 
-    public ResponseDto getProjects(UUID uuid) {
+
+    public ProjectService(RestTemplateBuilder builder) {
+        this.restTemplate = builder
+                .rootUri("http://core.storage:8000")
+                .build();
+    }
 
 
-        return ResponseDto.builder().build();
+    public List<Object> getProjects(UUID uuid) {
+        URI uri = UriComponentsBuilder
+                .fromPath("/projects/private")
+                .queryParam("uid", uuid)
+                .build()
+                .toUri();
+        List response = restTemplate.getForObject(uri, List.class);
+        return response;
     }
 }

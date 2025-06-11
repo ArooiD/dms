@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 import ru.mirea.designvault.gateway.service.ProjectService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,7 +21,7 @@ public class ProjectController {
     }
 
     @GetMapping()
-    public ResponseDto getAllProjects(@AuthenticationPrincipal Jwt token) {
+    public List<Object> getAllProjects(@AuthenticationPrincipal Jwt token) {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
     }
 }
