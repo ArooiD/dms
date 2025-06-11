@@ -10,6 +10,7 @@ services:
       - "8001:8000"
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
+    env_file: ../.env
     networks:
       - designvault_network
     restart: always
@@ -29,6 +30,7 @@ services:
       - "8002:8000"
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
+    env_file: ../.env
     networks:
       - designvault_network
     restart: always
@@ -50,6 +52,7 @@ services:
       - designvault_network
     environment:
       - PYTHONUNBUFFERED=1
+    env_file: ../.env
     restart: always
     healthcheck:
       test: [ "CMD", "python", "healthcheck.py" ]
@@ -69,6 +72,9 @@ services:
     build: ../core/search
     volumes:
       - ../core/search:/app
+    env_file: ../.env
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
     ports:
       - "8004:8000"
     networks:
@@ -87,6 +93,7 @@ services:
     build: ../core/storage
     volumes:
       - ../core/storage:/app
+    env_file: ../.env
     ports:
       - "8005:8000"
     environment:
