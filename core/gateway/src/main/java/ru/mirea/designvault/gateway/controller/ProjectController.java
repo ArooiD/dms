@@ -2,9 +2,8 @@ package ru.mirea.designvault.gateway.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.mirea.designvault.gateway.dto.ProjectDto;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 import ru.mirea.designvault.gateway.service.ProjectService;
 
@@ -23,5 +22,10 @@ public class ProjectController {
     @GetMapping()
     public ResponseDto getAllProjects(@AuthenticationPrincipal Jwt token) {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
+    }
+
+    @PostMapping()
+    public Object createProject(@AuthenticationPrincipal Jwt token, @RequestBody ProjectDto project) {
+        return projectService.createProject(UUID.fromString(token.getSubject()), project);
     }
 }

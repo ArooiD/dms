@@ -1,6 +1,7 @@
 package ru.mirea.designvault.storage.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.mirea.designvault.storage.dto.ProjectDto;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.Project;
 import ru.mirea.designvault.storage.service.ProjectService;
@@ -21,6 +22,11 @@ public class ProjectController {
     @GetMapping("private")
     public List<Project> getPrivateProjects(@RequestParam("uid") UUID uid) {
         return projectService.getAllProjects(uid);
+    }
+
+    @PostMapping()
+    public Object createProject(@RequestParam("uid") UUID uid, @RequestBody ProjectDto dto) {
+        return projectService.createProject(uid, dto);
     }
 
     @GetMapping("shared")

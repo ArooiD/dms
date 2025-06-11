@@ -5,6 +5,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.mirea.designvault.gateway.dto.ProjectDto;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 
 import java.net.URI;
@@ -37,5 +38,14 @@ public class ProjectService {
                 .count(response.size())
                 .resultSet(response)
                 .build();
+    }
+
+    public Object createProject(UUID uid, ProjectDto project) {
+        return restTemplate.postForObject(
+                "/projects/private?uid={uid}",
+                project,
+                Object.class,
+                uid
+        );
     }
 }
