@@ -73,10 +73,9 @@ public class ProjectService {
 
     public List<DocumentDto> getProjectDtoDocument(String slug, UUID uid) {
         ResponseEntity<List> response = restTemplate.getForEntity(
-                "/projects/{slug}?uid={uid}",
+                "/projects/{slug}/documents",
                 List.class,
-                slug,
-                uid
+                slug
         );
         return response.getBody();
     }
