@@ -13,7 +13,6 @@ public class MinioConfig {
     private String accessKey;
     @Value("${minio.secret-key}")
     private String secretKey;
-
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();

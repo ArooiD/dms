@@ -1,0 +1,14 @@
+#!/bin/bash
+cd /opt/dv
+
+if [ -n "$1" ]; then
+  PREFIX="$1"
+  SERVICES=$(docker compose ps --services | grep "^${PREFIX}")
+  if [ -z "$SERVICES" ]; then
+    echo "No services found starting with '${PREFIX}'"
+    exit 1
+  fi
+  docker compose logs -f $SERVICES
+else
+  docker compose logs -f
+fi

@@ -8,6 +8,9 @@ services:
       - ../core/gateway:/app
     ports:
       - "8001:8000"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
+    env_file: ../.env
     networks:
       - designvault_network
     restart: always
@@ -25,6 +28,9 @@ services:
       - ../core/identity:/app
     ports:
       - "8002:8000"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
+    env_file: ../.env
     networks:
       - designvault_network
     restart: always
@@ -46,6 +52,7 @@ services:
       - designvault_network
     environment:
       - PYTHONUNBUFFERED=1
+    env_file: ../.env
     restart: always
     healthcheck:
       test: [ "CMD", "python", "healthcheck.py" ]
@@ -65,6 +72,9 @@ services:
     build: ../core/search
     volumes:
       - ../core/search:/app
+    env_file: ../.env
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
     ports:
       - "8004:8000"
     networks:
@@ -83,8 +93,11 @@ services:
     build: ../core/storage
     volumes:
       - ../core/storage:/app
+    env_file: ../.env
     ports:
       - "8005:8000"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport -XX:+UseSerialGC"
     networks:
       - designvault_network
     restart: always
@@ -93,7 +106,7 @@ services:
         condition: service_healthy
       infra.rabbitmq:
         condition: service_healthy
-#
+  #
   core.transform:
     container_name: core.transform
     image: registry.istokmw.tech/designvault/core-transform:latest
@@ -119,17 +132,15 @@ services:
       infra.rabbitmq:
         condition: service_healthy
 
-
   core.web:
     container_name: core.web
     image: registry.istokmw.tech/designvault/core-web:latest
     build: ../core/web
     ports:
-      - "3000:3000"
+      - "5173:5173"
     networks:
       - designvault_network
     volumes:
-      - ../core/web/node_modules:/app/node_modules
       - ../core/web/src:/app/src
       - ../core/web/public:/app/public
 

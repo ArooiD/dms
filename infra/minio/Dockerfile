@@ -6,9 +6,6 @@ ENV MINIO_VERSION RELEASE.2025-06-01T00-00-00Z
 RUN wget https://dl.min.io/server/minio/release/linux-amd64/minio -O /usr/local/bin/minio && \
     chmod +x /usr/local/bin/minio
 
-RUN useradd -m minio
-USER minio
-
 EXPOSE 9000 9090
 
 ENTRYPOINT ["minio"]

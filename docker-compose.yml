@@ -2,3 +2,7 @@ name: "designvault"
 include:
   - ./compose/infra.yml
   - ./compose/core.yml
+
+networks:
+  designvault_network:
+    name: designvault_network

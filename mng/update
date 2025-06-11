@@ -1,0 +1,10 @@
+#!/bin/bash
+cd /opt/dv
+
+git fetch
+
+git reset --hard origin/dev
+
+chmod +x /opt/dv/mng/*
+cd core
+gradle classes
