@@ -1,5 +1,6 @@
 package ru.mirea.designvault.storage.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -13,13 +14,22 @@ import java.util.UUID;
 @Table(schema = "public", name = "project")
 public class Project {
     @Id
+    @Column(name = "pid", unique = true)
     private UUID pid;
+    @Column(name = "uid")
     private UUID uid;
+    @Column(name = "slug", unique = true)
     private String slug;
+    @Column(name = "name")
     private String name;
+    @Column(name = "description")
     private String description;
+    @Column(name = "created")
     private Instant created;
+    @Column(name = "modified")
     private Instant modified;
+    @Column(name = "count")
     private Integer count;
+    @Column(name = "access")
     private String access;
 }

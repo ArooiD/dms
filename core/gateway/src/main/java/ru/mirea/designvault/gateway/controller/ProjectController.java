@@ -33,7 +33,8 @@ public class ProjectController {
 
     @GetMapping("{slug}/info")
     public ProjectInfoDto getProjectInfo(@AuthenticationPrincipal Jwt token, @PathVariable("slug") String slug) {
-        return null;
+        UUID uid = UUID.fromString(token.getSubject());
+        return projectService.getProjectInfo(slug, uid);
     }
 
 

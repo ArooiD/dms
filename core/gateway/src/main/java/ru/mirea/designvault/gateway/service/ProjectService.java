@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.mirea.designvault.gateway.dto.DocumentDto;
 import ru.mirea.designvault.gateway.dto.ProjectDto;
+import ru.mirea.designvault.gateway.dto.ProjectInfoDto;
 import ru.mirea.designvault.gateway.dto.ResponseDto;
 
 import java.net.URI;
@@ -78,5 +79,9 @@ public class ProjectService {
                 uid
         );
         return response.getBody();
+    }
+
+    public ProjectInfoDto getProjectInfo(String slug, UUID uid) {
+        return new ProjectInfoDto();
     }
 }
