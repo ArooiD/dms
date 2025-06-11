@@ -21,7 +21,7 @@ public class Document {
     @Id
     @Column(name = "did")
     private UUID did;
-    @Column(name = "slug", unique = true)
+    @Column(name = "slug")
     private String slug;
     @Column(name = "filename")
     private String filename;
@@ -33,4 +33,8 @@ public class Document {
     private Instant created;
     @Column(name = "modified")
     private Instant modified;
+    @Column(name = "hash")
+    private String hash;
+    @Column(name = "size")
+    private Long size;
 }
