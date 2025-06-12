@@ -9,6 +9,7 @@ import ru.mirea.designvault.storage.dto.IndexDto;
 import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.service.IndexService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +35,12 @@ public class IndexController {
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<SearchSnippetDto>> search(@RequestParam Map<String, String> query) throws JsonProcessingException {
-        List<SearchSnippetDto> result = indexService.search(query.get("text"));
+    public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) throws JsonProcessingException {
+        String text = query.get("text");
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.badRequest().body(Collections.emptyList());
+        }
+        List<SearchSnippetDto> result = indexService.search(text);
         return ResponseEntity.ok(result);
     }
 }
