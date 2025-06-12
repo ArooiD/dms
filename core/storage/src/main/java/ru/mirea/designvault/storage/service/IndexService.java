@@ -56,12 +56,9 @@ public class IndexService {
     private float[] getEmbeddingVector(String text) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         FragmentDto fragmentDto = FragmentDto.of(text);
         ObjectMapper mapper = new ObjectMapper();
-        log.info("Sending: " + mapper.writeValueAsString(fragmentDto));
-        HttpEntity<FragmentDto> request = new HttpEntity<>(fragmentDto, headers);
-
+        HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(fragmentDto), headers);
         try {
             ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
                     "/embedding/generate",
