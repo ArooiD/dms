@@ -17,7 +17,7 @@ import ru.mirea.designvault.gateway.service.FileService;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("project/{slug}")
+@RequestMapping("project/{slug}/files")
 public class FileController {
     private final FileService fileService;
 
