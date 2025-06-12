@@ -1,0 +1,19 @@
+#!/bin/bash
+cd /opt/dv
+
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 service1 [service2 ...]"
+  exit 1
+fi
+
+SERVICES=("$@")
+
+AVAILABLE_SERVICES=$(docker compose ps --services)
+for svc in "${SERVICES[@]}"; do
+  if ! echo "$AVAILABLE_SERVICES" | grep -qw "$svc"; then
+    echo "Service '$svc' not found"
+    exit 1
+  fi
+done
+
+docker compose logs -f "${SERVICES[@]}"
