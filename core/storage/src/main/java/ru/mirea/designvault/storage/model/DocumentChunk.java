@@ -1,7 +1,11 @@
 package ru.mirea.designvault.storage.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.N;
 import ru.mirea.designvault.storage.converter.FloatArrayToPgVectorConverter;
 import ru.mirea.designvault.storage.key.DocumentChunkId;
 import ru.mirea.designvault.storage.key.DocumentId;
@@ -9,6 +13,9 @@ import ru.mirea.designvault.storage.key.DocumentId;
 import java.util.UUID;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @IdClass(DocumentChunkId.class)
 @Table(schema = "public", name = "document_chunk")
