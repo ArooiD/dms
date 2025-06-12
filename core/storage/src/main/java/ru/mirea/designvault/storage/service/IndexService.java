@@ -56,13 +56,12 @@ public class IndexService {
     }
 
     public Float[] getEmbeddingVector(String text) {
-        RestTemplate restTemplate = new RestTemplate();
         String url = "/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> body = Map.of("text", text);
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-        ResponseEntity<EmbeddingDto> response = restTemplate.postForEntity(url, request, EmbeddingDto.class);
+        ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(url, request, EmbeddingDto.class);
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return response.getBody().getEmbedding();
         } else {
