@@ -9,6 +9,7 @@ import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.model.DocumentChunk;
 import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,11 +31,11 @@ public class IndexService {
         List<String> frags = dto.getFrags();
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
-            Map<String, Object> requestBody = Map.of("text", text);
+            Map<String, String> request = new HashMap<>();
             try {
                 EmbeddingDto response = transformClient.postForObject(
                         "",
-                        requestBody,
+                        request,
                         EmbeddingDto.class);
                 if (response != null && response.getEmbeddings() != null) {
                     saveChunkEmbedding(pid, did, i, text, response.getEmbeddings());
