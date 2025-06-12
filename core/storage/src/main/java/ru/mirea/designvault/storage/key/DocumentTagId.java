@@ -5,8 +5,9 @@ import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class VersionId extends DocumentId {
-    private Integer ver;
+public class DocumentTagId extends DocumentId {
+    private UUID tid;
 }
