@@ -2,6 +2,7 @@ package ru.mirea.designvault.storage.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import ru.mirea.designvault.storage.converter.FloatArrayToPgVectorConverter;
 import ru.mirea.designvault.storage.key.DocumentChunkId;
 import ru.mirea.designvault.storage.key.DocumentId;
 
@@ -21,6 +22,9 @@ public class DocumentChunk {
     @Id
     @Column(name = "cid", columnDefinition = "uuid default gen_random_uuid()")
     private UUID cid;
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "text")
     private String content;
+    @Column(name = "embedding", columnDefinition = "vector(1536)")
+    @Convert(converter = FloatArrayToPgVectorConverter.class)
+    private float[] embedding;
 }
