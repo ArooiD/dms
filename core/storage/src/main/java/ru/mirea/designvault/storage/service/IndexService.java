@@ -1,5 +1,6 @@
 package ru.mirea.designvault.storage.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class IndexService {
     private final RestTemplate transformClient;
@@ -52,15 +54,17 @@ public class IndexService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<FragmentDto> request = new HttpEntity<>(FragmentDto.of(text), headers);
         try {
-            ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
+            ResponseEntity<String> response = transformClient.postForEntity(
                     "/embedding/generate",
                     request,
-                    EmbeddingDto.class
+                    String.class
             );
-            if (response.getBody() == null || response.getBody().getEmbeddings() == null) {
-                throw new IllegalStateException("Empty embedding vector from response");
-            }
-            return response.getBody().getEmbeddings();
+            log.info("Embedding vector received: " + response.getBody());
+//            if (response.getBody() == null || response.getBody().getEmbeddings() == null) {
+//                throw new IllegalStateException("Empty embedding vector from response");
+//            }
+            return null;
+//            return response.getBody().getEmbeddings();
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve embedding vector: " + e.getMessage(), e);
         }
