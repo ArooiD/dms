@@ -70,7 +70,7 @@ public class IndexService {
 
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) throws JsonProcessingException {
-        String embeddingStr = new ObjectMapper().writeValueAsString(embedding);
+        String embeddingStr = "'" + new ObjectMapper().writeValueAsString(embedding) + "'";
         log.info("str -> {}", embeddingStr);
         repository.insertChunk(pid, did, chunkIndex, text, embeddingStr);
     }
