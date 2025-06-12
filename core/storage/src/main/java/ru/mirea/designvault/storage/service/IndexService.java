@@ -1,6 +1,10 @@
 package ru.mirea.designvault.storage.service;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
@@ -43,20 +47,22 @@ public class IndexService {
     }
 
     private float[] getEmbeddingVector(String text) {
-        Map<String, String> request = Map.of("text", text);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, String> body = Map.of("text", text);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
         try {
-            EmbeddingDto response = transformClient.postForObject(
+            ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
                     "/embedding/generate",
                     request,
                     EmbeddingDto.class
             );
-            if (response == null || response.getEmbeddings() == null) {
-                throw new IllegalStateException("Embedding service returned null or empty response.");
+            if (response.getBody() == null || response.getBody().getEmbeddings() == null) {
+                throw new IllegalStateException("Empty embedding vector from response");
             }
-
-            return response.getEmbeddings();
+            return response.getBody().getEmbeddings();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get embedding vector: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to retrieve embedding vector: " + e.getMessage(), e);
         }
     }
 
