@@ -8,11 +8,7 @@ import org.checkerframework.checker.units.qual.N;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class FragmentDto {
     private String text;
-
-    public static FragmentDto of(String text) {
-        return new FragmentDto(text);
-    }
 }

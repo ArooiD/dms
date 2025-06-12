@@ -52,19 +52,21 @@ public class IndexService {
     private float[] getEmbeddingVector(String text) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<FragmentDto> request = new HttpEntity<>(FragmentDto.of(text), headers);
+
+        FragmentDto fragmentDto = FragmentDto.of(text);
+        HttpEntity<FragmentDto> request = new HttpEntity<>(fragmentDto, headers);
+
         try {
-            ResponseEntity<String> response = transformClient.postForEntity(
+            ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
                     "/embedding/generate",
                     request,
-                    String.class
+                    EmbeddingDto.class
             );
-            log.info("Embedding vector received: " + response.getBody());
-//            if (response.getBody() == null || response.getBody().getEmbeddings() == null) {
-//                throw new IllegalStateException("Empty embedding vector from response");
-//            }
-            return null;
-//            return response.getBody().getEmbeddings();
+            EmbeddingDto body = response.getBody();
+            if (body == null || body.getEmbeddings() == null) {
+                throw new IllegalStateException("Empty embedding vector from response");
+            }
+            return body.getEmbeddings();
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve embedding vector: " + e.getMessage(), e);
         }
