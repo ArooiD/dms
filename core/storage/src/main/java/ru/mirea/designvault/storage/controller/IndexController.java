@@ -37,10 +37,11 @@ public class IndexController {
     @GetMapping("search")
     public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) throws JsonProcessingException {
         String text = query.get("query");
+        Integer count = Integer.parseInt(query.get("count"));
         if (text == null || text.isBlank()) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
-        List<SearchSnippetDto> result = indexService.vectorSearch(text);
+        List<SearchSnippetDto> result = indexService.vectorSearch(text, count);
         return ResponseEntity.ok(result);
     }
 }

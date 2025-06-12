@@ -14,6 +14,18 @@ import java.util.UUID;
 
 public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, DocumentChunkId> {
     @Query(nativeQuery = true,
-            value = "SELECT pid, did, content, embedding <-> cast(? as vector) AS distance FROM document_chunk ORDER BY distance LIMIT 3")
-    List<DocumentChunkProjection> findNearestNeighbors(String vector);
+            value = """
+                      WITH q AS (SELECT plainto_tsquery('russian', ?2) AS query)
+                      SELECT pid, did, content,
+                             embedding <-> cast(?1 AS vector) AS distance,
+                             ts_rank(tsv, q.query) AS rank
+                      FROM document_chunk, q
+                      WHERE tsv @@ q.query
+                      ORDER BY distance ASC, rank DESC
+                      LIMIT ?3
+                    """
+    )
+    List<DocumentChunkProjection> findNearestNeighborsWithFullText(String vector, String textQuery, int limit);
+
+
 }

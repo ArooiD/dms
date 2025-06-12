@@ -77,7 +77,7 @@ public class IndexService {
         documentChunkRepository.save(chunk);
     }
 
-    public List<SearchSnippetDto> vectorSearch(String text) {
+    public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
         float[] vector = getEmbeddingVector(text);
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {
@@ -86,7 +86,15 @@ public class IndexService {
         }
         sb.append("]");
         String vectorString = sb.toString();
-        return repository.findNearestNeighbors(vectorString).stream()
+        String[] words = text.trim().split("\\s+");
+        StringBuilder tsquery = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            if (i > 0) tsquery.append(" & ");
+            tsquery.append(words[i]).append(":*");
+        }
+        String tsQueryString = tsquery.toString();
+        return repository.findNearestNeighborsWithFullText(vectorString, tsQueryString, limit)
+                .stream()
                 .map(chunk -> SearchSnippetDto.builder()
                         .pid(chunk.getPid())
                         .did(chunk.getDid())
