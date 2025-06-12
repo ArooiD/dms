@@ -16,8 +16,9 @@ public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, D
             "FROM document_chunk ORDER BY distance LIMIT 10", nativeQuery = true)
     List<DocumentChunk> searchByEmbedding(@Param("vector") Float[] vector);
 
+    @Transactional
     @Modifying
-    @Query(value = "INSERT INTO document_chunk (pid, did, cid, content, embedding) VALUES (:pid, :did, :cid, :content, (:embedding)::vector(384))", nativeQuery = true)
+    @Query(value = "INSERT INTO document_chunk (pid, did, cid, content, embedding) VALUES (:pid, :did, :cid, :content, :embedding::vector(384))", nativeQuery = true)
     void insertChunk(@Param("pid") UUID pid,
                      @Param("did") UUID did,
                      @Param("cid") int cid,
