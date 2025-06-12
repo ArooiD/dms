@@ -9,10 +9,7 @@ import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.model.DocumentChunk;
 import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class IndexService {
@@ -31,14 +28,10 @@ public class IndexService {
         List<String> frags = dto.getFrags();
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
-            Map<String, String> request = new HashMap<>();
             try {
-                EmbeddingDto response = transformClient.postForObject(
-                        "",
-                        request,
-                        EmbeddingDto.class);
-                if (response != null && response.getEmbeddings() != null) {
-                    saveChunkEmbedding(pid, did, i, text, response.getEmbeddings());
+                float[] embedding = getEmbeddingVector(text);
+                if (embedding != null) {
+                    saveChunkEmbedding(pid, did, i, text, embedding);
                 } else {
                     System.err.println("Empty embedding received for fragment " + i);
                 }
@@ -46,6 +39,15 @@ public class IndexService {
                 System.err.println("Error generating embedding for fragment " + i + ": " + e.getMessage());
             }
         }
+    }
+
+    private float[] getEmbeddingVector(String text) {
+        Map<String, String> request = Map.of("text", text);
+        EmbeddingDto response = transformClient.postForObject("", request, EmbeddingDto.class);
+        if (response != null) {
+            return response.getEmbeddings();
+        }
+        return null;
     }
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) {
@@ -60,12 +62,10 @@ public class IndexService {
     }
 
     public List<SearchSnippetDto> search(String text) {
-        EmbeddingDto response = transformClient.postForObject(
-                "",
-                text,
-                EmbeddingDto.class);
-        assert response != null;
-        float[] vector = response.getEmbeddings();
+        float[] vector = getEmbeddingVector(text);
+        if (vector == null) {
+            return Collections.emptyList();
+        }
         return repository.searchByEmbedding(vector).stream()
                 .map(e -> SearchSnippetDto.builder()
                         .pid(e.getPid())
@@ -75,3 +75,4 @@ public class IndexService {
                 ).toList();
     }
 }
+
