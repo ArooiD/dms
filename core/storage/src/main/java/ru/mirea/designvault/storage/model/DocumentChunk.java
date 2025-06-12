@@ -19,7 +19,7 @@ public class DocumentChunk {
     @Column(name = "did")
     private UUID did;
     @Id
-    @Column(name = "cid")
+    @Column(name = "cid", columnDefinition = "uuid default gen_random_uuid()")
     private UUID cid;
     @Column(name = "content")
     private String content;

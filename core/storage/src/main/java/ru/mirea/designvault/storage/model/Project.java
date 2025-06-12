@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table(schema = "public", name = "project")
 public class Project {
     @Id
-    @Column(name = "pid")
+    @Column(name = "pid", columnDefinition = "uuid default gen_random_uuid()")
     private UUID pid;
     @Id
     @Column(name = "uid")

@@ -19,6 +19,6 @@ public class DocumentPreview {
     private UUID did;
     @Column(name = "name")
     private String name;
-    @Column(name = "outext")
-    private String outext;
+    @Column(name = "out_ext")
+    private String outExt;
 }

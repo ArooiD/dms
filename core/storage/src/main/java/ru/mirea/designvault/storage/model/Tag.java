@@ -8,11 +8,10 @@ import java.util.UUID;
 
 @Data
 @Entity
-//@IdClass(DocumentId.class)
 @Table(schema = "public", name = "tag")
 public class Tag {
     @Id
-    @Column(name = "tid")
+    @Column(name = "tid", columnDefinition = "uuid default gen_random_uuid()")
     private UUID tid;
     @Column(name = "name")
     private String name;

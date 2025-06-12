@@ -16,7 +16,7 @@ public class Document {
     @Column(name = "pid")
     private UUID pid;
     @Id
-    @Column(name = "did")
+    @Column(name = "did", columnDefinition = "uuid default gen_random_uuid()")
     private UUID did;
     @Column(name = "uid")
     private UUID uid;
