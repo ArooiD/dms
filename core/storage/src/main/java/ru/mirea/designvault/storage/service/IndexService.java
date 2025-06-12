@@ -41,10 +41,10 @@ public class IndexService {
                 if (embedding != null) {
                     saveChunkEmbedding(pid, did, i, text, embedding);
                 } else {
-                    System.err.println("Empty embedding received for fragment " + i);
+                    log.warn("Empty embedding received for fragment " + i);
                 }
             } catch (Exception e) {
-                System.err.println("Error generating embedding for fragment " + i + ": " + e.getMessage());
+                log.error("Error generating embedding for fragment " + i + ": " + e.getMessage());
             }
         }
     }
