@@ -82,16 +82,20 @@ public class IndexService {
 
     public List<SearchSnippetDto> search(String text) {
         float[] vector = getEmbeddingVector(text);
-        if (vector == null) {
-            return Collections.emptyList();
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < vector.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(vector[i]);
         }
-        return repository.findNearestNeighbors(vector).stream()
-                .map(e -> SearchSnippetDto.builder()
-                        .pid(e.getPid())
-                        .did(e.getDid())
-                        .snippet(e.getContent())
-                        .build()
-                ).toList();
+        sb.append("]");
+        String vectorString = sb.toString();
+        return repository.findNearestNeighbors(vectorString).stream()
+                .map(chunk -> SearchSnippetDto.builder()
+                        .pid(chunk.getPid())
+                        .did(chunk.getDid())
+                        .snippet(chunk.getContent())
+                        .build())
+                .toList();
     }
 }
 
