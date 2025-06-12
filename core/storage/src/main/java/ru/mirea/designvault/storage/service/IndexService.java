@@ -68,10 +68,10 @@ public class IndexService {
                     EmbeddingDto.class
             );
             EmbeddingDto body = response.getBody();
-            if (body == null || body.getEmbeddings() == null) {
+            if (body == null || body.getEmbedding() == null) {
                 throw new IllegalStateException("Empty embedding vector from response");
             }
-            return body.getEmbeddings();
+            return body.getEmbedding();
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve embedding vector: " + e.getMessage(), e);
         }
