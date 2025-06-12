@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -53,27 +50,18 @@ public class IndexService {
         }
     }
 
-    private float[] getEmbeddingVector(String text) throws JsonProcessingException {
+    public float[] getEmbeddingVector(String text) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://dv.istokmw.tech/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        FragmentDto fragmentDto = FragmentDto.of(text);
-        ObjectMapper mapper = new ObjectMapper();
-        var string = mapper.writeValueAsString(fragmentDto);
-        HttpEntity<String> request = new HttpEntity<>(string, headers);
-        log.info("Sending body: {}", string);
-        try {
-            ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
-                    "/embedding/generate",
-                    request,
-                    EmbeddingDto.class
-            );
-            EmbeddingDto body = response.getBody();
-            if (body == null || body.getEmbedding() == null) {
-                throw new IllegalStateException("Empty embedding vector from response");
-            }
-            return body.getEmbedding();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve embedding vector: " + e.getMessage(), e);
+        Map<String, String> body = Map.of("text", text);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        ResponseEntity<EmbeddingDto> response = restTemplate.postForEntity(url, request, EmbeddingDto.class);
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            return response.getBody().getEmbedding();
+        } else {
+            throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
         }
     }
 
