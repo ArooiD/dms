@@ -36,5 +36,5 @@ public class DocumentChunk {
     @Column(name = "embedding", columnDefinition = "vector(384)")
     @Convert(converter = FloatArrayToPgVectorConverter.class)
     @JdbcTypeCode(SqlTypes.VECTOR)
-    private Float[] embedding;
+    private float[] embedding;
 }

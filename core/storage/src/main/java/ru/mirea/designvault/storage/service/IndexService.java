@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
-import ru.mirea.designvault.storage.dto.FragmentDto;
 import ru.mirea.designvault.storage.dto.IndexDto;
 import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.model.DocumentChunk;
@@ -43,7 +41,7 @@ public class IndexService {
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
             try {
-                Float[] embedding = getEmbeddingVector(text);
+                float[] embedding = getEmbeddingVector(text);
                 if (embedding != null) {
                     saveChunkEmbedding(pid, did, i, text, embedding);
                 } else {
@@ -55,7 +53,7 @@ public class IndexService {
         }
     }
 
-    public Float[] getEmbeddingVector(String text) {
+    public float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://core.transform:8000/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
@@ -71,7 +69,7 @@ public class IndexService {
     }
 
 
-    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) throws JsonProcessingException {
+    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) throws JsonProcessingException {
         DocumentChunk chunk = DocumentChunk.builder()
                 .pid(pid)
                 .did(did)
