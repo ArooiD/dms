@@ -69,7 +69,7 @@ public class IndexService {
     }
 
 
-    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) throws JsonProcessingException {
+    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) {
         DocumentChunk chunk = DocumentChunk.builder()
                 .pid(pid)
                 .did(did)
@@ -77,21 +77,15 @@ public class IndexService {
                 .content(text)
                 .embedding(embedding)
                 .build();
-
         documentChunkRepository.save(chunk);
-
-        //        String escapedVector = Arrays.stream(embedding)
-//                .map(String::valueOf)
-//                .collect(Collectors.joining(",", "e'[", "]'::vector"));
-//        repository.insertChunk(pid, did, chunkIndex, text, escapedVector);
     }
 
-    public List<SearchSnippetDto> search(String text) throws JsonProcessingException {
+    public List<SearchSnippetDto> search(String text) {
         float[] vector = getEmbeddingVector(text);
         if (vector == null) {
             return Collections.emptyList();
         }
-        return repository.searchByEmbedding(vector).stream()
+        return repository.findNearestNeighbors(vector).stream()
                 .map(e -> SearchSnippetDto.builder()
                         .pid(e.getPid())
                         .did(e.getDid())

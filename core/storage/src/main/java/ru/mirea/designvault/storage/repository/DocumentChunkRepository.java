@@ -12,20 +12,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, DocumentChunkId> {
-    @Query(value = "SELECT pid, did, cid, content, embedding <#> CAST(:vector AS vector) AS distance " +
-            "FROM document_chunk ORDER BY distance LIMIT 10", nativeQuery = true)
-    List<DocumentChunk> searchByEmbedding(@Param("vector") float[] vector);
+//    @Query(value = "SELECT pid, did, cid, content, embedding <#> CAST(:vector AS vector) AS distance " +
+//            "FROM document_chunk ORDER BY distance LIMIT 10", nativeQuery = true)
+//    List<DocumentChunk> searchByEmbedding(@Param("vector") float[] vector);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO document_chunk (pid, did, cid, content, embedding)
-                        VALUES (:pid, :did, :cid, :content, :embedding)
-            """, nativeQuery = true)
-    void insertChunk(@Param("pid") UUID pid,
-                     @Param("did") UUID did,
-                     @Param("cid") int cid,
-                     @Param("content") String content,
-                     @Param("embedding") String embedding);
+
+    @Query(nativeQuery = true,
+            value = "SELECT * FROM document_chunk ORDER BY embedding <-> cast(? as vector) LIMIT 3")
+    List<DocumentChunk> findNearestNeighbors(float[] embedding);
 
 }
