@@ -3,12 +3,13 @@ package ru.mirea.designvault.storage.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.dto.IndexDto;
+import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.service.IndexService;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "index")
@@ -31,4 +32,9 @@ public class IndexController {
         }
     }
 
+    @GetMapping("search")
+    public ResponseEntity<List<SearchSnippetDto>> search(@RequestParam Map<String, String> query) {
+        List<SearchSnippetDto> result = indexService.search(query.get("text"));
+        return ResponseEntity.ok(result);
+    }
 }

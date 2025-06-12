@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
 import ru.mirea.designvault.storage.dto.IndexDto;
+import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.model.DocumentChunk;
 import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
@@ -55,5 +56,21 @@ public class IndexService {
                 .embedding(embedding)
                 .build();
         repository.save(chunk);
+    }
+
+    public List<SearchSnippetDto> search(String text) {
+        EmbeddingDto response = transformClient.postForObject(
+                "",
+                text,
+                EmbeddingDto.class);
+        assert response != null;
+        float[] vector = response.getEmbeddings();
+        return repository.searchByEmbedding(vector).stream()
+                .map(e -> SearchSnippetDto.builder()
+                        .pid(e.getPid())
+                        .did(e.getDid())
+                        .snippet(e.getContent())
+                        .build()
+                ).toList();
     }
 }
