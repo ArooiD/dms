@@ -20,7 +20,7 @@ public class IndexService {
     private final DocumentChunkRepository repository;
 
     public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository) {
-        this.transformClient = builder.rootUri("http://core.transform:8080/embeding/generate")
+        this.transformClient = builder.rootUri("http://core.transform:8080/embedding/generate")
                 .build();
         this.repository = repository;
     }
