@@ -16,11 +16,10 @@ public class Document {
     @Column(name = "pid")
     private UUID pid;
     @Id
-    @Column(name = "uid")
-    private UUID uid;
-    @Id
     @Column(name = "did")
     private UUID did;
+    @Column(name = "uid")
+    private UUID uid;
     @Column(name = "slug")
     private String slug;
     @Column(name = "filename")
