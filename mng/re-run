@@ -16,4 +16,5 @@ for svc in "${SERVICES[@]}"; do
   fi
 done
 
-docker compose logs -f "${SERVICES[@]}"
+docker compose down "${SERVICES[@]}"
+docker compose up -d --build "${SERVICES[@]}"
