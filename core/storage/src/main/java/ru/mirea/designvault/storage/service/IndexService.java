@@ -17,7 +17,7 @@ public class IndexService {
     private final DocumentChunkRepository repository;
 
     public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository) {
-        this.transformClient = builder.rootUri("http://core.transform:8080/embedding/generate")
+        this.transformClient = builder.rootUri("http://core.transform:8080")
                 .build();
         this.repository = repository;
     }
@@ -43,7 +43,7 @@ public class IndexService {
 
     private float[] getEmbeddingVector(String text) {
         Map<String, String> request = Map.of("text", text);
-        EmbeddingDto response = transformClient.postForObject("", request, EmbeddingDto.class);
+        EmbeddingDto response = transformClient.postForObject("/embedding/generate", request, EmbeddingDto.class);
         if (response != null) {
             return response.getEmbeddings();
         }
