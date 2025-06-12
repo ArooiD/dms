@@ -1,5 +1,7 @@
 package ru.mirea.designvault.storage.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -51,11 +53,13 @@ public class IndexService {
         }
     }
 
-    private float[] getEmbeddingVector(String text) {
+    private float[] getEmbeddingVector(String text) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         FragmentDto fragmentDto = FragmentDto.of(text);
+        ObjectMapper mapper = new ObjectMapper();
+        log.info("Sending: " + mapper.writeValueAsString(fragmentDto));
         HttpEntity<FragmentDto> request = new HttpEntity<>(fragmentDto, headers);
 
         try {
@@ -86,7 +90,7 @@ public class IndexService {
         repository.save(chunk);
     }
 
-    public List<SearchSnippetDto> search(String text) {
+    public List<SearchSnippetDto> search(String text) throws JsonProcessingException {
         float[] vector = getEmbeddingVector(text);
         if (vector == null) {
             return Collections.emptyList();
