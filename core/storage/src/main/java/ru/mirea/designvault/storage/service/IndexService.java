@@ -78,7 +78,7 @@ public class IndexService {
     }
 
     public List<SearchSnippetDto> search(String text) throws JsonProcessingException {
-        float[] vector = getEmbeddingVector(text);
+        Float[] vector = getEmbeddingVector(text);
         if (vector == null) {
             return Collections.emptyList();
         }
