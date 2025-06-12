@@ -1,7 +1,5 @@
 package ru.mirea.designvault.storage.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -15,8 +13,6 @@ import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -81,7 +77,7 @@ public class IndexService {
         documentChunkRepository.save(chunk);
     }
 
-    public List<SearchSnippetDto> search(String text) {
+    public List<SearchSnippetDto> vectorSearch(String text) {
         float[] vector = getEmbeddingVector(text);
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {

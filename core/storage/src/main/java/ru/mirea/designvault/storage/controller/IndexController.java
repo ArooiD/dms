@@ -40,7 +40,7 @@ public class IndexController {
         if (text == null || text.isBlank()) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
-        List<SearchSnippetDto> result = indexService.search(text);
+        List<SearchSnippetDto> result = indexService.vectorSearch(text);
         return ResponseEntity.ok(result);
     }
 }
