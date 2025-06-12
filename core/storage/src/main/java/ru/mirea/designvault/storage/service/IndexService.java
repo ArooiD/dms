@@ -71,8 +71,8 @@ public class IndexService {
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) throws JsonProcessingException {
         String embeddingStr = "'" + new ObjectMapper().writeValueAsString(embedding) + "'";
-        log.info("str -> {}", embeddingStr);
-        repository.insertChunk(pid, did, chunkIndex, text, embeddingStr);
+        String postgresArray = embeddingStr.replace('[', '{').replace(']', '}');
+        repository.insertChunk(pid, did, chunkIndex, text, postgresArray);
     }
 
     public List<SearchSnippetDto> search(String text) throws JsonProcessingException {
