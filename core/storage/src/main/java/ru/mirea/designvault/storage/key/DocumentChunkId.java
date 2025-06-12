@@ -9,5 +9,5 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DocumentChunkId extends DocumentId {
-    UUID cid;
+    Integer cid;
 }

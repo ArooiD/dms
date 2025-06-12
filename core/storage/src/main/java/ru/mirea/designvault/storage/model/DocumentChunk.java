@@ -20,11 +20,11 @@ public class DocumentChunk {
     @Column(name = "did")
     private UUID did;
     @Id
-    @Column(name = "cid", columnDefinition = "uuid default gen_random_uuid()")
-    private UUID cid;
+    @Column(name = "cid")
+    private Integer cid;
     @Column(name = "content", columnDefinition = "text")
     private String content;
-    @Column(name = "embedding", columnDefinition = "vector(1536)")
+    @Column(name = "embedding", columnDefinition = "vector(384)")
     @Convert(converter = FloatArrayToPgVectorConverter.class)
     private float[] embedding;
 }
