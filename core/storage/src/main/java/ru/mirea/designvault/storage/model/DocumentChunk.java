@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.checker.units.qual.N;
+import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.mirea.designvault.storage.converter.FloatArrayToPgVectorConverter;
@@ -33,8 +34,8 @@ public class DocumentChunk {
     private Integer cid;
     @Column(name = "content", columnDefinition = "text")
     private String content;
-    @Column(name = "embedding", columnDefinition = "vector(384)")
-    @Convert(converter = FloatArrayToPgVectorConverter.class)
+    @Column(name = "embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 384)
     private float[] embedding;
 }
