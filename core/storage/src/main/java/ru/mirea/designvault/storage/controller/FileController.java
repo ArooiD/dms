@@ -3,12 +3,12 @@ package ru.mirea.designvault.storage.controller;
 import lombok.extern.slf4j.Slf4j;
 
 import ru.mirea.designvault.storage.dto.FileInfo;
-import ru.mirea.designvault.storage.service.FileService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.mirea.designvault.storage.service.FileService;
 
 import java.io.InputStream;
 import java.util.List;
