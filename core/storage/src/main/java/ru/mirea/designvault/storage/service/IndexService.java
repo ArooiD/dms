@@ -6,6 +6,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
@@ -25,6 +26,7 @@ public class IndexService {
 
     public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository) {
         this.transformClient = builder.rootUri("http://core.transform:8000")
+                .messageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
         this.repository = repository;
     }
