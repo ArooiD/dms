@@ -70,9 +70,12 @@ public class IndexService {
 
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) throws JsonProcessingException {
-        String embeddingStr = "'" + new ObjectMapper().writeValueAsString(embedding) + "'";
-        String postgresArray = embeddingStr.replace('[', '{').replace(']', '}');
-        repository.insertChunk(pid, did, chunkIndex, text, postgresArray);
+//        String embeddingStr = "'" + new ObjectMapper().writeValueAsString(embedding) + "'";
+        String escapedVector = Arrays.stream(embedding)
+                .map(String::valueOf)
+                .collect(Collectors.joining(",", "e'[", "]'::vector"));
+        repository.insertChunk(pid, did, chunkIndex, text, escapedVector);
+
     }
 
     public List<SearchSnippetDto> search(String text) throws JsonProcessingException {

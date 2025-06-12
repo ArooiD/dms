@@ -18,7 +18,10 @@ public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, D
 
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO document_chunk (pid, did, cid, content, embedding) VALUES (:pid, :did, :cid, :content, CAST(:embedding AS vector(384))", nativeQuery = true)
+    @Query(value = """
+            INSERT INTO document_chunk (pid, did, cid, content, embedding)
+                        VALUES (:pid, :did, :cid, :content, :embedding)
+            """, nativeQuery = true)
     void insertChunk(@Param("pid") UUID pid,
                      @Param("did") UUID did,
                      @Param("cid") int cid,
