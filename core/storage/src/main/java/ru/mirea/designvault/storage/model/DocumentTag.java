@@ -2,13 +2,13 @@ package ru.mirea.designvault.storage.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import ru.mirea.designvault.storage.key.DocumentId;
+import ru.mirea.designvault.storage.key.DocumentTagId;
 
 import java.util.UUID;
 
 @Data
 @Entity
-@IdClass(DocumentId.class)
+@IdClass(DocumentTagId.class)
 @Table(schema = "public", name = "document_tag")
 public class DocumentTag {
     @Id
