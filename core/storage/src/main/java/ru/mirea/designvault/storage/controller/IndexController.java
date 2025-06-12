@@ -1,6 +1,7 @@
 package ru.mirea.designvault.storage.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class IndexController {
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<SearchSnippetDto>> search(@RequestParam Map<String, String> query) {
+    public ResponseEntity<List<SearchSnippetDto>> search(@RequestParam Map<String, String> query) throws JsonProcessingException {
         List<SearchSnippetDto> result = indexService.search(query.get("text"));
         return ResponseEntity.ok(result);
     }
