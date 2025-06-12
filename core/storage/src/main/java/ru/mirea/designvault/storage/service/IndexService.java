@@ -24,13 +24,15 @@ import java.util.stream.IntStream;
 public class IndexService {
     private final RestTemplate transformClient;
     private final DocumentChunkRepository repository;
+    private final DocumentChunkRepository documentChunkRepository;
 
-    public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository) {
+    public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository, DocumentChunkRepository documentChunkRepository) {
         this.transformClient = builder
-//                .rootUri("http://core.transform:8000")
+                .rootUri("http://core.transform:8000")
 //                .messageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
         this.repository = repository;
+        this.documentChunkRepository = documentChunkRepository;
     }
 
 
@@ -55,7 +57,7 @@ public class IndexService {
 
     public Float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://core.transform:8000/embedding/generate";
+        String url = "/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> body = Map.of("text", text);
@@ -70,12 +72,19 @@ public class IndexService {
 
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) throws JsonProcessingException {
-//        String embeddingStr = "'" + new ObjectMapper().writeValueAsString(embedding) + "'";
-        String escapedVector = Arrays.stream(embedding)
-                .map(String::valueOf)
-                .collect(Collectors.joining(",", "e'[", "]'::vector"));
-        repository.insertChunk(pid, did, chunkIndex, text, escapedVector);
+        DocumentChunk chunk = DocumentChunk.builder()
+                .pid(pid)
+                .did(did)
+                .cid(chunkIndex)
+                .content(text)
+                .embedding(embedding)
+                .build();
+        documentChunkRepository.save(chunk);
 
+        //        String escapedVector = Arrays.stream(embedding)
+//                .map(String::valueOf)
+//                .collect(Collectors.joining(",", "e'[", "]'::vector"));
+//        repository.insertChunk(pid, did, chunkIndex, text, escapedVector);
     }
 
     public List<SearchSnippetDto> search(String text) throws JsonProcessingException {
