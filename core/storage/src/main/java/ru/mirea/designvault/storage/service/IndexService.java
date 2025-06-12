@@ -58,7 +58,9 @@ public class IndexService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         FragmentDto fragmentDto = FragmentDto.of(text);
         ObjectMapper mapper = new ObjectMapper();
-        HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(fragmentDto), headers);
+        var string = mapper.writeValueAsString(fragmentDto);
+        HttpEntity<String> request = new HttpEntity<>(string, headers);
+        log.info("Sending body: {}", string);
         try {
             ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
                     "/embedding/generate",
