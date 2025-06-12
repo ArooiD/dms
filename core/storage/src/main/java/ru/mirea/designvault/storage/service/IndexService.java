@@ -95,6 +95,7 @@ public class IndexService {
                         .pid(chunk.getPid())
                         .did(chunk.getDid())
                         .snippet(highlightText(chunk.getContent(), text))
+                        .score(chunk.getDistance())
                         .build())
                 .toList();
     }
