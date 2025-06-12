@@ -22,6 +22,7 @@ public class IndexService {
         this.repository = repository;
     }
 
+
     public void indexDocument(IndexDto dto) {
         UUID pid = dto.getPid();
         UUID did = dto.getDid();
@@ -43,12 +44,22 @@ public class IndexService {
 
     private float[] getEmbeddingVector(String text) {
         Map<String, String> request = Map.of("text", text);
-        EmbeddingDto response = transformClient.postForObject("/embedding/generate", request, EmbeddingDto.class);
-        if (response != null) {
+        try {
+            EmbeddingDto response = transformClient.postForObject(
+                    "/embedding/generate",
+                    request,
+                    EmbeddingDto.class
+            );
+            if (response == null || response.getEmbeddings() == null) {
+                throw new IllegalStateException("Embedding service returned null or empty response.");
+            }
+
             return response.getEmbeddings();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get embedding vector: " + e.getMessage(), e);
         }
-        return null;
     }
+
 
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) {
         DocumentChunk chunk = DocumentChunk.builder()
