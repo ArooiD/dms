@@ -5,13 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.N;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import ru.mirea.designvault.storage.converter.FloatArrayToPgVectorConverter;
 import ru.mirea.designvault.storage.key.DocumentChunkId;
-import ru.mirea.designvault.storage.key.DocumentId;
 
 import java.util.UUID;
 
