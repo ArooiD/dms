@@ -72,7 +72,7 @@ public class IndexService {
     private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) {
         String embeddingStr = "[" +
                 Arrays.stream(embedding)
-                        .map(aFloat -> Float.toString(aFloat))
+                        .map(String::valueOf)
                         .collect(Collectors.joining(",")) + "]";
         repository.insertChunk(pid, did, chunkIndex, text, embeddingStr);
     }

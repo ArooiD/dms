@@ -17,15 +17,11 @@ public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, D
     List<DocumentChunk> searchByEmbedding(@Param("vector") Float[] vector);
 
     @Modifying
-    @Transactional
-    @Query(value = "INSERT INTO document_chunk (pid, did, cid, content, embedding) " +
-            "VALUES (:pid, :did, :cid, :content, :embedding::vector)", nativeQuery = true)
-    void insertChunk(
-            @Param("pid") UUID pid,
-            @Param("did") UUID did,
-            @Param("cid") int cid,
-            @Param("content") String content,
-            @Param("embedding") String embedding
-    );
+    @Query(value = "INSERT INTO document_chunk (pid, did, cid, content, embedding) VALUES (:pid, :did, :cid, :content, :embedding::vector)", nativeQuery = true)
+    void insertChunk(@Param("pid") UUID pid,
+                     @Param("did") UUID did,
+                     @Param("cid") int cid,
+                     @Param("content") String content,
+                     @Param("embedding") String embedding);
 
 }
