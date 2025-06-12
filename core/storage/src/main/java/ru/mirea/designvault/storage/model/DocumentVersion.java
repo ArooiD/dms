@@ -2,7 +2,6 @@ package ru.mirea.designvault.storage.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import ru.mirea.designvault.storage.key.DocumentId;
 import ru.mirea.designvault.storage.key.VersionId;
 
 import java.time.Instant;
@@ -11,8 +10,8 @@ import java.util.UUID;
 @Data
 @Entity
 @IdClass(VersionId.class)
-@Table(schema = "public", name = "version")
-public class Version {
+@Table(schema = "public", name = "document_version")
+public class DocumentVersion {
     @Id
     @Column(name = "pid")
     private UUID pid;

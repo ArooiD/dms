@@ -9,8 +9,8 @@ import java.util.UUID;
 @Data
 @Entity
 @IdClass(DocumentId.class)
-@Table(schema = "public", name = "preview")
-public class Preview {
+@Table(schema = "public", name = "document_preview")
+public class DocumentPreview {
     @Id
     @Column(name = "pid")
     private UUID pid;
