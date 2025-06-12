@@ -36,7 +36,7 @@ public class IndexController {
 
     @GetMapping("search")
     public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) throws JsonProcessingException {
-        String text = query.get("text");
+        String text = query.get("query");
         if (text == null || text.isBlank()) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
