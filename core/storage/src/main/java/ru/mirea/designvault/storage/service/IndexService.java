@@ -74,6 +74,7 @@ public class IndexService {
                 Arrays.stream(embedding)
                         .map(String::valueOf)
                         .collect(Collectors.joining(",")) + "]";
+        log.info("str -> {}",embeddingStr);
         repository.insertChunk(pid, did, chunkIndex, text, embeddingStr);
     }
 
