@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
+import ru.mirea.designvault.storage.dto.FragmentDto;
 import ru.mirea.designvault.storage.dto.IndexDto;
 import ru.mirea.designvault.storage.dto.SearchSnippetDto;
 import ru.mirea.designvault.storage.model.DocumentChunk;
@@ -49,8 +50,7 @@ public class IndexService {
     private float[] getEmbeddingVector(String text) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        Map<String, String> body = Map.of("text", text);
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<FragmentDto> request = new HttpEntity<>(FragmentDto.of(text), headers);
         try {
             ResponseEntity<EmbeddingDto> response = transformClient.postForEntity(
                     "/embedding/generate",
