@@ -16,6 +16,8 @@ import ru.mirea.designvault.storage.model.DocumentChunk;
 import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -39,7 +41,7 @@ public class IndexService {
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
             try {
-                float[] embedding = getEmbeddingVector(text);
+                Float[] embedding = getEmbeddingVector(text);
                 if (embedding != null) {
                     saveChunkEmbedding(pid, did, i, text, embedding);
                 } else {
@@ -51,7 +53,7 @@ public class IndexService {
         }
     }
 
-    public float[] getEmbeddingVector(String text) {
+    public Float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://core.transform:8000/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
@@ -67,15 +69,12 @@ public class IndexService {
     }
 
 
-    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) {
-        DocumentChunk chunk = DocumentChunk.builder()
-                .pid(pid)
-                .did(did)
-                .cid(chunkIndex)
-                .content(text)
-                .embedding(embedding)
-                .build();
-        repository.save(chunk);
+    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, Float[] embedding) {
+        String embeddingStr = "[" +
+                Arrays.stream(embedding)
+                        .map(aFloat -> Float.toString(aFloat))
+                        .collect(Collectors.joining(",")) + "]";
+        repository.insertChunk(pid, did, chunkIndex, text, embeddingStr);
     }
 
     public List<SearchSnippetDto> search(String text) throws JsonProcessingException {

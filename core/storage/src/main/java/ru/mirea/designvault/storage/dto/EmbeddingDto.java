@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class EmbeddingDto {
-    private float[] embedding;
+    private Float[] embedding;
     private Integer length;
 }
