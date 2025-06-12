@@ -14,6 +14,7 @@ import ru.mirea.designvault.storage.model.DocumentChunk;
 import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -93,9 +94,18 @@ public class IndexService {
                 .map(chunk -> SearchSnippetDto.builder()
                         .pid(chunk.getPid())
                         .did(chunk.getDid())
-                        .snippet(chunk.getContent())
+                        .snippet(highlightText(chunk.getContent(), text))
                         .build())
                 .toList();
+    }
+
+    public String highlightText(String snippet, String query) {
+        if (snippet == null || query == null) return snippet;
+        String[] words = query.trim().split("\\s+");
+        for (String word : words) {
+            snippet = snippet.replaceAll("(?i)" + Pattern.quote(word), "<mark>$0</mark>");
+        }
+        return snippet;
     }
 }
 
