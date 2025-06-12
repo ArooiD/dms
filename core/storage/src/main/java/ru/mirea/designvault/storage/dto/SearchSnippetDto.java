@@ -11,5 +11,5 @@ public class SearchSnippetDto {
     private UUID pid;
     private UUID did;
     private String snippet;
-    private Integer score;
+    private Float score;
 }
