@@ -27,8 +27,6 @@ public class Document {
     private String filename;
     @Column(name = "ext")
     private String ext;
-    @Column(name = "version")
-    private Integer version;
     @Column(name = "created")
     private Instant created;
     @Column(name = "modified")
