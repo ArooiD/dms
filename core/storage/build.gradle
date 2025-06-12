@@ -18,7 +18,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'io.minio:minio:8.5.7'
 //    implementation 'org.postgresql:postgresql:42.7.7'
-    implementation("org.hibernate.orm:hibernate-vector:7.0.1.Final")
+    implementation("org.hibernate.orm:hibernate-vector:6.6.4.Final")
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
