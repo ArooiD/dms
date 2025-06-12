@@ -53,7 +53,7 @@ public class IndexService {
 
     public float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://dv.istokmw.tech/embedding/generate";
+        String url = "http://core.transform:8000/embedding/generate";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> body = Map.of("text", text);
