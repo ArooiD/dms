@@ -16,7 +16,7 @@ import ru.mirea.designvault.gateway.service.StorageService;
 
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("project/{slug}/files")
 @Tag(name = "File API", description = "Работа с файлами проекта")
 public class FileController {
