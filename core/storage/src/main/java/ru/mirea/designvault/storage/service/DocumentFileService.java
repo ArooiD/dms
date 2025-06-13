@@ -25,13 +25,13 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
-public class FileService {
+public class DocumentFileService {
     private final MinioClient minio;
     private final String bucket;
     private final DocumentVersionRepository documentVersionRepository;
 
-    public FileService(MinioClient minio,
-                       @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
+    public DocumentFileService(MinioClient minio,
+                               @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
         this.documentVersionRepository = documentVersionRepository;

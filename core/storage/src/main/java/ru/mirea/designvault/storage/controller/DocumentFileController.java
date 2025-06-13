@@ -7,7 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.model.DocumentFile;
-import ru.mirea.designvault.storage.service.FileService;
+import ru.mirea.designvault.storage.service.DocumentFileService;
 
 import java.util.UUID;
 
@@ -15,16 +15,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/{pid}")
 public class DocumentFileController {
-    private final FileService fileService;
+    private final DocumentFileService documentFileService;
 
-    public DocumentFileController(FileService fileService) {
-        this.fileService = fileService;
+    public DocumentFileController(DocumentFileService documentFileService) {
+        this.documentFileService = documentFileService;
     }
-
-//    @PostMapping()
-//    public FileInfo upload(@PathVariable(value = "pid") UUID pid, @RequestParam("file") MultipartFile file) throws Exception {
-//        return fileService.upload(pid, file);
-//    }
 
     @GetMapping(value = {
             "/{did}",
@@ -34,12 +29,21 @@ public class DocumentFileController {
     public ResponseEntity<InputStreamResource> getDocumentVersion(@PathVariable(value = "pid") UUID pid,
                                                                   @PathVariable(value = "did") UUID did,
                                                                   @PathVariable(value = "ver", required = false) Integer ver) {
-        DocumentFile object = fileService.getDocumentVersion(pid, did, ver);
+        DocumentFile object = documentFileService.getDocumentVersion(pid, did, ver);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + object.getName() + "\"")
                 .contentType(object.getMediaType())
                 .body(object.getInputStreamResource());
     }
+
+
+
+
+    //    @PostMapping()
+//    public FileInfo upload(@PathVariable(value = "pid") UUID pid, @RequestParam("file") MultipartFile file) throws Exception {
+//        return fileService.upload(pid, file);
+//    }
+
 
 //    @PutMapping("{name}")
 //    public FileInfo update(@PathVariable(value = "pid") UUID pid, @PathVariable(name = "name") String name, @RequestParam("file") MultipartFile file) throws Exception {
