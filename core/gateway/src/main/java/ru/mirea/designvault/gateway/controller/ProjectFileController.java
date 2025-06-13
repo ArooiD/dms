@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.gateway.dto.DocumentDto;
 import ru.mirea.designvault.gateway.dto.FileDto;
-import ru.mirea.designvault.gateway.model.File;
 import ru.mirea.designvault.gateway.service.ProjectService;
 import ru.mirea.designvault.gateway.service.StorageService;
 
@@ -53,33 +52,33 @@ public class ProjectFileController {
     }
 
 
-    @PostMapping("new")
-    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-                                    @PathVariable("pr_slug") String slug,
-                                    @RequestParam("file") MultipartFile file) {
-        try {
-            File dto = fileService.updateFileToProject(slug, file);
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
-        }
-    }
+//    @PostMapping("new")
+//    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
+//                                    @PathVariable("pr_slug") String slug,
+//                                    @RequestParam("file") MultipartFile file) {
+//        try {
+//            File dto = fileService.updateFileToProject(slug, file);
+//            return ResponseEntity.status(HttpStatus.ACCEPTED)
+//                    .body(dto);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Error: " + e.getMessage());
+//        }
+//    }
 
-    @PutMapping("{doc_slug}")
-    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-                                    @PathVariable("pr_slug") String slug,
-                                    @PathVariable("doc_slug") String name,
-                                    @RequestParam("file") MultipartFile file) {
-        try {
-            File dto = fileService.updateFileToProject(slug, name, file);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
-        }
-    }
+//    @PutMapping("{doc_slug}")
+//    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
+//                                    @PathVariable("pr_slug") String slug,
+//                                    @PathVariable("doc_slug") String name,
+//                                    @RequestParam("file") MultipartFile file) {
+//        try {
+//            File dto = fileService.updateFileToProject(slug, name, file);
+//            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Error: " + e.getMessage());
+//        }
+//    }
 
     @DeleteMapping("{doc_slug}")
     public ResponseEntity<?> deleteFileToContract(
