@@ -1,5 +1,10 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +34,32 @@ public class ProjectFileController {
     }
 
     @GetMapping("")
+    @Operation(
+            summary = "Получить документы проекта",
+            description = "Возвращает список последних версий документов по slug проекта",
+            operationId = "getProjectDocuments"
+    )
     public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
         UUID uid = UUID.fromString(token.getSubject());
         return projectService.getProjectDtoDocument(slug, uid);
     }
 
+    @Operation(
+            summary = "Получение версии документа",
+            description = "Возвращает файл указанной версии документа по slug проекта и slug документа. "
+                    + "Если версия не указана — возвращает последнюю.",
+            parameters = {
+                    @Parameter(name = "pr_slug", description = "Идентификатор проекта (slug)", required = true),
+                    @Parameter(name = "doc_slug", description = "Идентификатор документа (slug)", required = true),
+                    @Parameter(name = "ver", description = "Номер версии документа", required = false)
+            }
+    )
     @GetMapping(value = {
             "{doc_slug}",
             "{doc_slug}/{ver}"
     })
     public ResponseEntity<?> fetch(
-//            @AuthenticationPrincipal Jwt token,
+            @AuthenticationPrincipal Jwt token,
             @PathVariable("pr_slug") String slug,
             @PathVariable("doc_slug") String name,
             @PathVariable(value = "ver", required = false) Integer ver) {
@@ -53,6 +73,19 @@ public class ProjectFileController {
     }
 
 
+    @Operation(
+            summary = "Загрузка нового файла версии документа",
+            description = "Добавляет новую версию файла в проект по slug проекта. Файл передается в multipart/form-data.",
+            parameters = {
+                    @Parameter(name = "pr_slug", description = "Идентификатор проекта (slug)", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(implementation = MultipartFile.class)
+                    )
+            )
+    )
     @PostMapping("new")
     public Object upload(@AuthenticationPrincipal Jwt token,
                          @PathVariable("pr_slug") String slug,
