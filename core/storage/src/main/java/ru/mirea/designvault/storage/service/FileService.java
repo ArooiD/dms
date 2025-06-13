@@ -45,36 +45,10 @@ public class FileService {
         }
     }
 
-//    public FileInfo upload(UUID userId, MultipartFile file) throws Exception {
-//        String originalFileName = file.getOriginalFilename();
-//        String objectName = userId + "/" + originalFileName;
-//        PutObjectArgs args = PutObjectArgs.builder()
-//                .bucket(bucket)
-//                .object(objectName)
-//                .stream(file.getInputStream(), file.getSize(), -1)
-//                .contentType(file.getContentType())
-//                .build();
-//        minio.putObject(args);
-//        StatObjectResponse stat = minio.statObject(
-//                StatObjectArgs.builder()
-//                        .bucket(bucket)
-//                        .object(objectName)
-//                        .build()
-//        );
-//        ZonedDateTime odtStat = stat.lastModified();
-//        Instant zdtStat = odtStat.toInstant();
-//        FileInfo info = new FileInfo();
-
-    /// /        info.setObjectName(objectName);
-//        info.setSize(file.getSize());
-//        info.setContentType(file.getContentType());
-//        info.setLastModified(zdtStat);
-//        return info;
-//    }
     public File getDocumentVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
-            String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
+            String objectPath = String.format("%s/%s/%d/_content", pid, did, targetVersion);
             DocumentVersionProjection document = documentVersionRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
@@ -177,12 +151,17 @@ public class FileService {
                 ListObjectsArgs.builder()
                         .bucket(bucket)
                         .prefix(basePrefix)
+                        .delimiter("/")
                         .recursive(false)
                         .build()
         );
+
         int maxVersion = -1;
         for (Result<Item> result : results) {
-            String[] parts = result.get().objectName().split("/");
+            Item item = result.get();
+            if (!item.isDir()) continue;
+
+            String[] parts = item.objectName().split("/");
             if (parts.length >= 3 && parts[0].equals(cid.toString()) && parts[1].equals(did.toString())) {
                 try {
                     int v = Integer.parseInt(parts[2]);
@@ -191,19 +170,16 @@ public class FileService {
                 }
             }
         }
+
         if (maxVersion == -1) {
             throw new FileNotFoundException("Документ не найден");
         }
         if (version == null) {
             return maxVersion;
         }
-        try {
-            if (version > maxVersion) {
-                throw new FileNotFoundException("Запрашиваемая версия не найдена");
-            }
-            return version;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Некорректный формат версии: " + version);
+        if (version > maxVersion) {
+            throw new FileNotFoundException("Запрашиваемая версия не найдена");
         }
+        return version;
     }
 }
