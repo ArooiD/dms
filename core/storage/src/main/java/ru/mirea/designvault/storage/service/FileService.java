@@ -27,13 +27,11 @@ import java.util.zip.ZipOutputStream;
 public class FileService {
     private final MinioClient minio;
     private final String bucket;
-    private final DocumentRepository documentRepository;
 
     public FileService(MinioClient minio,
                        @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
-        this.documentRepository = documentRepository;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
             minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
@@ -70,6 +68,7 @@ public class FileService {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
+
 
 
             InputStream is = minio.getObject(
