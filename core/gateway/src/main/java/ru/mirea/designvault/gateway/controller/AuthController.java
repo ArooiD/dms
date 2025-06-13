@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
-@Tag(name = "Auth API", description = "Авторизация в системе")
+@Tag(name = "01 - Auth API", description = "Авторизация в системе")
 public class AuthController {
     private final IdentityService authService;
 
@@ -23,6 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("login")
+//    @Operation(summary = "Get project info", operationId = "1")
     public ResponseEntity<Map> login(HttpSession session, @RequestBody AuthDto dto) {
         Map token = authService.getToken(dto);
         return ResponseEntity.ok(token);
