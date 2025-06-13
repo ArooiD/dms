@@ -2,14 +2,14 @@ package ru.mirea.designvault.storage.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import ru.mirea.designvault.storage.key.VersionId;
+import ru.mirea.designvault.storage.key.DocumentVersionId;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Data
 @Entity
-@IdClass(VersionId.class)
+@IdClass(DocumentVersionId.class)
 @Table(schema = "public", name = "document_version")
 public class DocumentVersion {
     @Id

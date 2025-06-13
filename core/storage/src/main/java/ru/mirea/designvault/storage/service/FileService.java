@@ -9,8 +9,10 @@ import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.mirea.designvault.storage.key.DocumentVersionId;
 import ru.mirea.designvault.storage.model.File;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
+import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
 
 import java.io.*;
 import java.time.Instant;
@@ -27,11 +29,13 @@ import java.util.zip.ZipOutputStream;
 public class FileService {
     private final MinioClient minio;
     private final String bucket;
+    private final DocumentVersionRepository documentVersionRepository;
 
     public FileService(MinioClient minio,
-                       @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository) throws Exception {
+                       @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
+        this.documentVersionRepository = documentVersionRepository;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
             minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
@@ -68,9 +72,7 @@ public class FileService {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
-
-
-
+            documentVersionRepository.getDocumentVersionProjectionById(new DocumentVersionId(pid, did, targetVersion));
             InputStream is = minio.getObject(
                     GetObjectArgs.builder()
                             .bucket(bucket)

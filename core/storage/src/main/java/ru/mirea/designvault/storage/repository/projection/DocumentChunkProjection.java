@@ -1,4 +1,4 @@
-package ru.mirea.designvault.storage.dto;
+package ru.mirea.designvault.storage.repository.projection;
 
 import java.util.UUID;
 
