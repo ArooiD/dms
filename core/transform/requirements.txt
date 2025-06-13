@@ -11,3 +11,4 @@ watchgod
 pydantic
 httpx
 preview-generator
+python-multipart
