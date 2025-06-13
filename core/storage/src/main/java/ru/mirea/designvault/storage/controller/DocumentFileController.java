@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,14 +39,13 @@ public class DocumentFileController {
     }
 
 
-    @PostMapping(value = {
-            "",
-            "/",
-            "/{did}"
-    })
-    public Object upload(@PathVariable(value = "pid") UUID pid,
+    @PostMapping(
+            value = {"", "/", "/{did}"},
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public Object upload(@PathVariable("pid") UUID pid,
                          @PathVariable(value = "did", required = false) UUID did,
-                         @RequestPart("uid") UUID uid,
+                         @RequestParam("uid") UUID uid,
                          @RequestPart("file") MultipartFile file) throws Exception {
         return documentFileService.addDocumentVersion(pid, did, uid, file);
     }
