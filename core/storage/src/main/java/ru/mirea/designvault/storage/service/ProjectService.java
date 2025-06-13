@@ -56,6 +56,6 @@ public class ProjectService {
     }
 
     public UUID resolveDid(UUID pid, String slug) {
-        return documentRepository.findDidByPidAndSlugByPidAndSlug(pid, slug);
+        return documentRepository.findDocumentsByPidAndSlug(pid, slug).getDid();
     }
 }
