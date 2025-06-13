@@ -7,18 +7,31 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.mirea.designvault.gateway.dto.DocumentDto;
 import ru.mirea.designvault.gateway.dto.FileDto;
 import ru.mirea.designvault.gateway.model.File;
+import ru.mirea.designvault.gateway.service.ProjectService;
 import ru.mirea.designvault.gateway.service.StorageService;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("projects/{pr_slug}/documents")
 @Tag(name = "Project API", description = "Работа с cущностью проекта")
 public class ProjectFileController {
     private final StorageService fileService;
+    private final ProjectService projectService;
 
-    public ProjectFileController(StorageService fileService) {
+    public ProjectFileController(StorageService fileService, ProjectService projectService) {
         this.fileService = fileService;
+        this.projectService = projectService;
+    }
+
+    @GetMapping("")
+    public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
+        UUID uid = UUID.fromString(token.getSubject());
+        return projectService.getProjectDtoDocument(slug, uid);
     }
 
     @GetMapping(value = {
