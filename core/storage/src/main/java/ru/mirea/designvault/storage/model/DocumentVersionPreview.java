@@ -20,8 +20,10 @@ public class DocumentVersionPreview {
     @Id
     @Column(name = "ver")
     private Integer ver;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "preview_type")
-    private String previewType;
+    @Column(name = "filename")
+    private String filename;
+    @Column(name = "ext")
+    private String ext;
+    @Column(name = "content_type")
+    private String contentType;
 }
