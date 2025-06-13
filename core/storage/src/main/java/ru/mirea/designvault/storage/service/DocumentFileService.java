@@ -223,7 +223,7 @@ public class DocumentFileService {
                 did = existingDoc.get().getDid();
                 return "Документ с таким содержимым уже существует, did=" + did;
             }
-            did = createNewDocument(pid, uid, file.getName());
+            did = createNewDocument(pid, uid, file.getOriginalFilename());
             createNewVersion(pid, did, uid, file, hash, 1);
             return "Создан новый документ и версия 1, did=" + did;
         } else {
@@ -265,6 +265,7 @@ public class DocumentFileService {
         dv.setVer(version);
         dv.setContentType(file.getContentType());
         dv.setUid(uid);
+        dv.setExt(extractExtension(file.getOriginalFilename()));
         dv.setHash(hash);
         dv.setSize(file.getSize());
         dv.setCreated(Instant.now());
