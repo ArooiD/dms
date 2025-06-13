@@ -16,24 +16,20 @@ os.makedirs(cache_dir, exist_ok=True)
 manager = PreviewManager(cache_dir, create_folder=True)
 
 
-@router.post("/preview")
+@router.post("/generate/preview")
 async def generate_preview(file: UploadFile = File(...)):
     suffix = os.path.splitext(file.filename)[1] or ""
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         shutil.copyfileobj(file.file, tmp)
         input_path = tmp.name
-
     try:
         mime_type = file.content_type or mimetypes.guess_type(file.filename)[0] or ""
         if mime_type.startswith("image/"):
-            # картинка -> jpeg превью
             output_path = manager.get_jpeg_preview(input_path)
             return FileResponse(output_path, media_type="image/jpeg", filename="preview.jpg")
-
         elif mime_type in ("application/pdf",):
             output_path = manager.get_pdf_preview(input_path)
             return FileResponse(output_path, media_type="application/pdf", filename="preview.pdf")
-
         elif mime_type in ("application/msword",
                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            "application/vnd.oasis.opendocument.text"):
@@ -41,7 +37,6 @@ async def generate_preview(file: UploadFile = File(...)):
             with open(output_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
             return HTMLResponse(content=html_content)
-
         elif mime_type.startswith("text/"):
             output_path = manager.get_text_preview(input_path)
             with open(output_path, "r", encoding="utf-8") as f:
@@ -49,7 +44,6 @@ async def generate_preview(file: UploadFile = File(...)):
             return PlainTextResponse(content=text_content)
         else:
             return FileResponse(input_path, media_type=mime_type or "application/octet-stream", filename=file.filename)
-
     finally:
         os.unlink(input_path)
 
