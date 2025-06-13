@@ -30,14 +30,12 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
     }, [status]);
 
     const performCreateProject = (values) => {
-        setStatus('pending')
-        console.log(values)
-
-        const temp = toJS(BUCKETS_LIST)
-
-        console.log('res => ', temp)
-
-        fetch(`${import.meta.env.VITE_DOMAIN}/api/project`, {
+        setStatus('pending');
+        console.log(values);
+        const temp = toJS(BUCKETS_LIST);
+        console.log('res => ', temp);
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        fetch(`${externalHost}/api/project`, {
             method: 'POST',
             headers: {
                 authorization: `Bearer ${getToken()}`,
@@ -112,7 +110,7 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
                     name={'slug'}
                     rules={[{required: true}]}
                 >
-                    <Input />
+                    <Input/>
                 </Form.Item>
                 <Form.Item
                     style={{width: '100%'}}
@@ -120,7 +118,7 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
                     name={'name'}
                     rules={[{required: true}]}
                 >
-                    <Input />
+                    <Input/>
                 </Form.Item>
                 <Form.Item
                     style={{width: '100%'}}
@@ -128,7 +126,7 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
                     name={'description'}
                     rules={[{required: false}]}
                 >
-                    <TextArea />
+                    <TextArea/>
                 </Form.Item>
                 <Form.Item
                     style={{width: '100%'}}
@@ -145,7 +143,7 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
                             label: 'Доступный',
                             value: 'shared'
                         }
-                    ]} />
+                    ]}/>
                 </Form.Item>
             </Flex>
         </Modal>
