@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.storage.model.File;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -59,7 +56,7 @@ public class FileService {
         ZonedDateTime odtStat = stat.lastModified();
         Instant zdtStat = odtStat.toInstant();
         FileInfo info = new FileInfo();
-        info.setObjectName(objectName);
+//        info.setObjectName(objectName);
         info.setSize(file.getSize());
         info.setContentType(file.getContentType());
         info.setLastModified(zdtStat);
@@ -67,9 +64,26 @@ public class FileService {
     }
 
 
-    public InputStream download(UUID userId, String objectName) throws Exception {
-        return minio.getObject(GetObjectArgs.builder()
-                .bucket(bucket).object(userId + "/" + objectName).build());
+    public File getDocumentVersion(UUID pid, UUID did, Integer ver) {
+        try {
+            Integer targetVersion = resolveVersion(pid, did, ver);
+            String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
+            InputStream is = minio.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectPath)
+                            .build()
+            );
+            log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
+            return File.builder()
+                    .fullName("pid")
+                    .contentType("")
+                    .stream(is)
+                    .build();
+        } catch (Exception e) {
+            log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
+            throw new RuntimeException("Ошибка при получении версии документа", e);
+        }
     }
 
     public FileInfo update(UUID userId, String objectName, MultipartFile file) throws Exception {
@@ -102,7 +116,7 @@ public class FileService {
             ZonedDateTime odtStat = item.lastModified();
             Instant instItem = odtStat.toInstant();
             FileInfo info = new FileInfo();
-            info.setObjectName(item.objectName());
+//            info.setObjectName(item.objectName());
             info.setSize(item.size());
             info.setContentType(null);
             info.setLastModified(instItem);
@@ -140,5 +154,41 @@ public class FileService {
                 .ext("zip")
                 .stream(bais)
                 .build();
+    }
+
+    private Integer resolveVersion(UUID cid, UUID did, Integer version) throws Exception {
+        String basePrefix = String.format("%s/%s/", cid, did);
+        Iterable<Result<Item>> results = minio.listObjects(
+                ListObjectsArgs.builder()
+                        .bucket(bucket)
+                        .prefix(basePrefix)
+                        .recursive(false)
+                        .build()
+        );
+        int maxVersion = -1;
+        for (Result<Item> result : results) {
+            String[] parts = result.get().objectName().split("/");
+            if (parts.length >= 3 && parts[0].equals(cid.toString()) && parts[1].equals(did.toString())) {
+                try {
+                    int v = Integer.parseInt(parts[2]);
+                    maxVersion = Math.max(maxVersion, v);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (maxVersion == -1) {
+            throw new FileNotFoundException("Документ не найден");
+        }
+        if (version == null) {
+            return maxVersion;
+        }
+        try {
+            if (version > maxVersion) {
+                throw new FileNotFoundException("Запрашиваемая версия не найдена");
+            }
+            return version;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Некорректный формат версии: " + version);
+        }
     }
 }

@@ -26,6 +26,8 @@ public class Document {
     private String filename;
     @Column(name = "ext")
     private String ext;
+    @Column(name = "content_type")
+    private String contentType;
     @Column(name = "created")
     private Instant created;
     @Column(name = "modified")

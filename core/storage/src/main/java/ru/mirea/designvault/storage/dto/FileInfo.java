@@ -12,8 +12,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileInfo {
-    private String objectName;
-    private long size;
+    private String name;
+    private String ext;
+    private Integer ver;
+    private Long size;
+    private String hash;
     private String contentType;
     private Instant lastModified;
 }
