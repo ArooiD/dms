@@ -64,10 +64,10 @@ public class DocumentFileService {
                             .build()
             );
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
-
             String name = Optional.ofNullable(document.getFilename()).orElse("document") +
                     "." +
                     Optional.ofNullable(document.getExt()).orElse("bin");
+            log.info(name);
             return DocumentFile.builder()
                     .name(name)
                     .contentType(document.getContentType())

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.dto.IndexDto;
 import ru.mirea.designvault.storage.dto.SearchSnippetDto;
-import ru.mirea.designvault.storage.service.IndexService;
+import ru.mirea.designvault.storage.service.DocumentIndexService;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,9 +17,9 @@ import java.util.Map;
 @RequestMapping(value = "index")
 public class IndexController {
 
-    private final IndexService indexService;
+    private final DocumentIndexService indexService;
 
-    public IndexController(IndexService indexService) {
+    public IndexController(DocumentIndexService indexService) {
         this.indexService = indexService;
     }
 

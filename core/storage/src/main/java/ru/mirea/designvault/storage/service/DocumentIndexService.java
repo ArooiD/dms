@@ -16,15 +16,14 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
-public class IndexService {
+public class DocumentIndexService {
     private final RestTemplate transformClient;
     private final DocumentVersionChunkRepository repository;
     private final DocumentVersionChunkRepository documentChunkRepository;
 
-    public IndexService(RestTemplateBuilder builder, DocumentVersionChunkRepository repository, DocumentVersionChunkRepository documentChunkRepository) {
+    public DocumentIndexService(RestTemplateBuilder builder, DocumentVersionChunkRepository repository, DocumentVersionChunkRepository documentChunkRepository) {
         this.transformClient = builder
                 .rootUri("http://core.transform:8000")
-//                .messageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
         this.repository = repository;
         this.documentChunkRepository = documentChunkRepository;
