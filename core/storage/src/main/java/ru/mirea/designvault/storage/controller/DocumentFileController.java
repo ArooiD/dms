@@ -6,6 +6,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.storage.model.DocumentFile;
 import ru.mirea.designvault.storage.service.DocumentFileService;
 
@@ -37,10 +38,19 @@ public class DocumentFileController {
     }
 
 
+    @PostMapping(value = {
+            "",
+            "/",
+            "/{did}"
+    })
+    public Object upload(@PathVariable(value = "pid") UUID pid,
+                         @PathVariable(value = "did", required = false) UUID did,
+                         @RequestPart("user") UUID uid,
+                         @RequestPart("file") MultipartFile file) throws Exception {
+        return documentFileService.addDocumentVersion(pid, did, uid, file);
+    }
 
 
-    //    @PostMapping()
-//    public FileInfo upload(@PathVariable(value = "pid") UUID pid, @RequestParam("file") MultipartFile file) throws Exception {
 //        return fileService.upload(pid, file);
 //    }
 

@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface DocumentRepository extends CrudRepository<Document, DocumentId> {
     List<Document> getDocumentsByPid(UUID pid);
+
+    boolean existsBySlug(String slug);
 }

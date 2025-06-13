@@ -1,24 +1,29 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.mirea.designvault.storage.dto.FileInfo;
+import org.springframework.web.multipart.MultipartFile;
 import io.minio.*;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.mirea.designvault.storage.exception.DocumentRetrievalException;
+import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.DocumentFile;
+import ru.mirea.designvault.storage.model.DocumentVersion;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
 import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -28,12 +33,14 @@ import java.util.zip.ZipOutputStream;
 public class DocumentFileService {
     private final MinioClient minio;
     private final String bucket;
+    private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
 
     public DocumentFileService(MinioClient minio,
                                @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
+        this.documentRepository = documentRepository;
         this.documentVersionRepository = documentVersionRepository;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
@@ -82,35 +89,34 @@ public class DocumentFileService {
 //        return upload(userId, file);
 //    }
 
-    public void delete(UUID userId, String objectName) throws Exception {
-        minio.removeObject(RemoveObjectArgs.builder()
-                .bucket(bucket).object(userId + "/" + objectName).build());
-    }
+//    public void delete(UUID userId, String objectName) throws Exception {
+//        minio.removeObject(RemoveObjectArgs.builder()
+//                .bucket(bucket).object(userId + "/" + objectName).build());
+//    }
 
-    public List<FileInfo> listAll(UUID pid) throws Exception {
-        List<FileInfo> all = new ArrayList<>();
-        Iterable<Result<Item>> results = minio.listObjects(
-                ListObjectsArgs.builder()
-                        .bucket(bucket)
-                        .prefix(pid.toString() + "/")
-                        .recursive(true)
-                        .build()
-        );
-        for (Result<Item> r : results) {
-            Item item = r.get();
-            ZonedDateTime odtStat = item.lastModified();
-            Instant instItem = odtStat.toInstant();
-            FileInfo info = new FileInfo();
-//            info.setObjectName(item.objectName());
-            info.setSize(item.size());
-            info.setContentType(null);
-            info.setLastModified(instItem);
-            all.add(info);
-        }
-        return all;
-    }
+//    public List<FileInfo> listAll(UUID pid) throws Exception {
+//        List<FileInfo> all = new ArrayList<>();
+//        Iterable<Result<Item>> results = minio.listObjects(
+//                ListObjectsArgs.builder()
+//                        .bucket(bucket)
+//                        .prefix(pid.toString() + "/")
+//                        .recursive(true)
+//                        .build()
+//        );
+//        for (Result<Item> r : results) {
+//            Item item = r.get();
+//            ZonedDateTime odtStat = item.lastModified();
+//            Instant instItem = odtStat.toInstant();
+//            FileInfo info = new FileInfo();
 
-
+    /// /            info.setObjectName(item.objectName());
+//            info.setSize(item.size());
+//            info.setContentType(null);
+//            info.setLastModified(instItem);
+//            all.add(info);
+//        }
+//        return all;
+//    }
     public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
@@ -178,4 +184,108 @@ public class DocumentFileService {
         }
         return version;
     }
+
+    private String extractExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "";
+        return filename.substring(filename.lastIndexOf('.') + 1);
+    }
+
+    private String calculateHash(InputStream inputStream) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] bytesBuffer = new byte[1024];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
+                digest.update(bytesBuffer, 0, bytesRead);
+            }
+            byte[] hashedBytes = digest.digest();
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException("Не удалось вычислить хеш", ex);
+        } finally {
+            inputStream.close();
+        }
+    }
+
+
+    public Object addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
+        String hash = calculateHash(file.getInputStream());
+        if (did == null) {
+            Optional<DocumentVersion> existingDoc = documentVersionRepository.findByPidAndHash(pid, hash);
+            if (existingDoc.isPresent()) {
+                did = existingDoc.get().getDid();
+                return "Документ с таким содержимым уже существует, did=" + did;
+            }
+            did = createNewDocument(pid, uid, file.getName());
+            createNewVersion(pid, did, uid, file, hash, 1);
+            return "Создан новый документ и версия 1, did=" + did;
+        } else {
+            boolean versionExists = documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash);
+            if (versionExists) {
+                return "Такая версия уже существует, ничего не делаем";
+            }
+            int newVersion = resolveVersion(pid, did, null) + 1;
+            createNewVersion(pid, did, uid, file, hash, newVersion);
+            return "Создана новая версия " + newVersion;
+        }
+    }
+
+    private UUID createNewDocument(UUID pid, UUID uid, String name) {
+        Document doc = new Document();
+        doc.setPid(pid);
+        doc.setDid(UUID.randomUUID());
+        doc.setUid(uid);
+        doc.setSlug(generateSlug(name, this::isSlugUnique));
+        doc.setCreated(Instant.now());
+        doc.setModified(Instant.now());
+        documentRepository.save(doc);
+        return doc.getDid();
+    }
+
+    private void createNewVersion(UUID pid, UUID did, UUID uid, MultipartFile file, String hash, int version) throws Exception {
+        String objectPath = String.format("%s/%s/%d/content", pid, did, version);
+        minio.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectPath)
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build()
+        );
+        DocumentVersion dv = new DocumentVersion();
+        dv.setPid(pid);
+        dv.setDid(did);
+        dv.setVer(version);
+        dv.setUid(uid);
+        dv.setHash(hash);
+        dv.setSize(file.getSize());
+        dv.setCreated(Instant.now());
+        documentVersionRepository.save(dv);
+    }
+
+    public String generateSlug(String input, Function<String, Boolean> isUniqueSlug) {
+        String base = Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") // убрать акценты
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")  // заменить всё, кроме букв и цифр, на "-"
+                .replaceAll("-{2,}", "-")       // убрать повторяющиеся "-"
+                .replaceAll("^-|-$", "");       // убрать "-" в начале и конце
+        String slug = base;
+        int suffix = 1;
+        while (!isUniqueSlug.apply(slug)) {
+            slug = base + "-" + suffix++;
+        }
+        return slug;
+    }
+
+    public boolean isSlugUnique(String slug) {
+        return !documentRepository.existsBySlug(slug);
+    }
+
+
 }
