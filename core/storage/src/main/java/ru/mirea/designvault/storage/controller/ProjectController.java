@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.dto.ProjectDto;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.Project;
+import ru.mirea.designvault.storage.repository.projection.DocumentInfoDto;
 import ru.mirea.designvault.storage.service.ProjectService;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class ProjectController {
     }
 
     @GetMapping("{slug}/documents")
-    public List<Document> getProjectDocument(@PathVariable("slug") String slug) {
+    public List<DocumentInfoDto> getProjectDocument(@PathVariable("slug") String slug) {
         return projectService.getProjectDocument(slug);
     }
 

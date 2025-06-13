@@ -7,6 +7,7 @@ import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.Project;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
 import ru.mirea.designvault.storage.repository.ProjectRepository;
+import ru.mirea.designvault.storage.repository.projection.DocumentInfoDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class ProjectService {
         return projectRepository.findProjectByPidAndUid(pid, uid);
     }
 
-    public List<Document> getProjectDocument(String slug) {
+    public List<DocumentInfoDto> getProjectDocument(String slug) {
         UUID pid = projectRepository.getProjectBySlug(slug).getPid();
         return documentRepository.getDocumentsByPid(pid);
     }
