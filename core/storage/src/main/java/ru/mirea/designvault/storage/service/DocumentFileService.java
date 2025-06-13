@@ -79,45 +79,6 @@ public class DocumentFileService {
         }
     }
 
-//    public FileInfo update(UUID userId, String objectName, MultipartFile file) throws Exception {
-//        PutObjectArgs args = PutObjectArgs.builder()
-//                .bucket(bucket)
-//                .object(userId + "/" + objectName)
-//                .stream(file.getInputStream(), file.getSize(), -1)
-//                .contentType(file.getContentType())
-//                .build();
-//        minio.putObject(args);
-//        return upload(userId, file);
-//    }
-
-//    public void delete(UUID userId, String objectName) throws Exception {
-//        minio.removeObject(RemoveObjectArgs.builder()
-//                .bucket(bucket).object(userId + "/" + objectName).build());
-//    }
-
-//    public List<FileInfo> listAll(UUID pid) throws Exception {
-//        List<FileInfo> all = new ArrayList<>();
-//        Iterable<Result<Item>> results = minio.listObjects(
-//                ListObjectsArgs.builder()
-//                        .bucket(bucket)
-//                        .prefix(pid.toString() + "/")
-//                        .recursive(true)
-//                        .build()
-//        );
-//        for (Result<Item> r : results) {
-//            Item item = r.get();
-//            ZonedDateTime odtStat = item.lastModified();
-//            Instant instItem = odtStat.toInstant();
-//            FileInfo info = new FileInfo();
-
-    /// /            info.setObjectName(item.objectName());
-//            info.setSize(item.size());
-//            info.setContentType(null);
-//            info.setLastModified(instItem);
-//            all.add(info);
-//        }
-//        return all;
-//    }
     public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
@@ -187,13 +148,17 @@ public class DocumentFileService {
     }
 
     private String extractExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "";
-        return filename.substring(filename.lastIndexOf('.') + 1);
+        if (filename == null) return "";
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == filename.length() - 1) return "";
+        return filename.substring(dotIndex + 1);
     }
 
     private String extractFilename(String filename) {
-        if (filename == null || !filename.contains(".")) return "";
-        return filename.substring(filename.lastIndexOf('.'));
+        if (filename == null) return "";
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex == -1) return filename;
+        return filename.substring(0, dotIndex);
     }
 
     private String calculateHash(InputStream inputStream) throws IOException {
