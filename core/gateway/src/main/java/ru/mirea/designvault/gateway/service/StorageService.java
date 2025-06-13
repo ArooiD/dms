@@ -24,11 +24,22 @@ public class StorageService {
     public ResponseEntity<Resource> getFileObjectVersion(String slug, String name, Integer ver) {
         UUID pid = UUID.fromString("84055427-00ea-41e0-800a-e3e31f8acefc");
         UUID did = UUID.fromString("1eef8b77-0e78-4f34-b45c-95d3017b4239");
-        ResponseEntity<Resource> response = client.exchange("/flie/{pid}/{did}",
+        String url;
+        Object[] uriVariables;
+        if (ver == null) {
+            url = "/file/{pid}/{did}";
+            uriVariables = new Object[]{pid, did};
+        } else {
+            url = "/file/{pid}/{did}/{ver}";
+            uriVariables = new Object[]{pid, did, ver};
+        }
+        ResponseEntity<Resource> response = client.exchange(
+                url,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 Resource.class,
-                pid, did);
+                uriVariables
+        );
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Ошибка при получении файла: " + response.getStatusCode());
         }
