@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mirea.designvault.gateway.dto.AuthDto;
-import ru.mirea.designvault.gateway.service.AuthService;
+import ru.mirea.designvault.gateway.service.IdentityService;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
 public class AuthController {
-    private final AuthService authService;
+    private final IdentityService authService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(IdentityService authService) {
         this.authService = authService;
     }
 

@@ -9,10 +9,10 @@ import ru.mirea.designvault.gateway.dto.AuthDto;
 import java.util.Map;
 
 @Service
-public class AuthService {
+public class IdentityService {
     private final RestTemplate restTemplate;
 
-    public AuthService(RestTemplateBuilder builder) {
+    public IdentityService(RestTemplateBuilder builder) {
         this.restTemplate = builder
                 .rootUri("http://core.identity:8000")
                 .build();

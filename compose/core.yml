@@ -37,6 +37,8 @@ services:
     depends_on:
       infra.psql:
         condition: service_healthy
+      infra.keycloak:
+        condition: service_healthy
       infra.rabbitmq:
         condition: service_healthy
 
