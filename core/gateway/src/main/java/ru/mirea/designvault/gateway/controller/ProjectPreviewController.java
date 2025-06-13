@@ -1,5 +1,7 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,15 @@ public class ProjectPreviewController {
         this.storageService = storageService;
     }
 
+    @Operation(
+            summary = "Получение файла документа или его версии",
+            description = "Возвращает содержимое файла документа по slug проекта, slug документа и опциональной версии.",
+            parameters = {
+                    @Parameter(name = "pr_slug", description = "Slug проекта", required = true),
+                    @Parameter(name = "doc_slug", description = "Slug документа", required = true),
+                    @Parameter(name = "ver", description = "Версия документа (необязательный параметр)", required = false)
+            }
+    )
     @GetMapping(value = {
             "{doc_slug}",
             "{doc_slug}/{ver}"

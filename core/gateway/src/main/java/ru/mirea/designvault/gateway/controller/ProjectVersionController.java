@@ -1,5 +1,8 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +22,20 @@ public class ProjectVersionController {
     public ProjectVersionController(StorageService storageService) {
         this.storageService = storageService;
     }
+
+    @Operation(
+            summary = "Получить версии документа",
+            description = "Возвращает список всех версий указанного документа в проекте по его slug.",
+            parameters = {
+                    @Parameter(name = "pr_slug", description = "Slug проекта", required = true, example = "my-project"),
+                    @Parameter(name = "doc_slug", description = "Slug документа", required = true, example = "my-document")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список версий документа успешно получен"),
+                    @ApiResponse(responseCode = "404", description = "Документ или проект не найдены"),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            }
+    )
 
     @GetMapping(value = {"/{doc_slug}", "/{doc_slug}/"})
     public Object getDocumentsVersions(@PathVariable("pr_slug") String pr_slug,
