@@ -58,10 +58,10 @@ public class FileController {
         }
     }
 
-    @PutMapping("{name}")
+    @PutMapping("{doc_slug}")
     public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
                                     @PathVariable("pr_slug") String slug,
-                                    @PathVariable("name") String name,
+                                    @PathVariable("doc_slug") String name,
                                     @RequestParam("file") MultipartFile file) {
         try {
             File dto = fileService.updateFileToProject(slug, name, file);
@@ -72,11 +72,11 @@ public class FileController {
         }
     }
 
-    @DeleteMapping("{name}")
+    @DeleteMapping("{doc_slug}")
     public ResponseEntity<?> deleteFileToContract(
             @AuthenticationPrincipal Jwt token,
             @PathVariable("pr_slug") String slug,
-            @PathVariable("name") String name
+            @PathVariable("doc_slug") String name
     ) {
         try {
             FileDto dto = fileService.deleteFileToProject(slug, name);
