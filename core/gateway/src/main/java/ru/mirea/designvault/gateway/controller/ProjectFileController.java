@@ -1,28 +1,23 @@
 package ru.mirea.designvault.gateway.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.gateway.dto.FileDto;
 import ru.mirea.designvault.gateway.model.File;
 import ru.mirea.designvault.gateway.service.StorageService;
 
-import java.util.UUID;
-
 @RestController
-@RequestMapping("project/{pr_slug}/files")
+@RequestMapping("projects/{pr_slug}/files")
 @Tag(name = "Project API", description = "Работа с cущностью проекта")
-public class FileController {
+public class ProjectFileController {
     private final StorageService fileService;
 
-    public FileController(StorageService fileService) {
+    public ProjectFileController(StorageService fileService) {
         this.fileService = fileService;
     }
 
