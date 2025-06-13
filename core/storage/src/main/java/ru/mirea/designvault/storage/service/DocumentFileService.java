@@ -263,6 +263,7 @@ public class DocumentFileService {
         dv.setPid(pid);
         dv.setDid(did);
         dv.setVer(version);
+        dv.setFilename(file.getOriginalFilename());
         dv.setContentType(file.getContentType());
         dv.setUid(uid);
         dv.setExt(extractExtension(file.getOriginalFilename()));
