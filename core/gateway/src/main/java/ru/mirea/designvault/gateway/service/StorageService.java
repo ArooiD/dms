@@ -51,14 +51,6 @@ public class StorageService {
         return new ResponseEntity<>(response.getBody(), headers, HttpStatus.OK);
     }
 
-    public File updateFileToProject(String slug, String name, MultipartFile file) {
-        return null;
-    }
-
-    public File updateFileToProject(String slug, MultipartFile file) {
-        return null;
-    }
-
     public FileDto deleteFileToProject(String slug, String name) {
         return null;
     }
