@@ -7,6 +7,7 @@ import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.DocumentVersion;
 import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,4 +18,6 @@ public interface DocumentVersionRepository extends CrudRepository<DocumentVersio
     Optional<DocumentVersion> findByPidAndHash(UUID pid, String hash);
 
     boolean existsByPidAndDidAndHash(UUID pid, UUID did, String hash);
+
+    List<DocumentVersion> findAllByPidAndDid(UUID pid, UUID did);
 }

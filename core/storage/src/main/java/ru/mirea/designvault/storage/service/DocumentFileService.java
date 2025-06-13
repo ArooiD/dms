@@ -302,5 +302,7 @@ public class DocumentFileService {
         return !documentRepository.existsBySlug(slug);
     }
 
-
+    public List<DocumentVersion> getDocumentVersions(UUID pid, UUID did) {
+        return documentVersionRepository.findAllByPidAndDid(pid, did);
+    }
 }

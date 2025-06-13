@@ -15,6 +15,7 @@ public class ProjectVersionController {
     @GetMapping(value = {"/{doc_slug}", "/{doc_slug}/"})
     public Object getDocumentsVersions(@PathVariable("pr_slug") String pr_slug,
                                        @PathVariable("doc_slug") String doc_slug) {
+
         return new ArrayList<>();
     }
 }
