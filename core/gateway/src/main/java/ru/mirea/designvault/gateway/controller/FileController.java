@@ -17,7 +17,7 @@ import ru.mirea.designvault.gateway.service.StorageService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("project/{slug}/files")
+@RequestMapping("project/{pr_slug}/files")
 @Tag(name = "File API", description = "Работа с файлами проекта")
 public class FileController {
     private final StorageService fileService;
@@ -27,12 +27,12 @@ public class FileController {
     }
 
     @GetMapping(value = {
-            "{name}",
-            "{name}/{ver}"
+            "{doc_slug}",
+            "{doc_slug}/{ver}"
     })
     public ResponseEntity<?> fetch(@AuthenticationPrincipal Jwt token,
-                                   @PathVariable("slug") String slug,
-                                   @PathVariable("name") String name,
+                                   @PathVariable("pr_slug") String slug,
+                                   @PathVariable("doc_slug") String name,
                                    @PathVariable(value = "ver", required = false) Integer ver) {
         try {
             UUID uid = UUID.fromString(token.getSubject());
@@ -46,7 +46,7 @@ public class FileController {
 
     @PostMapping("document")
     public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-                                    @PathVariable("slug") String slug,
+                                    @PathVariable("pr_slug") String slug,
                                     @RequestParam("file") MultipartFile file) {
         try {
             File dto = fileService.updateFileToProject(slug, file);
@@ -60,7 +60,7 @@ public class FileController {
 
     @PutMapping("{name}")
     public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-                                    @PathVariable("slug") String slug,
+                                    @PathVariable("pr_slug") String slug,
                                     @PathVariable("name") String name,
                                     @RequestParam("file") MultipartFile file) {
         try {
@@ -75,7 +75,7 @@ public class FileController {
     @DeleteMapping("{name}")
     public ResponseEntity<?> deleteFileToContract(
             @AuthenticationPrincipal Jwt token,
-            @PathVariable("slug") String slug,
+            @PathVariable("pr_slug") String slug,
             @PathVariable("name") String name
     ) {
         try {
