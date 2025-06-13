@@ -1,5 +1,6 @@
 package ru.mirea.designvault.storage.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mirea.designvault.storage.dto.FileInfo;
@@ -8,23 +9,29 @@ import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.mirea.designvault.storage.model.File;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+
+@Slf4j
 @Service
 public class FileService {
-    private final Logger logger;
     private final MinioClient minio;
     private final String bucket;
 
     public FileService(MinioClient minio,
                        @Value("${minio.bucket}") String bucket) throws Exception {
-        this.logger = LoggerFactory.getLogger(this.getClass());
         this.minio = minio;
         this.bucket = bucket;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
@@ -102,5 +109,36 @@ public class FileService {
             all.add(info);
         }
         return all;
+    }
+
+
+    public File makeArchive(List<File> files) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            for (File file : files) {
+                String entryName = file.getFullName() != null ? file.getFullName() : file.getName();
+                if (entryName == null) {
+                    entryName = "unnamed_file_" + UUID.randomUUID();
+                }
+                zos.putNextEntry(new ZipEntry(entryName));
+                try (InputStream is = file.getStream()) {
+                    if (is != null) {
+                        byte[] buffer = new byte[8192];
+                        int len;
+                        while ((len = is.read(buffer)) > 0) {
+                            zos.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zos.closeEntry();
+            }
+        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        return File.builder()
+                .contentType("application/zip")
+                .name("archive")
+                .ext("zip")
+                .stream(bais)
+                .build();
     }
 }

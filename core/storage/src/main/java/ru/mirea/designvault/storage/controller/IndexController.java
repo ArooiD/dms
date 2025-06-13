@@ -34,6 +34,18 @@ public class IndexController {
         }
     }
 
+    @DeleteMapping("document")
+    public ResponseEntity<String> clearChunk(@RequestBody IndexDto dto) {
+        try {
+            indexService.cleanIndex(dto);
+            return ResponseEntity.ok("Indexed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Clean failed: " + e.getMessage());
+        }
+    }
+
+
     @GetMapping("search")
     public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) throws JsonProcessingException {
         String text = query.get("query");

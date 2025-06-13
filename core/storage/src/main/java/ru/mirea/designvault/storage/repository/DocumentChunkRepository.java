@@ -27,5 +27,11 @@ public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, D
     )
     List<DocumentChunkProjection> findNearestNeighborsWithFullText(String vector, String textQuery, int limit);
 
-
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true,
+            value = """
+                    DELETE FROM document_chunk WHERE pid = :pid AND did = :did
+                    """)
+    void deleteAllByPidAndDid(UUID pid, UUID did);
 }

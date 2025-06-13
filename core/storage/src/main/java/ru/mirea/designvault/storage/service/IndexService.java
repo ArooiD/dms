@@ -50,6 +50,13 @@ public class IndexService {
         }
     }
 
+    public void cleanIndex(IndexDto dto) {
+        UUID pid = dto.getPid();
+        UUID did = dto.getDid();
+        documentChunkRepository.deleteAllByPidAndDid(pid, did);
+    }
+
+
     public float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://core.transform:8000/embedding/generate";
