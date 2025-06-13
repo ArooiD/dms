@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice \
-    openjdk-11-jre-headless \
+    openjdk-17-jre-headless \
     poppler-utils \
     unoconv \
     ffmpeg \
