@@ -159,7 +159,7 @@ public class StorageService {
     public Object getDocumentsVersions(String prSlug, String docSlug) {
         UUID pid = resolveProjectSlug(prSlug);
         UUID did = resolveDocumentSlug(pid, docSlug);
-        String url = "/versions/" + pid + "/" + did;
+        String url = "/version/" + pid + "/" + did;
         ResponseEntity<Object> response = client.getForEntity(url, Object.class);
         return response.getBody();
     }
