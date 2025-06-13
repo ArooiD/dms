@@ -243,11 +243,11 @@ public class DocumentFileService {
 
     public String generateSlug(String input, Function<String, Boolean> isUniqueSlug) {
         String base = Normalizer.normalize(input, Normalizer.Form.NFD)
-                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") // убрать акценты
+                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "")
                 .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "-")  // заменить всё, кроме букв и цифр, на "-"
-                .replaceAll("-{2,}", "-")       // убрать повторяющиеся "-"
-                .replaceAll("^-|-$", "");       // убрать "-" в начале и конце
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
         String slug = base;
         int suffix = 1;
         while (!isUniqueSlug.apply(slug)) {
