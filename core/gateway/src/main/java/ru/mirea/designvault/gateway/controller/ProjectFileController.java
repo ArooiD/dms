@@ -52,12 +52,6 @@ public class ProjectFileController {
         }
     }
 
-    @GetMapping(value = "{doc_slug}/versions")
-    public Object getDocumentsVersions(@PathVariable("pr_slug") String pr_slug,
-                                       @PathVariable("doc_slug") String doc_slug) {
-        return new ArrayList<>();
-    }
-
 
     @PostMapping("new")
     public Object upload(@AuthenticationPrincipal Jwt token,
