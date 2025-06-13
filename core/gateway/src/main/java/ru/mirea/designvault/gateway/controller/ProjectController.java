@@ -47,8 +47,8 @@ public class ProjectController {
         return projectService.createProject(UUID.fromString(token.getSubject()), project);
     }
 
-    @DeleteMapping()
-    public Object deleteProject(@AuthenticationPrincipal Jwt token, @RequestParam UUID pid) {
+    @DeleteMapping("{pr_slug}")
+    public Object deleteProject(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug, @RequestParam UUID pid) {
         return projectService.deleteProject(UUID.fromString(token.getSubject()), pid);
     }
 }
