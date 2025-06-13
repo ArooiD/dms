@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("project/{pr_slug}/files")
-@Tag(name = "Project API", description = "Работа с файлами проекта")
+@Tag(name = "Project API", description = "Работа с cущностью проекта")
 public class FileController {
     private final StorageService fileService;
 
@@ -32,9 +32,9 @@ public class FileController {
     })
     public ResponseEntity<?> fetch(
 //            @AuthenticationPrincipal Jwt token,
-                                   @PathVariable("pr_slug") String slug,
-                                   @PathVariable("doc_slug") String name,
-                                   @PathVariable(value = "ver", required = false) Integer ver) {
+            @PathVariable("pr_slug") String slug,
+            @PathVariable("doc_slug") String name,
+            @PathVariable(value = "ver", required = false) Integer ver) {
         try {
 //            UUID uid = UUID.fromString(token.getSubject());
             return fileService.getFileObjectVersion(slug, name, ver);

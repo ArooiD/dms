@@ -28,15 +28,15 @@ public class ProjectController {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
     }
 
-    @GetMapping("{slug}/info")
-    public ProjectInfoDto getProjectInfo(@AuthenticationPrincipal Jwt token, @PathVariable("slug") String slug) {
+    @GetMapping("{pr_slug}/info")
+    public ProjectInfoDto getProjectInfo(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
         UUID uid = UUID.fromString(token.getSubject());
         return projectService.getProjectInfo(slug, uid);
     }
 
 
-    @GetMapping("{slug}/documents")
-    public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("slug") String slug) {
+    @GetMapping("{pr_slug}/documents")
+    public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
         UUID uid = UUID.fromString(token.getSubject());
         return projectService.getProjectDtoDocument(slug, uid);
     }

@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
+@Tag(name = "Auth API", description = "Авторизация в системе")
 public class AuthController {
     private final IdentityService authService;
 
