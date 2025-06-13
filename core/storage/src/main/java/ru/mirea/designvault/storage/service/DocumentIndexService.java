@@ -58,7 +58,7 @@ public class DocumentIndexService {
 
     public float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://core.transform:8000/embedding/generate";
+        String url = "http://core.transform:8000/generate/embedding";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> body = Map.of("text", text);
