@@ -7,6 +7,7 @@ import io.minio.*;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.mirea.designvault.storage.dto.DocumentVersionResponse;
 import ru.mirea.designvault.storage.exception.DocumentRetrievalException;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.DocumentFile;
@@ -218,25 +219,31 @@ public class DocumentFileService {
 
 
     @Transactional
-    public Object addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
+    public DocumentVersionResponse addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
         String hash = calculateHash(file.getInputStream());
+        String status;
+
         if (did == null) {
             Optional<DocumentVersion> existingDoc = documentVersionRepository.findByPidAndHash(pid, hash);
             if (existingDoc.isPresent()) {
                 did = existingDoc.get().getDid();
-                return "Документ с таким содержимым уже существует, did=" + did;
+                status = "Документ с таким содержимым уже существует";
+                return new DocumentVersionResponse(pid, did, status);
             }
             did = createNewDocument(pid, uid, file.getOriginalFilename());
             createNewVersion(pid, did, uid, file, hash, 1);
-            return "Создан новый документ и версия 1, did=" + did;
+            status = "Создан новый документ и версия 1";
+            return new DocumentVersionResponse(pid, did, status);
         } else {
             boolean versionExists = documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash);
             if (versionExists) {
-                return "Такая версия уже существует, ничего не делаем";
+                status = "Такая версия уже существует, ничего не делаем";
+                return new DocumentVersionResponse(pid, did, status);
             }
             int newVersion = resolveVersion(pid, did, null) + 1;
             createNewVersion(pid, did, uid, file, hash, newVersion);
-            return "Создана новая версия " + newVersion;
+            status = "Создана новая версия " + newVersion;
+            return new DocumentVersionResponse(pid, did, status);
         }
     }
 

@@ -41,6 +41,13 @@ public class ProjectController {
         return projectService.resolveDid(pid, slug);
     }
 
+    @GetMapping("/{pid}/documents/{did}/slug")
+    public String getProjectDocument(
+            @PathVariable("pid") UUID pid,
+            @PathVariable("did") UUID did) {
+        return projectService.resolveDocumentSlug(pid, did);
+    }
+
     @PostMapping()
     public Object createProject(@RequestParam("uid") UUID uid, @RequestBody ProjectDto dto) {
         return projectService.createProject(uid, dto);

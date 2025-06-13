@@ -15,4 +15,6 @@ public interface DocumentRepository extends CrudRepository<Document, DocumentId>
     boolean existsBySlug(String slug);
 
     Document findDocumentsByPidAndSlug(UUID pid, String slug);
+
+    Document findDocumentsByPidAndDid(UUID pid, UUID did);
 }
