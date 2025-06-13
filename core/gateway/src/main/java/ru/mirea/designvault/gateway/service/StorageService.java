@@ -6,7 +6,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import ru.mirea.designvault.gateway.dto.FileDto;
 
 import java.util.UUID;
 
@@ -82,8 +81,11 @@ public class StorageService {
         return new ResponseEntity<>(response.getBody(), headers, HttpStatus.OK);
     }
 
+    public Object addFileObjectVersion(String slug, UUID uid, MultipartFile file) {
+        return null;
+    }
 
-    public FileDto deleteFileToProject(String slug, String name) {
+    public Object addFileObjectVersion(String slug, String name, UUID uid, MultipartFile file) {
         return null;
     }
 }

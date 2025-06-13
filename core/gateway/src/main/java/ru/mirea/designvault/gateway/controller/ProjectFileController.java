@@ -51,46 +51,44 @@ public class ProjectFileController {
         }
     }
 
-//    @PostMapping("new")
-//    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-//                                    @PathVariable("pr_slug") String slug,
-//                                    @RequestParam("file") MultipartFile file) {
-//        try {
-//            File dto = fileService.updateFileToProject(slug, file);
-//            return ResponseEntity.status(HttpStatus.ACCEPTED)
-//                    .body(dto);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error: " + e.getMessage());
-//        }
-//    }
+    @PostMapping("new")
+    public Object upload(@AuthenticationPrincipal Jwt token,
+                         @PathVariable("pr_slug") String slug,
+                         @RequestParam("file") MultipartFile file) {
+        try {
+            UUID uid = UUID.fromString(token.getSubject());
+            return fileService.addFileObjectVersion(slug, uid, file);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
+    }
 
-//    @PutMapping("{doc_slug}")
-//    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
-//                                    @PathVariable("pr_slug") String slug,
-//                                    @PathVariable("doc_slug") String name,
-//                                    @RequestParam("file") MultipartFile file) {
+    @PutMapping("{doc_slug}")
+    public Object upload(@AuthenticationPrincipal Jwt token,
+                         @PathVariable("pr_slug") String slug,
+                         @PathVariable("doc_slug") String name,
+                         @RequestParam("file") MultipartFile file) {
+        try {
+            UUID uid = UUID.fromString(token.getSubject());
+            return fileService.addFileObjectVersion(slug, name, uid, file);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
+    }
+//    @DeleteMapping("{doc_slug}")
+//    public ResponseEntity<?> deleteFileToContract(
+//            @AuthenticationPrincipal Jwt token,
+//            @PathVariable("pr_slug") String slug,
+//            @PathVariable("doc_slug") String name
+//    ) {
 //        try {
-//            File dto = fileService.updateFileToProject(slug, name, file);
+//            FileDto dto = fileService.deleteFileToProject(slug, name);
 //            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                    .body("Error: " + e.getMessage());
 //        }
 //    }
-
-    @DeleteMapping("{doc_slug}")
-    public ResponseEntity<?> deleteFileToContract(
-            @AuthenticationPrincipal Jwt token,
-            @PathVariable("pr_slug") String slug,
-            @PathVariable("doc_slug") String name
-    ) {
-        try {
-            FileDto dto = fileService.deleteFileToProject(slug, name);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
-        }
-    }
 }
