@@ -12,7 +12,9 @@ import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.DocumentFile;
 import ru.mirea.designvault.storage.model.DocumentVersion;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
+import ru.mirea.designvault.storage.repository.DocumentVersionPreviewRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
+import ru.mirea.designvault.storage.repository.projection.DocumentVersionPreviewProjection;
 import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
 
 import java.io.*;
@@ -35,13 +37,15 @@ public class DocumentFileService {
     private final MinioClient minio;
     private final String bucket;
     private final DocumentRepository documentRepository;
+    private final DocumentVersionPreviewRepository documentVersionPreviewRepository;
     private final DocumentVersionRepository documentVersionRepository;
 
     public DocumentFileService(MinioClient minio,
-                               @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
+                               @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionPreviewRepository documentVersionPreviewRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
         this.documentRepository = documentRepository;
+        this.documentVersionPreviewRepository = documentVersionPreviewRepository;
         this.documentVersionRepository = documentVersionRepository;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
@@ -49,7 +53,7 @@ public class DocumentFileService {
         }
     }
 
-    public DocumentFile getDocumentVersion(UUID pid, UUID did, Integer ver) {
+    public DocumentFile getDocumentContentVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
@@ -78,6 +82,37 @@ public class DocumentFileService {
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
         }
     }
+
+    public DocumentFile getDocumentPreviewVersion(UUID pid, UUID did, Integer ver) {
+        try {
+            Integer targetVersion = resolveVersion(pid, did, ver);
+            String objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
+            DocumentVersionPreviewProjection document = documentVersionPreviewRepository.findByPidAndDidAndVer(pid, did, targetVersion);
+            if (document == null) {
+                throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
+            }
+            InputStream is = minio.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectPath)
+                            .build()
+            );
+            log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") +
+                    "." +
+                    Optional.ofNullable(document.getExt()).orElse("bin");
+            log.info(name);
+            return DocumentFile.builder()
+                    .name(name)
+                    .contentType(document.getContentType())
+                    .stream(is)
+                    .build();
+        } catch (Exception e) {
+            log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
+            throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
+        }
+    }
+
 
     public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

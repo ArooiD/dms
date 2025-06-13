@@ -32,7 +32,7 @@ public class DocumentPreviewController {
     public ResponseEntity<InputStreamResource> getDocumentVersion(@PathVariable(value = "pid") UUID pid,
                                                                   @PathVariable(value = "did") UUID did,
                                                                   @PathVariable(value = "ver", required = false) Integer ver) {
-        DocumentFile object = documentFileService.getDocumentVersion(pid, did, ver);
+        DocumentFile object = documentFileService.getDocumentPreviewVersion(pid, did, ver);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
@@ -40,17 +40,6 @@ public class DocumentPreviewController {
                 .body(object.getInputStreamResource());
     }
 
-
-    @PostMapping(
-            value = {"", "/", "/{did}"},
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public Object upload(@PathVariable("pid") UUID pid,
-                         @PathVariable(value = "did", required = false) UUID did,
-                         @RequestParam("uid") UUID uid,
-                         @RequestPart("file") MultipartFile file) throws Exception {
-        return documentFileService.addDocumentVersion(pid, did, uid, file);
-    }
 
     private String encodeFallbackName(String name) {
         return name.replaceAll("[^\\x20-\\x7E]", "_");

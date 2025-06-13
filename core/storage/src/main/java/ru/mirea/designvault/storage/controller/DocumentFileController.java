@@ -33,7 +33,7 @@ public class DocumentFileController {
     public ResponseEntity<InputStreamResource> getDocumentVersion(@PathVariable(value = "pid") UUID pid,
                                                                   @PathVariable(value = "did") UUID did,
                                                                   @PathVariable(value = "ver", required = false) Integer ver) {
-        DocumentFile object = documentFileService.getDocumentVersion(pid, did, ver);
+        DocumentFile object = documentFileService.getDocumentContentVersion(pid, did, ver);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
