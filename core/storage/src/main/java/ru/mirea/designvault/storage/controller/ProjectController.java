@@ -29,6 +29,18 @@ public class ProjectController {
         return projectService.getProject(pid, uid);
     }
 
+    @GetMapping("/{slug}/pid")
+    public UUID getProject(@PathVariable("slug") String slug) {
+        return projectService.resolvePid(slug);
+    }
+
+    @GetMapping("/{pid}/documents/{slug}/did")
+    public UUID getProjectDocument(
+            @PathVariable("pid") UUID pid,
+            @PathVariable("slug") String slug) {
+        return projectService.resolveDid(pid, slug);
+    }
+
     @PostMapping()
     public Object createProject(@RequestParam("uid") UUID uid, @RequestBody ProjectDto dto) {
         return projectService.createProject(uid, dto);
@@ -48,18 +60,6 @@ public class ProjectController {
     public List<Document> getProjectDocument(@PathVariable("slug") String slug) {
         return projectService.getProjectDocument(slug);
     }
-
-
-    @GetMapping("/{pid}/documents/{did}")
-    public Document getProjectDocument(
-            @PathVariable("pid") UUID pid,
-            @PathVariable("did") UUID did
-    ) {
-
-        return new Document();
-    }
-
-    
 
 
 }

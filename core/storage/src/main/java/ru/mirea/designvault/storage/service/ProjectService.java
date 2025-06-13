@@ -50,4 +50,12 @@ public class ProjectService {
         UUID pid = projectRepository.getProjectBySlug(slug).getPid();
         return documentRepository.getDocumentsByPid(pid);
     }
+
+    public UUID resolvePid(String slug) {
+        return projectRepository.findProjectBySlug(slug).getPid();
+    }
+
+    public UUID resolveDid(UUID pid, String slug) {
+        return documentRepository.findDidByPidAndSlugByPidAndSlug(pid, slug);
+    }
 }

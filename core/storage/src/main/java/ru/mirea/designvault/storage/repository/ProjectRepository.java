@@ -20,4 +20,6 @@ public interface ProjectRepository extends CrudRepository<Project, ProjectId> {
     Project findProjectByPidAndUid(UUID pid, UUID uid);
 
     Project getProjectBySlug(String slug);
+
+    Project findProjectBySlug(String slug);
 }

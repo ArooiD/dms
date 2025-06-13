@@ -13,4 +13,12 @@ public interface DocumentRepository extends CrudRepository<Document, DocumentId>
     List<Document> getDocumentsByPid(UUID pid);
 
     boolean existsBySlug(String slug);
+
+    UUID findDocumentsByPid(UUID pid);
+
+    UUID findDocumentsByPidAndSlug(UUID pid, String slug);
+
+    UUID findDidByPidAndSlug(UUID pid, String slug);
+
+    UUID findDidByPidAndSlugByPidAndSlug(UUID pid, String slug);
 }
