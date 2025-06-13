@@ -3,9 +3,10 @@ import bc from './ProjectCard.module.scss'
 import {useStores} from "../../utils/hooks/useStores.js";
 import {observer} from "mobx-react-lite";
 import {useNavigate} from "react-router-dom";
+import TextArea from "antd/lib/input/TextArea.js";
 
 
-const ProjectCard = observer(({name, slug, created, count, access, modified}) => {
+const ProjectCard = observer(({name, slug, description, created, count, access, modified}) => {
     const {
         systemStore: {
             IS_THEME_DARK
@@ -18,7 +19,10 @@ const ProjectCard = observer(({name, slug, created, count, access, modified}) =>
             navigate(`/browser/${slug}`)
         }} className={bc.container} style={{backgroundColor: IS_THEME_DARK ? '#5b3d6d': "#bb9dcd"}}>
             <Flex justify={'space-between'}>
-                <Typography.Text style={{fontWeight: '500'}}>{name ?? `Без имени`}</Typography.Text>
+                <Flex vertical>
+                    <Typography.Text style={{fontWeight: '500'}}>{name ?? `Без имени`}</Typography.Text>
+                    <Typography.Text>{description}</Typography.Text>
+                </Flex>
                 <Typography.Text style={{fontWeight: '500'}}>{count}</Typography.Text>
             </Flex>
             <Flex justify={'space-between'}>

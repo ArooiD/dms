@@ -1,10 +1,32 @@
-import {Breadcrumb, Button, Checkbox, Descriptions, Flex, Input, Table, Typography} from "antd";
+import {
+    Breadcrumb,
+    Button,
+    Checkbox,
+    Descriptions,
+    Flex,
+    Input,
+    Table,
+    Typography,
+    Upload,
+    message,
+    Modal,
+    App
+} from "antd";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {observer} from "mobx-react-lite";
 import bbp from './ProjectBrowserPage.module.scss'
-import {ArrowLeftOutlined, CopyOutlined, FileOutlined, FolderOutlined} from "@ant-design/icons";
+import {
+    ArrowLeftOutlined,
+    ArrowUpOutlined,
+    CopyOutlined,
+    FileOutlined,
+    FolderAddOutlined,
+    FolderOutlined, UploadOutlined
+} from "@ant-design/icons";
 import {useEffect, useState} from "react";
 import {useStores} from "../../utils/hooks/useStores.js";
+import DrawerDetailFile from "../../components/DrawerDetailFile/DrawerDetailFile.jsx";
+import SpinBlock from "../../components/SpinBlock/SpinBlock.jsx";
 
 
 function transformFolders(fileList) {
@@ -39,6 +61,9 @@ const ProjectBrowserPage = observer(() => {
     const {project_id} = useParams()
     const navigate = useNavigate()
     const location = useLocation()
+    // const [messageApi, contextHolder] = message.useMessage();
+
+    const {message, modal} = App.useApp()
 
     const [projectInfo, setProjectInfo] = useState({})
     const [projectDocuments, setProjectDocuments] = useState([])
@@ -62,7 +87,7 @@ const ProjectBrowserPage = observer(() => {
                 } else if (res.ok) return res.json()
             })
             .then(res => {
-                console.log(res)
+                console.log('info => ',res)
                 setProjectInfo(res)
 
                 fetch(`${externalHost}/api/projects/${project_id}/documents`, {
@@ -104,11 +129,15 @@ const ProjectBrowserPage = observer(() => {
     } = useStores()
 
     const [projectPath, setProjectPath] = useState([])
+    const [depth, setDepth] = useState(0);
     const [isPending, setIsPending] = useState(false)
 
     const goUp = () => {
-        if (projectPath.length === 1) {
+        if (depth === 0) {
             navigate('/browser')
+        } else {
+            console.log(globalDocuments)
+            // setTableDocuments()
         }
     }
 
@@ -137,6 +166,88 @@ const ProjectBrowserPage = observer(() => {
         }])
     }, [globalDocuments])
 
+    const [selectedFile, setSelectedFile] = useState(null)
+    useEffect(() => {
+        if (selectedFile) {
+            setOpenDrawerDetailFile(true)
+        }
+    }, [selectedFile])
+    const [openDrawerDetailFile, setOpenDrawerDetailFile] = useState(false)
+    const handleCloseDrawerDetailFile = () => {
+        setOpenDrawerDetailFile(false)
+        setSelectedFile(null)
+    }
+
+    const [isPendingUpload, setIsPendingUpload] = useState(false)
+    const handleUpload = async (file) => {
+        setIsPendingUpload(true)
+        message.open({
+            key: 'updatable',
+            type: 'loading',
+            content: 'Загрузка файла',
+        });
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        try {
+            const response = await fetch(`${externalHost}/api/projects/${project_id}/documents/new`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    authorization: `Bearer ${getToken()}`
+                }
+            });
+
+            if (response.ok) {
+                message.open({
+                    key: 'updatable',
+                    type: 'success',
+                    content: 'Файл успешно загружен!',
+                });
+                updateProject()
+            } else {
+                message.open({
+                    key: 'updatable',
+                    type: 'error',
+                    content: 'Ошибка загрузки файла!',
+                });
+            }
+            setIsPendingUpload(false)
+        } catch (error) {;
+            message.open({
+                key: 'updatable',
+                type: 'error',
+                content: 'Ошибка загрузки файла!',
+            });
+            setIsPendingUpload(false)
+        }
+
+        return false;
+    };
+
+    const deleteProject = (p_id) => {
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        fetch(`${externalHost}/api/projects/${p_id}`, {
+            method: 'DELETE',
+            headers: {
+                authorization: `Bearer ${getToken()}`
+            }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    logout()
+                    navigate('/login')
+                } else if (response.ok) return response.json()
+            })
+            .then(response => {
+                console.log(response)
+            })
+            .catch(e => {
+                console.error(e)
+            })
+    }
+
     return (
         <Flex gap={'small'} vertical className={bbp.container}>
             <Flex align={'center'} justify={'space-between'} className={bbp.header}>
@@ -147,27 +258,33 @@ const ProjectBrowserPage = observer(() => {
                         items={[
                             {
                                 label: 'Доступ',
-                                children: <Typography.Text>PRIVATE</Typography.Text>
+                                children: <Typography.Text style={{whiteSpace: 'nowrap'}}>PRIVATE</Typography.Text>
                             },
                             {
                                 label: 'Создан',
-                                children: <Typography.Text>segodna</Typography.Text>
+                                children: <Typography.Text>undefined</Typography.Text>
                             }
                         ]}
                     />
                 </Flex>
                 <Flex gap={'small'}>
-                    <Button size={'large'} danger onClick={() => {
-
+                    <Button disabled={isPending || isPendingUpload} size={'large'} danger onClick={() => {
+                        modal.confirm({
+                            title: 'Удаление проекта',
+                            description: 'Вы уверены, что хотите удалить проект? Все файлы будут уничтожены!',
+                            onOk: () => deleteProject(project_id),
+                        })
                     }}>Удалить</Button>
                     <Button disabled size={'large'}>Откатить</Button>
-                    <Button size={'large'}>Обновить</Button>
-                    <Button type={'primary'} size={'large'}>Загрузить</Button>
+                    <Button disabled={isPending || isPendingUpload} size={'large'} onClick={() => {updateProject()}}>Обновить</Button>
+                    <Upload disabled={isPending || isPendingUpload} beforeUpload={handleUpload} showUploadList={false}>
+                        <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'} size={'large'}>Загрузить</Button>
+                    </Upload>
                 </Flex>
             </Flex>
-            <Flex vertical className={bbp.body} gap={'small'}>
+            <Flex vertical className={bbp.body} gap={'middle'}>
                 <Flex gap={'small'} className={bbp.body_contentHeader}>
-                    <Button onClick={() => goUp()} size={'large'} className={bbp.contentHeader__backButton}
+                    <Button onClick={() => navigate('/browser')} size={'large'} className={bbp.contentHeader__backButton}
                             icon={<ArrowLeftOutlined/>}/>
                     <Flex className={bbp.containerHeader_pathBlock}>
                         <Breadcrumb
@@ -179,9 +296,11 @@ const ProjectBrowserPage = observer(() => {
                         />
                         <Button icon={<CopyOutlined/>} className={bbp.pathBlock__copyPathButton}/>
                     </Flex>
-                    <Button size={'large'}>Создать директорию</Button>
+                    <Button style={{aspectRatio: 1}} icon={<ArrowUpOutlined />} size={'large'} onClick={() => goUp()}></Button>
+                    <Button style={{aspectRatio: 1}} icon={<FolderAddOutlined />} size={'large'}></Button>
                 </Flex>
-                <Flex>
+                <Flex style={{position: 'relative', height: '100%', overflow: 'clip', borderRadius: '8px'}}>
+                    {(isPendingUpload || isPending) && <Flex style={{position: 'absolute', width: '100%', height: '100%'}}><SpinBlock /></Flex>}
                     <Table
                         onRow={(record, rowIndex) => {
                             return {
@@ -191,9 +310,11 @@ const ProjectBrowserPage = observer(() => {
                                             title: record.slug
                                         }])
                                         console.log('папка')
+                                        setDepth(prevState => prevState + 1);
                                         setTableDocuments([...record.folders, ...record.files])
                                     } else {
-                                        console.log('файл')
+                                        console.log('файл', record)
+                                        setSelectedFile(record)
                                     }
                                 },
                             };
@@ -215,7 +336,7 @@ const ProjectBrowserPage = observer(() => {
                                 render: (name, record) => (
                                     <Flex gap={'small'}>
                                         {record.isFolder ? <FolderOutlined/> : <FileOutlined/>}
-                                        <Typography.Text>{name}{record.isFolder ? '' : `.${record.ext}`}</Typography.Text>
+                                        <Typography.Text>{record.isFolder ? `${name}` : `${record.filename}.${record.ext}`}</Typography.Text>
                                     </Flex>
                                 )
                             },
@@ -225,18 +346,20 @@ const ProjectBrowserPage = observer(() => {
                                 title: 'Изменен'
                             },
                             {
-                                key: 'size',
-                                dataIndex: 'size',
-                                title: 'Размер'
+                                key: 'ver',
+                                dataIndex: 'ver',
+                                title: 'Версия'
                             }
                         ]}
                         dataSource={tableDocuments.sort(s => s.isFolder ? -1 : 1)}
                     />
+
+                    <DrawerDetailFile callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
                 </Flex>
             </Flex>
-            <Flex className={bbp.footer}>
+            {/*<Flex className={bbp.footer}>*/}
 
-            </Flex>
+            {/*</Flex>*/}
         </Flex>
     )
 })

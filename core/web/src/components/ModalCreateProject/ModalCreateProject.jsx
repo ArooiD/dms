@@ -35,7 +35,7 @@ const ModalCreateProject = observer(({callback_open, callback_close}) => {
         const temp = toJS(BUCKETS_LIST);
         console.log('res => ', temp);
         const externalHost = import.meta.env.VITE_DOMAIN || "";
-        fetch(`${externalHost}/api/projects`, {
+        fetch(`${externalHost}/api/projects/new`, {
             method: 'POST',
             headers: {
                 authorization: `Bearer ${getToken()}`,
