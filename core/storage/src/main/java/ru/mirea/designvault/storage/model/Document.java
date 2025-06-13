@@ -13,27 +13,17 @@ import java.util.UUID;
 @Table(schema = "public", name = "document")
 public class Document {
     @Id
-    @Column(name = "pid")
+    @Column(name = "pid", nullable = false)
     private UUID pid;
     @Id
-    @Column(name = "did", columnDefinition = "uuid default gen_random_uuid()")
+    @Column(name = "did", nullable = false, columnDefinition = "uuid default gen_random_uuid()")
     private UUID did;
-    @Column(name = "uid")
+    @Column(name = "uid", nullable = false)
     private UUID uid;
     @Column(name = "slug")
     private String slug;
-    @Column(name = "filename")
-    private String filename;
-    @Column(name = "ext")
-    private String ext;
-    @Column(name = "content_type")
-    private String contentType;
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private Instant created;
     @Column(name = "modified")
     private Instant modified;
-    @Column(name = "hash")
-    private String hash;
-    @Column(name = "size")
-    private Long size;
 }

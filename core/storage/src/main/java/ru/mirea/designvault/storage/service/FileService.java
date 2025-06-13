@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.storage.model.File;
+import ru.mirea.designvault.storage.repository.DocumentRepository;
 
 import java.io.*;
 import java.time.Instant;
@@ -26,11 +27,13 @@ import java.util.zip.ZipOutputStream;
 public class FileService {
     private final MinioClient minio;
     private final String bucket;
+    private final DocumentRepository documentRepository;
 
     public FileService(MinioClient minio,
-                       @Value("${minio.bucket}") String bucket) throws Exception {
+                       @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
+        this.documentRepository = documentRepository;
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
             minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
@@ -56,18 +59,20 @@ public class FileService {
 //        ZonedDateTime odtStat = stat.lastModified();
 //        Instant zdtStat = odtStat.toInstant();
 //        FileInfo info = new FileInfo();
-////        info.setObjectName(objectName);
+
+    /// /        info.setObjectName(objectName);
 //        info.setSize(file.getSize());
 //        info.setContentType(file.getContentType());
 //        info.setLastModified(zdtStat);
 //        return info;
 //    }
-
-
     public File getDocumentVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
+            documentRepository.findDocumentsBy
+
+
             InputStream is = minio.getObject(
                     GetObjectArgs.builder()
                             .bucket(bucket)
