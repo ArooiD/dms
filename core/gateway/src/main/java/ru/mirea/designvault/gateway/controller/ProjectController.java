@@ -42,7 +42,7 @@ public class ProjectController {
     }
 
 
-    @PostMapping()
+    @PostMapping("new")
     public Object createProject(@AuthenticationPrincipal Jwt token, @RequestBody ProjectDto project) {
         return projectService.createProject(UUID.fromString(token.getSubject()), project);
     }
