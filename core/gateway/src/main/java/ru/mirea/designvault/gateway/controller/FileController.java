@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("project/{slug}/files")
+@Tag(name = "File API", description = "Работа с файлами проекта")
 public class FileController {
     private final StorageService fileService;
 
