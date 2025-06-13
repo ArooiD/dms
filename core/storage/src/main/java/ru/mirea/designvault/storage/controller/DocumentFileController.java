@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.storage.model.DocumentFile;
 import ru.mirea.designvault.storage.service.DocumentFileService;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Slf4j
@@ -33,7 +35,8 @@ public class DocumentFileController {
                                                                   @PathVariable(value = "ver", required = false) Integer ver) {
         DocumentFile object = documentFileService.getDocumentVersion(pid, did, ver);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + object.getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
                 .contentType(object.getMediaType())
                 .body(object.getInputStreamResource());
     }
@@ -50,6 +53,9 @@ public class DocumentFileController {
         return documentFileService.addDocumentVersion(pid, did, uid, file);
     }
 
+    private String encodeFallbackName(String name) {
+        return name.replaceAll("[^\\x20-\\x7E]", "_");
+    }
 
 //        return fileService.upload(pid, file);
 //    }
