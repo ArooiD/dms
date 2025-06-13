@@ -51,7 +51,6 @@ public class ProjectFileController {
         }
     }
 
-
 //    @PostMapping("new")
 //    public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
 //                                    @PathVariable("pr_slug") String slug,
@@ -94,6 +93,4 @@ public class ProjectFileController {
                     .body("Error: " + e.getMessage());
         }
     }
-
-
 }
