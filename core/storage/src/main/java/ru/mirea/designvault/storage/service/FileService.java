@@ -1,17 +1,13 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.mirea.designvault.storage.dto.FileInfo;
 import io.minio.*;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.storage.exception.DocumentRetrievalException;
-import ru.mirea.designvault.storage.key.DocumentVersionId;
-import ru.mirea.designvault.storage.model.File;
+import ru.mirea.designvault.storage.model.DocumentFile;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
 import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
@@ -45,7 +41,7 @@ public class FileService {
         }
     }
 
-    public File getDocumentVersion(UUID pid, UUID did, Integer ver) {
+    public DocumentFile getDocumentVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d/_content", pid, did, targetVersion);
@@ -64,7 +60,7 @@ public class FileService {
             String name = Optional.ofNullable(document.getFilename()).orElse("document") +
                     "." +
                     Optional.ofNullable(document.getExt()).orElse("bin");
-            return File.builder()
+            return DocumentFile.builder()
                     .name(name)
                     .contentType(document.getContentType())
                     .stream(is)
@@ -115,10 +111,10 @@ public class FileService {
     }
 
 
-    public File makeArchive(List<File> files) throws IOException {
+    public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-            for (File file : files) {
+            for (DocumentFile file : files) {
                 String entryName = file.getFullName() != null ? file.getFullName() : file.getName();
                 if (entryName == null) {
                     entryName = "unnamed_file_" + UUID.randomUUID();
@@ -137,7 +133,7 @@ public class FileService {
             }
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        return File.builder()
+        return DocumentFile.builder()
                 .contentType("application/zip")
                 .name("archive")
                 .ext("zip")

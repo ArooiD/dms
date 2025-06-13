@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class FileDto {
+public class DocumentFileDto {
     @JsonProperty("did")
     private UUID did;
     @JsonProperty("cid")

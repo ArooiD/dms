@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
-import ru.mirea.designvault.storage.dto.FileDto;
+import ru.mirea.designvault.storage.dto.DocumentFileDto;
 
 import java.io.InputStream;
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class File {
+public class DocumentFile {
     private UUID cid;
     private UUID did;
     private String ver;
@@ -35,8 +35,8 @@ public class File {
         return new InputStreamResource(this.stream);
     }
 
-    public FileDto toDto() {
-        return FileDto.builder()
+    public DocumentFileDto toDto() {
+        return DocumentFileDto.builder()
                 .did(did)
                 .cid(cid)
                 .name(name)
