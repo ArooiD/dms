@@ -14,8 +14,7 @@ import java.util.UUID;
 @Repository
 public interface DocumentRepository extends CrudRepository<Document, DocumentId> {
     @Query(value = """
-            SELECT d.pid, d.did, d.slug, v.ver, v.filename, v.ext, 
-                   d.created AS created, v.created AS modified
+            SELECT d.pid, d.did, d.uid, d.slug, v.ver, v.filename, v.ext, d.created AS created, v.created AS modified
             FROM document d
             JOIN document_version v ON d.did = v.did
             WHERE d.pid = :pid
