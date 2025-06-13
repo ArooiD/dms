@@ -24,7 +24,7 @@ public class ProjectDocumentController {
         this.projectService = projectService;
     }
 
-    @GetMapping("{pr_slug}/documents")
+    @GetMapping("")
     public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
         UUID uid = UUID.fromString(token.getSubject());
         return projectService.getProjectDtoDocument(slug, uid);
