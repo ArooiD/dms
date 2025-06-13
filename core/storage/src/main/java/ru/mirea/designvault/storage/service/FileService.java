@@ -70,7 +70,6 @@ public class FileService {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
-            documentRepository.findDocumentsBy
 
 
             InputStream is = minio.getObject(
