@@ -125,7 +125,7 @@ public class StorageService {
     public Object addFileObjectVersion(String slug, String name, UUID uid, MultipartFile file) throws IOException {
         UUID pid = resolveProjectSlug(slug);
         UUID did = resolveDocumentSlug(pid, name);
-        String url = "/files/" + pid + "/" + did;
+        String url = "/file/" + pid + "/" + did;
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
             @Override
