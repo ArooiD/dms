@@ -118,7 +118,7 @@ public class StorageService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<Object> response = client.postForEntity(url, requestEntity, Object.class);
+        ResponseEntity<String> response = client.postForEntity(url, requestEntity, String.class);
         return response.getBody();
     }
 
@@ -138,7 +138,7 @@ public class StorageService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<Object> response = client.postForEntity(url, requestEntity, Object.class);
+        ResponseEntity<String> response = client.postForEntity(url, requestEntity, String.class);
         return response.getBody();
     }
 }
