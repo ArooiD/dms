@@ -9,16 +9,19 @@ import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.mirea.designvault.storage.exception.DocumentRetrievalException;
 import ru.mirea.designvault.storage.key.DocumentVersionId;
 import ru.mirea.designvault.storage.model.File;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
+import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
 
 import java.io.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -72,7 +75,12 @@ public class FileService {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
-            documentVersionRepository.getDocumentVersionProjectionById(new DocumentVersionId(pid, did, targetVersion));
+            DocumentVersionProjection document = documentVersionRepository.getDocumentVersionProjectionById(
+                    new DocumentVersionId(pid, did, targetVersion)
+            );
+            if (document == null) {
+                throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
+            }
             InputStream is = minio.getObject(
                     GetObjectArgs.builder()
                             .bucket(bucket)
@@ -80,14 +88,18 @@ public class FileService {
                             .build()
             );
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
+
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") +
+                    "." +
+                    Optional.ofNullable(document.getExt()).orElse("bin");
             return File.builder()
-                    .name(pid.toString() + ".docx")
-                    .contentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    .name(name)
+                    .contentType(document.getContentType())
                     .stream(is)
                     .build();
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
-            throw new RuntimeException("Ошибка при получении версии документа", e);
+            throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
         }
     }
 
