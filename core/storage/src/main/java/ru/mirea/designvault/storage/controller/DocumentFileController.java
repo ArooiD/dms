@@ -45,7 +45,7 @@ public class DocumentFileController {
     })
     public Object upload(@PathVariable(value = "pid") UUID pid,
                          @PathVariable(value = "did", required = false) UUID did,
-                         @RequestPart("user") UUID uid,
+                         @RequestPart("uid") UUID uid,
                          @RequestPart("file") MultipartFile file) throws Exception {
         return documentFileService.addDocumentVersion(pid, did, uid, file);
     }
