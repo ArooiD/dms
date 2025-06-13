@@ -23,14 +23,18 @@ import java.util.UUID;
 public class DocumentChunk {
     @Id
     @Column(name = "pid")
+    @JdbcTypeCode(SqlTypes.UUID)
     private UUID pid;
     @Id
     @Column(name = "did")
+    @JdbcTypeCode(SqlTypes.UUID)
     private UUID did;
     @Id
     @Column(name = "cid")
-    private Integer cid;
+    @JdbcTypeCode(SqlTypes.INTEGER)
+    private int cid;
     @Column(name = "content", columnDefinition = "text")
+    @JdbcTypeCode(SqlTypes.LONGNVARCHAR)
     private String content;
     @Column(name = "embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
@@ -42,5 +46,6 @@ public class DocumentChunk {
             insertable = false,
             updatable = false
     )
+    @JdbcTypeCode(SqlTypes.OTHER)
     private String tsv;
 }

@@ -66,11 +66,11 @@ public class IndexService {
     }
 
 
-    private void saveChunkEmbedding(UUID pid, UUID did, int chunkIndex, String text, float[] embedding) {
+    private void saveChunkEmbedding(UUID pid, UUID did, int cid, String text, float[] embedding) {
         DocumentChunk chunk = DocumentChunk.builder()
                 .pid(pid)
                 .did(did)
-                .cid(chunkIndex)
+                .cid(cid)
                 .content(text)
                 .embedding(embedding)
                 .build();
