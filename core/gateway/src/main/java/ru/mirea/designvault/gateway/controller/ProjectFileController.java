@@ -99,6 +99,22 @@ public class ProjectFileController {
         }
     }
 
+
+    @Operation(
+            summary = "Обновление файла документа",
+            description = "Загружает новую версию файла для документа по slug проекта и slug документа. Файл передается в multipart/form-data.",
+            parameters = {
+                    @Parameter(name = "pr_slug", description = "Slug проекта", required = true),
+                    @Parameter(name = "doc_slug", description = "Slug документа", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(implementation = MultipartFile.class)
+                    )
+            )
+    )
     @PutMapping("{doc_slug}")
     public Object upload(@AuthenticationPrincipal Jwt token,
                          @PathVariable("pr_slug") String slug,
@@ -112,20 +128,4 @@ public class ProjectFileController {
                     .body("Error: " + e.getMessage());
         }
     }
-
-
-//    @DeleteMapping("{doc_slug}")
-//    public ResponseEntity<?> deleteFileToContract(
-//            @AuthenticationPrincipal Jwt token,
-//            @PathVariable("pr_slug") String slug,
-//            @PathVariable("doc_slug") String name
-//    ) {
-//        try {
-//            FileDto dto = fileService.deleteFileToProject(slug, name);
-//            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error: " + e.getMessage());
-//        }
-//    }
 }
