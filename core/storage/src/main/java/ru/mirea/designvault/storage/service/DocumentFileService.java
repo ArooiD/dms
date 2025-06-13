@@ -86,7 +86,7 @@ public class DocumentFileService {
     public DocumentFile getDocumentPreviewVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
-            String objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
+            String objectPath = String.format("%s/%s/%d/preview", pid, did, targetVersion);
             DocumentVersionPreviewProjection document = documentVersionPreviewRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
