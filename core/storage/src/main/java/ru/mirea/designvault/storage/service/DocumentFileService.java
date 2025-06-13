@@ -52,7 +52,7 @@ public class DocumentFileService {
     public DocumentFile getDocumentVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
-            String objectPath = String.format("%s/%s/%d/_content", pid, did, targetVersion);
+            String objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
             DocumentVersionProjection document = documentVersionRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
@@ -268,7 +268,8 @@ public class DocumentFileService {
         dv.setPid(pid);
         dv.setDid(did);
         dv.setVer(version);
-        dv.setFilename(extractFilename(file.getOriginalFilename()));
+        dv.setFilename(extractFilename(file.getOriginalFilename())
+        );
         dv.setContentType(file.getContentType());
         dv.setUid(uid);
         dv.setExt(extractExtension(file.getOriginalFilename()));
