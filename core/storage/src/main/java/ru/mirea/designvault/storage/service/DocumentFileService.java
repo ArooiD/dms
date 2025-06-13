@@ -261,6 +261,7 @@ public class DocumentFileService {
         dv.setPid(pid);
         dv.setDid(did);
         dv.setVer(version);
+        dv.setContentType(file.getContentType());
         dv.setUid(uid);
         dv.setHash(hash);
         dv.setSize(file.getSize());
