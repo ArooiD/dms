@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     ghostscript \
     libmagic1 \
+    libimage-exiftool-perl \
     curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
