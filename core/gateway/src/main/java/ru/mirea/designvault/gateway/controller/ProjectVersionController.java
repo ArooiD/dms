@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mirea.designvault.gateway.service.ProjectService;
+import ru.mirea.designvault.gateway.service.StorageService;
 
 import java.util.ArrayList;
 
@@ -12,10 +14,15 @@ import java.util.ArrayList;
 @Tag(name = "Project API", description = "Работа с cущностью проекта")
 @RequestMapping("projects/{pr_slug}/versions")
 public class ProjectVersionController {
+    private final StorageService storageService;
+
+    public ProjectVersionController(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
     @GetMapping(value = {"/{doc_slug}", "/{doc_slug}/"})
     public Object getDocumentsVersions(@PathVariable("pr_slug") String pr_slug,
                                        @PathVariable("doc_slug") String doc_slug) {
-
-        return new ArrayList<>();
+        return storageService.getDocumentsVersions(pr_slug, doc_slug);
     }
 }

@@ -27,11 +27,9 @@ public class DocumentVersionController {
         this.documentFileService = documentFileService;
     }
 
-    @GetMapping(value = {
-            "/{did}",
-    })
+    @GetMapping(value = "/{did}")
     public List<DocumentVersion> getDocumentVersions(@PathVariable(value = "pid") UUID pid,
-                                                    @PathVariable(value = "did") UUID did) {
+                                                     @PathVariable(value = "did") UUID did) {
         return documentFileService.getDocumentVersions(pid, did);
     }
 }
