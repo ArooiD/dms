@@ -76,7 +76,7 @@ public class FileService {
             );
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
             return File.builder()
-                    .fullName("pid")
+                    .name(pid.toString() + ".docx")
                     .contentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     .stream(is)
                     .build();
