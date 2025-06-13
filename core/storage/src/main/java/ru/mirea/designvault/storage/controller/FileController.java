@@ -25,10 +25,10 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping()
-    public FileInfo upload(@PathVariable(value = "pid") UUID pid, @RequestParam("file") MultipartFile file) throws Exception {
-        return fileService.upload(pid, file);
-    }
+//    @PostMapping()
+//    public FileInfo upload(@PathVariable(value = "pid") UUID pid, @RequestParam("file") MultipartFile file) throws Exception {
+//        return fileService.upload(pid, file);
+//    }
 
     @GetMapping(value = {
             "/{did}",
@@ -45,14 +45,14 @@ public class FileController {
                 .body(object.getInputStreamResource());
     }
 
-    @PutMapping("{name}")
-    public FileInfo update(@PathVariable(value = "pid") UUID pid, @PathVariable(name = "name") String name, @RequestParam("file") MultipartFile file) throws Exception {
-        return fileService.update(pid, name, file);
-    }
-
-    @DeleteMapping("{name}")
-    public ResponseEntity<Void> delete(@PathVariable(value = "pid") UUID pid, @PathVariable(name = "name") String objectName) throws Exception {
-        fileService.delete(pid, objectName);
-        return ResponseEntity.noContent().build();
-    }
+//    @PutMapping("{name}")
+//    public FileInfo update(@PathVariable(value = "pid") UUID pid, @PathVariable(name = "name") String name, @RequestParam("file") MultipartFile file) throws Exception {
+//        return fileService.update(pid, name, file);
+//    }
+//
+//    @DeleteMapping("{name}")
+//    public ResponseEntity<Void> delete(@PathVariable(value = "pid") UUID pid, @PathVariable(name = "name") String objectName) throws Exception {
+//        fileService.delete(pid, objectName);
+//        return ResponseEntity.noContent().build();
+//    }
 }
