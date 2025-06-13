@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @Tag(name = "Project API", description = "Работа с cущностью проекта")
-@RequestMapping("project")
+@RequestMapping("projects")
 public class ProjectController {
     private final ProjectService projectService;
 
