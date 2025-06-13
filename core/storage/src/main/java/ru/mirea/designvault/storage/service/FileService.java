@@ -77,7 +77,7 @@ public class FileService {
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
             return File.builder()
                     .fullName("pid")
-                    .contentType("")
+                    .contentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     .stream(is)
                     .build();
         } catch (Exception e) {
