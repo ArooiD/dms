@@ -1,5 +1,6 @@
 package ru.mirea.designvault.gateway.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "Project API", description = "Работа с cущностью проекта")
 @RequestMapping("project")
 public class ProjectController {
     private final ProjectService projectService;
