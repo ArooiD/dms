@@ -34,14 +34,6 @@ public class ProjectController {
         return projectService.getProjectInfo(slug, uid);
     }
 
-
-    @GetMapping("{pr_slug}/documents")
-    public List<DocumentDto> getProjectDocuments(@AuthenticationPrincipal Jwt token, @PathVariable("pr_slug") String slug) {
-        UUID uid = UUID.fromString(token.getSubject());
-        return projectService.getProjectDtoDocument(slug, uid);
-    }
-
-
     @PostMapping("new")
     public Object createProject(@AuthenticationPrincipal Jwt token, @RequestBody ProjectDto project) {
         return projectService.createProject(UUID.fromString(token.getSubject()), project);
