@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("project/{pr_slug}/files")
-@Tag(name = "File API", description = "Работа с файлами проекта")
+@Tag(name = "Project API", description = "Работа с файлами проекта")
 public class FileController {
     private final StorageService fileService;
 
