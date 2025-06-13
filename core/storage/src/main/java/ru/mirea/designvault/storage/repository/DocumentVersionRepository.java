@@ -6,7 +6,9 @@ import ru.mirea.designvault.storage.key.DocumentVersionId;
 import ru.mirea.designvault.storage.model.DocumentVersion;
 import ru.mirea.designvault.storage.repository.projection.DocumentVersionProjection;
 
+import java.util.UUID;
+
 @Repository
 public interface DocumentVersionRepository extends CrudRepository<DocumentVersion, DocumentVersionId> {
-    DocumentVersionProjection getDocumentVersionProjectionById(DocumentVersionId documentVersionId);
+    DocumentVersionProjection findByPidAndDidAndVer(UUID pid, UUID did, Integer ver);
 }

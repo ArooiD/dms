@@ -75,9 +75,7 @@ public class FileService {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
             String objectPath = String.format("%s/%s/%d", pid, did, targetVersion);
-            DocumentVersionProjection document = documentVersionRepository.getDocumentVersionProjectionById(
-                    new DocumentVersionId(pid, did, targetVersion)
-            );
+            DocumentVersionProjection document = documentVersionRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
             }
