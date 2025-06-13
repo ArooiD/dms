@@ -1,6 +1,7 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import io.minio.*;
 import io.minio.messages.Item;
@@ -213,6 +214,7 @@ public class DocumentFileService {
     }
 
 
+    @Transactional
     public Object addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
         String hash = calculateHash(file.getInputStream());
         if (did == null) {
