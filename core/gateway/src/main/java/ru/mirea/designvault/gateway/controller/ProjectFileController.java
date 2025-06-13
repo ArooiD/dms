@@ -12,7 +12,7 @@ import ru.mirea.designvault.gateway.model.File;
 import ru.mirea.designvault.gateway.service.StorageService;
 
 @RestController
-@RequestMapping("projects/{pr_slug}/files")
+@RequestMapping("projects/{pr_slug}/documents")
 @Tag(name = "Project API", description = "Работа с cущностью проекта")
 public class ProjectFileController {
     private final StorageService fileService;
