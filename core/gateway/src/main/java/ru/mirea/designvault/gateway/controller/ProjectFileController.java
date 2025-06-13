@@ -40,7 +40,7 @@ public class ProjectFileController {
     }
 
 
-    @PostMapping("document")
+    @PostMapping("new")
     public ResponseEntity<?> upload(@AuthenticationPrincipal Jwt token,
                                     @PathVariable("pr_slug") String slug,
                                     @RequestParam("file") MultipartFile file) {
