@@ -49,7 +49,7 @@ const ProjectBrowserPage = observer(() => {
     const updateProject = () => {
         setIsPending(true)
         const externalHost = import.meta.env.VITE_DOMAIN || "";
-        fetch(`${externalHost}/api/project/${project_id}/info`, {
+        fetch(`${externalHost}/api/projects/${project_id}/info`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${getToken()}`
@@ -65,7 +65,7 @@ const ProjectBrowserPage = observer(() => {
                 console.log(res)
                 setProjectInfo(res)
 
-                fetch(`${externalHost}/api/project/${project_id}/documents`, {
+                fetch(`${externalHost}/api/projects/${project_id}/documents`, {
                     method: 'GET',
                     headers: {
                         authorization: `Bearer ${getToken()}`
