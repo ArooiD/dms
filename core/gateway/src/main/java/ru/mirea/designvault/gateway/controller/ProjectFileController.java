@@ -8,10 +8,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mirea.designvault.gateway.dto.DocumentDto;
-import ru.mirea.designvault.gateway.dto.FileDto;
 import ru.mirea.designvault.gateway.service.ProjectService;
 import ru.mirea.designvault.gateway.service.StorageService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,6 +52,13 @@ public class ProjectFileController {
         }
     }
 
+    @GetMapping(value = "{doc_slug}/versions")
+    public Object getDocumentsVersions(@PathVariable("pr_slug") String pr_slug,
+                                       @PathVariable("doc_slug") String doc_slug) {
+        return new ArrayList<>();
+    }
+
+
     @PostMapping("new")
     public Object upload(@AuthenticationPrincipal Jwt token,
                          @PathVariable("pr_slug") String slug,
@@ -77,6 +85,8 @@ public class ProjectFileController {
                     .body("Error: " + e.getMessage());
         }
     }
+
+
 //    @DeleteMapping("{doc_slug}")
 //    public ResponseEntity<?> deleteFileToContract(
 //            @AuthenticationPrincipal Jwt token,
