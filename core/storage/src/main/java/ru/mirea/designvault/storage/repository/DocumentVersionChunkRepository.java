@@ -4,14 +4,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.mirea.designvault.storage.repository.projection.DocumentChunkProjection;
+import ru.mirea.designvault.storage.repository.projection.DocumentVersionChunkProjection;
 import ru.mirea.designvault.storage.key.DocumentChunkId;
-import ru.mirea.designvault.storage.model.DocumentChunk;
+import ru.mirea.designvault.storage.model.DocumentVersionChunk;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, DocumentChunkId> {
+public interface DocumentVersionChunkRepository extends CrudRepository<DocumentVersionChunk, DocumentChunkId> {
     @Query(nativeQuery = true,
             value = """
                       WITH q AS (SELECT plainto_tsquery('russian', ?2) AS query)
@@ -24,7 +24,7 @@ public interface DocumentChunkRepository extends CrudRepository<DocumentChunk, D
                       LIMIT ?3
                     """
     )
-    List<DocumentChunkProjection> findNearestNeighborsWithFullText(String vector, String textQuery, int limit);
+    List<DocumentVersionChunkProjection> findNearestNeighborsWithFullText(String vector, String textQuery, int limit);
 
     @Modifying
     @Transactional

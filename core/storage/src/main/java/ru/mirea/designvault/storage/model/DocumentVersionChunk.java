@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import ru.mirea.designvault.storage.key.DocumentChunkId;
 
@@ -19,8 +18,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @IdClass(DocumentChunkId.class)
-@Table(schema = "public", name = "document_chunk")
-public class DocumentChunk {
+@Table(schema = "public", name = "document_version_chunk")
+public class DocumentVersionChunk {
     @Id
     @Column(name = "pid")
     @JdbcTypeCode(SqlTypes.UUID)

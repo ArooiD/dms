@@ -2,7 +2,7 @@ package ru.mirea.designvault.storage.repository.projection;
 
 import java.util.UUID;
 
-public interface DocumentChunkProjection {
+public interface DocumentVersionChunkProjection {
     UUID getPid();
     UUID getDid();
     String getContent();

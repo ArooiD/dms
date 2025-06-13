@@ -8,8 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.storage.dto.EmbeddingDto;
 import ru.mirea.designvault.storage.dto.IndexDto;
 import ru.mirea.designvault.storage.dto.SearchSnippetDto;
-import ru.mirea.designvault.storage.model.DocumentChunk;
-import ru.mirea.designvault.storage.repository.DocumentChunkRepository;
+import ru.mirea.designvault.storage.model.DocumentVersionChunk;
+import ru.mirea.designvault.storage.repository.DocumentVersionChunkRepository;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -18,10 +18,10 @@ import java.util.regex.Pattern;
 @Service
 public class IndexService {
     private final RestTemplate transformClient;
-    private final DocumentChunkRepository repository;
-    private final DocumentChunkRepository documentChunkRepository;
+    private final DocumentVersionChunkRepository repository;
+    private final DocumentVersionChunkRepository documentChunkRepository;
 
-    public IndexService(RestTemplateBuilder builder, DocumentChunkRepository repository, DocumentChunkRepository documentChunkRepository) {
+    public IndexService(RestTemplateBuilder builder, DocumentVersionChunkRepository repository, DocumentVersionChunkRepository documentChunkRepository) {
         this.transformClient = builder
                 .rootUri("http://core.transform:8000")
 //                .messageConverters(new MappingJackson2HttpMessageConverter())
@@ -74,7 +74,7 @@ public class IndexService {
 
 
     private void saveChunkEmbedding(UUID pid, UUID did, int cid, String text, float[] embedding) {
-        DocumentChunk chunk = DocumentChunk.builder()
+        DocumentVersionChunk chunk = DocumentVersionChunk.builder()
                 .pid(pid)
                 .did(did)
                 .cid(cid)
