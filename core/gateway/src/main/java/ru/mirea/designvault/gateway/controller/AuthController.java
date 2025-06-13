@@ -24,8 +24,8 @@ public class AuthController {
     }
 
     @PostMapping("login")
-//    @Operation(summary = "Get project info", operationId = "1")
-    public ResponseEntity<Map> login(HttpSession session, @RequestBody AuthDto dto) {
+    @Operation(summary = "User login", description = "Аутентификация пользователя и получение токена", operationId = "authLogin")
+    public ResponseEntity<Map> login(@RequestBody AuthDto dto) {
         Map token = authService.getToken(dto);
         return ResponseEntity.ok(token);
     }
