@@ -191,6 +191,11 @@ public class DocumentFileService {
         return filename.substring(filename.lastIndexOf('.') + 1);
     }
 
+    private String extractFilename(String filename) {
+        if (filename == null || !filename.contains(".")) return "";
+        return filename.substring(filename.lastIndexOf('.'));
+    }
+
     private String calculateHash(InputStream inputStream) throws IOException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -263,7 +268,7 @@ public class DocumentFileService {
         dv.setPid(pid);
         dv.setDid(did);
         dv.setVer(version);
-        dv.setFilename(file.getOriginalFilename());
+        dv.setFilename(extractFilename(file.getOriginalFilename()));
         dv.setContentType(file.getContentType());
         dv.setUid(uid);
         dv.setExt(extractExtension(file.getOriginalFilename()));
