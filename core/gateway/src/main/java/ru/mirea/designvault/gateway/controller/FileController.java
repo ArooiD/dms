@@ -30,12 +30,13 @@ public class FileController {
             "{doc_slug}",
             "{doc_slug}/{ver}"
     })
-    public ResponseEntity<?> fetch(@AuthenticationPrincipal Jwt token,
+    public ResponseEntity<?> fetch(
+//            @AuthenticationPrincipal Jwt token,
                                    @PathVariable("pr_slug") String slug,
                                    @PathVariable("doc_slug") String name,
                                    @PathVariable(value = "ver", required = false) Integer ver) {
         try {
-            UUID uid = UUID.fromString(token.getSubject());
+//            UUID uid = UUID.fromString(token.getSubject());
             return fileService.getFileObjectVersion(slug, name, ver);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
