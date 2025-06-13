@@ -26,10 +26,10 @@ public class ProjectController {
         return projectService.getProjects(UUID.fromString(token.getSubject()));
     }
 
-    @GetMapping("{pid}")
-    public ProjectDto getProjectById(@AuthenticationPrincipal Jwt token, @PathVariable("pid") UUID pid) {
-        return projectService.getProject(UUID.fromString(token.getSubject()), pid);
-    }
+//    @GetMapping("{pid}")
+//    public ProjectDto getProjectById(@AuthenticationPrincipal Jwt token, @PathVariable("pid") UUID pid) {
+//        return projectService.getProject(UUID.fromString(token.getSubject()), pid);
+//    }
 
     @GetMapping("{slug}/info")
     public ProjectInfoDto getProjectInfo(@AuthenticationPrincipal Jwt token, @PathVariable("slug") String slug) {
