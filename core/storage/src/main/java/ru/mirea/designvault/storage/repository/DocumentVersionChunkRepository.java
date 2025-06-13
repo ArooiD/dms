@@ -18,7 +18,7 @@ public interface DocumentVersionChunkRepository extends CrudRepository<DocumentV
                       SELECT pid, did, content,
                              embedding <-> cast(?1 AS vector) AS distance,
                              ts_rank(tsv, q.query) AS rank
-                      FROM document_chunk, q
+                      FROM document_version_chunk, q
                       WHERE tsv @@ q.query
                       ORDER BY distance ASC, rank DESC
                       LIMIT ?3
@@ -30,7 +30,7 @@ public interface DocumentVersionChunkRepository extends CrudRepository<DocumentV
     @Transactional
     @Query(nativeQuery = true,
             value = """
-                    DELETE FROM document_chunk WHERE pid = :pid AND did = :did
+                    DELETE FROM document_version_chunk WHERE pid = :pid AND did = :did
                     """)
     void deleteAllByPidAndDid(UUID pid, UUID did);
 }

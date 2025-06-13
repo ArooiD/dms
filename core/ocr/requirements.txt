@@ -10,3 +10,6 @@ watchgod==0.8
 uvicorn[standard]==0.22.0
 starlette==0.46.2
 httpx
+
+
+

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.storage.dto.ProjectDto;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.Project;
+import ru.mirea.designvault.storage.repository.projection.DocumentInfoDto;
 import ru.mirea.designvault.storage.service.ProjectService;
 
 import java.util.ArrayList;
@@ -29,6 +30,25 @@ public class ProjectController {
         return projectService.getProject(pid, uid);
     }
 
+    @GetMapping("/{slug}/pid")
+    public UUID getProject(@PathVariable("slug") String slug) {
+        return projectService.resolvePid(slug);
+    }
+
+    @GetMapping("/{pid}/documents/{slug}/did")
+    public UUID getProjectDocument(
+            @PathVariable("pid") UUID pid,
+            @PathVariable("slug") String slug) {
+        return projectService.resolveDid(pid, slug);
+    }
+
+    @GetMapping("/{pid}/documents/{did}/slug")
+    public String getProjectDocument(
+            @PathVariable("pid") UUID pid,
+            @PathVariable("did") UUID did) {
+        return projectService.resolveDocumentSlug(pid, did);
+    }
+
     @PostMapping()
     public Object createProject(@RequestParam("uid") UUID uid, @RequestBody ProjectDto dto) {
         return projectService.createProject(uid, dto);
@@ -45,21 +65,9 @@ public class ProjectController {
     }
 
     @GetMapping("{slug}/documents")
-    public List<Document> getProjectDocument(@PathVariable("slug") String slug) {
+    public List<DocumentInfoDto> getProjectDocument(@PathVariable("slug") String slug) {
         return projectService.getProjectDocument(slug);
     }
-
-
-    @GetMapping("/{pid}/documents/{did}")
-    public Document getProjectDocument(
-            @PathVariable("pid") UUID pid,
-            @PathVariable("did") UUID did
-    ) {
-
-        return new Document();
-    }
-
-    
 
 
 }

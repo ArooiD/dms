@@ -42,7 +42,7 @@ function transformFolders(fileList) {
     }
 
     fileList.forEach(file => {
-        const pathParts = file.filename.split('/').filter(part => part).slice(1);
+        const pathParts = file.slug.split('/').filter(part => part).slice(1);
         if (pathParts.length === 1) {
             result.push(file);
         } else {
