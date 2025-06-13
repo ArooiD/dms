@@ -119,7 +119,6 @@ public class DocumentFileService {
                         .recursive(false)
                         .build()
         );
-
         int maxVersion = -1;
         for (Result<Item> result : results) {
             Item item = result.get();
@@ -134,7 +133,6 @@ public class DocumentFileService {
                 }
             }
         }
-
         if (maxVersion == -1) {
             throw new FileNotFoundException("Документ не найден");
         }
@@ -233,8 +231,7 @@ public class DocumentFileService {
         dv.setPid(pid);
         dv.setDid(did);
         dv.setVer(version);
-        dv.setFilename(extractFilename(file.getOriginalFilename())
-        );
+        dv.setFilename(extractFilename(file.getOriginalFilename()));
         dv.setContentType(file.getContentType());
         dv.setUid(uid);
         dv.setExt(extractExtension(file.getOriginalFilename()));
