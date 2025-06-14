@@ -70,9 +70,9 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: str = Query(..., description="pidr"),
-    did: str = Query(..., description="did inside"),
-    ver: int = Query(..., description="verMut"),
+    pid: str = Form(..., description="pidr"),
+    did: str = Form(..., description="did inside"),
+    ver: int = Form(..., description="verMut"),
     file: UploadFile = File(...)
 ):
 
@@ -87,10 +87,10 @@ async def upload_file(
 
     if file_extension in [".docx"] and mime == "text/html":
         mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    print(f"BEFORE pid:{pid} did:{did}")
-    pid = uuid.UUID(str(pid))
-    did = uuid.UUID(str(did))
-    print(f"pid:{pid} did:{did}")
+    # print(f"BEFORE pid:{pid} did:{did}")
+    # pid = uuid.UUID(str(pid))
+    # did = uuid.UUID(str(did))
+    # print(f"pid:{pid} did:{did}")
 
     try:
         text = await parse_file(io.BytesIO(contents), mime)
