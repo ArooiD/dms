@@ -70,11 +70,12 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: uuid.UUID = Form(..., description="pidr"),
-    did: uuid.UUID = Form(..., description="did inside"),
+    pid: str = Form(..., description="pidr"),
+    did: str = Form(..., description="did inside"),
     ver: int = Form(..., description="verMut"),
-    file: UploadFile = File(...)):
-    time_parse = time.time()
+    file: UploadFile = File(...)
+):
+
     if not file.filename:
         raise HTTPException(status_code=400, detail="Empty file")
 
@@ -86,6 +87,10 @@ async def upload_file(
 
     if file_extension in [".docx"] and mime == "text/html":
         mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    print(f"BEFORE pid:{pid} did:{did}")
+    pid = uuid.UUID(pid)
+    did = uuid.UUID(did)
+    print(f"pid:{pid} did:{did}")
 
     try:
         text = await parse_file(io.BytesIO(contents), mime)
@@ -123,3 +128,7 @@ def parse_text(text: str, _split_symbol):
 
 def is_empty(line: str):
     return not line or line.strip() == ""
+
+
+if __name__ == '__main__':
+    print(uuid.UUID("123e4567-e89b-12d3-a456-426655440000"))
