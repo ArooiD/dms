@@ -7,5 +7,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DocumentChunkId extends DocumentId {
+    Integer ver;
     Integer cid;
 }

@@ -9,5 +9,6 @@ import java.util.UUID;
 public class IndexDto {
     private UUID pid;
     private UUID did;
+    private Integer ver;
     private List<String> frags;
 }

@@ -29,6 +29,10 @@ public class DocumentVersionChunk {
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID did;
     @Id
+    @Column(name = "ver")
+    @JdbcTypeCode(SqlTypes.INTEGER)
+    private Integer ver;
+    @Id
     @Column(name = "cid")
     @JdbcTypeCode(SqlTypes.INTEGER)
     private int cid;
