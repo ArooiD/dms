@@ -28,8 +28,8 @@ public class IndexController {
     public ResponseEntity<String> indexChunk(@RequestBody IndexDto dto) {
         try {
             log.info("Index chunk: {} {} {} {}", dto.getPid(), dto.getDid(), dto.getVer(), dto.getFrags().size());
-            indexService.indexDocument(dto);
-            return ResponseEntity.ok("Indexed successfully");
+            var i = indexService.indexDocument(dto);
+            return ResponseEntity.ok("Indexed successfully" + i);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Indexing failed: " + e.getMessage());

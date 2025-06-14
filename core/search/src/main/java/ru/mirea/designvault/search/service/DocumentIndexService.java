@@ -2,7 +2,6 @@ package ru.mirea.designvault.search.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +31,13 @@ public class DocumentIndexService {
     }
 
     @Transactional
-    public void indexDocument(IndexDto dto) {
+    public int indexDocument(IndexDto dto) {
         UUID pid = UUID.fromString(dto.getPid());
         UUID did = UUID.fromString(dto.getDid());
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
-        for (int i = 0; i < frags.size(); i++) {
+        int i;
+        for (i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
             try {
                 float[] embedding = getEmbeddingVector(text);
@@ -51,6 +51,7 @@ public class DocumentIndexService {
                 log.error("Error generating embedding for fragment {}: {}", i, e.getMessage());
             }
         }
+        return i;
     }
 
     public void cleanIndex(IndexDto dto) {
