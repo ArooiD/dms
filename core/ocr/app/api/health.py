@@ -87,6 +87,7 @@ async def upload_file(
 
     if file_extension in [".docx"] and mime == "text/html":
         mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    print(f"BEFORE pid:{pid} did:{did}")
     pid = uuid.UUID(pid)
     did = uuid.UUID(did)
     print(f"pid:{pid} did:{did}")
