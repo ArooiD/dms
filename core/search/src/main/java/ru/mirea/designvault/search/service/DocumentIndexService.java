@@ -26,7 +26,7 @@ public class DocumentIndexService {
         this.transformClient = builder
                 .rootUri("http://core.transform:8000")
                 .build();
-        this.documentChunkRepository = documentChunkRepository;
+        this.documentChunkRepository = repository;
     }
 
 
