@@ -30,9 +30,9 @@ public class DocumentIndexService {
     }
 
     public void indexDocument(IndexDto dto) {
-        UUID pid = dto.getPid();
-        UUID did = dto.getDid();
-        Integer ver = dto.getVer();
+        UUID pid = UUID.fromString(dto.getPid());
+        UUID did = UUID.fromString(dto.getDid());
+        Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
@@ -50,8 +50,8 @@ public class DocumentIndexService {
     }
 
     public void cleanIndex(IndexDto dto) {
-        UUID pid = dto.getPid();
-        UUID did = dto.getDid();
+        UUID pid = UUID.fromString(dto.getPid());
+        UUID did = UUID.fromString(dto.getDid());
         documentChunkRepository.deleteAllByPidAndDid(pid, did);
     }
 

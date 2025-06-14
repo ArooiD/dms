@@ -7,8 +7,8 @@ import java.util.UUID;
 
 @Data
 public class IndexDto {
-    private UUID pid;
-    private UUID did;
-    private Integer ver;
+    private String pid;
+    private String did;
+    private String ver;
     private List<String> frags;
 }
