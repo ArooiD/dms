@@ -1,4 +1,4 @@
-package ru.mirea.designvault.storage.key;
+package ru.mirea.designvault.search.key;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
