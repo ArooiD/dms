@@ -70,8 +70,8 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: uuid = Form(..., description="pidr"),
-    did: uuid = Form(..., description="did inside"),
+    pid: uuid.UUID = Form(..., description="pidr"),
+    did: uuid.UUID = Form(..., description="did inside"),
     ver: int = Form(..., description="verMut"),
     file: UploadFile = File(...)):
     time_parse = time.time()
