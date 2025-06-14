@@ -12,10 +12,10 @@ import ru.mirea.designvault.search.dto.SearchSnippetDto;
 import ru.mirea.designvault.search.model.DocumentVersionChunk;
 import ru.mirea.designvault.search.repository.DocumentVersionChunkRepository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,38 +40,49 @@ public class DocumentIndexService {
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
         log.info("HERE -> 1");
-        List<DocumentVersionChunk> chunks = IntStream.range(0, frags.size())
-                .mapToObj(i -> {
-                    String text = frags.get(i);
-                    try {
-                        log.info("HERE -> 2 {}", i);
-                        float[] embedding = getEmbeddingVector(text);
-                        if (embedding != null) {
-                            return DocumentVersionChunk.builder()
-                                    .pid(pid)
-                                    .did(did)
-                                    .ver(ver)
-                                    .cid(i)
-                                    .content(text)
-                                    .embedding(embedding)
-                                    .build();
-                        } else {
-                            log.warn("Empty embedding received for fragment {}", i);
-                        }
-                    } catch (Exception e) {
-                        log.error("Error generating embedding for fragment {}: {}", i, e.getMessage());
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<Future<DocumentVersionChunk>> futures = new ArrayList<>();
+        for (int i = 0; i < frags.size(); i++) {
+            final int index = i;
+            futures.add(executor.submit(() -> {
+                String text = frags.get(index);
+                try {
+                    float[] embedding = getEmbeddingVector(text); // REST call
+                    if (embedding != null) {
+                        return DocumentVersionChunk.builder()
+                                .pid(pid)
+                                .did(did)
+                                .ver(ver)
+                                .cid(index)
+                                .content(text)
+                                .embedding(embedding)
+                                .build();
+                    } else {
+                        log.warn("Empty embedding for fragment {}", index);
                     }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        log.info("HERE -> 3");
+                } catch (Exception e) {
+                    log.error("Error generating embedding for fragment {}: {}", index, e.getMessage());
+                }
+                return null;
+            }));
+        }
+        List<DocumentVersionChunk> chunks = new ArrayList<>();
+        for (Future<DocumentVersionChunk> future : futures) {
+            try {
+                DocumentVersionChunk chunk = future.get();
+                if (chunk != null) {
+                    chunks.add(chunk);
+                }
+            } catch (Exception e) {
+                log.error("Error retrieving future result: {}", e.getMessage());
+            }
+        }
+        executor.shutdown();
         if (!chunks.isEmpty()) {
             var e = documentChunkRepository.saveAll(chunks);
             log.info("Saved {} chunks to database", chunks.size());
             return List.of(e).size();
         }
-
         return frags.size();
     }
 
