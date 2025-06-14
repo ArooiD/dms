@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 
 import httpx
 from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Form
@@ -69,8 +70,8 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: str = Form(..., description="pidr"),
-    did: str = Form(..., description="did inside"),
+    pid: uuid = Form(..., description="pidr"),
+    did: uuid = Form(..., description="did inside"),
     ver: int = Form(..., description="verMut"),
     file: UploadFile = File(...)):
     time_parse = time.time()
