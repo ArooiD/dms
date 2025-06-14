@@ -1,6 +1,7 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -314,15 +315,27 @@ public class DocumentFileService {
 
     public ResponseEntity<String> generatePreview(UUID pid, UUID did, MultipartFile file) throws Exception {
         String url = "http://core.transform:8000/generate/preview";
+
+
+//        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//        HttpHeaders fileHeaders = new HttpHeaders();
+//        fileHeaders.setContentType(MediaType.parseMediaType(file.getContentType()));
+//        HttpEntity<byte[]> filePart = new HttpEntity<>(file.getBytes(), fileHeaders);
+//        body.add("file", filePart);
+//        body.add("pid", pid.toString());
+//        body.add("did", did.toString());
+        ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename(); // имя файла обязательно!
+            }
+        };
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new HttpEntity<>(fileAsResource, fileHeaders));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        HttpHeaders fileHeaders = new HttpHeaders();
-        fileHeaders.setContentType(MediaType.parseMediaType(file.getContentType()));
-        HttpEntity<byte[]> filePart = new HttpEntity<>(file.getBytes(), fileHeaders);
-        body.add("file", filePart);
-        body.add("pid", pid.toString());
-        body.add("did", did.toString());
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
         return transformClient.postForEntity(url, requestEntity, String.class);
     }
