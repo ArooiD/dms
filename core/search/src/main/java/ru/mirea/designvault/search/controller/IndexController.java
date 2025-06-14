@@ -31,6 +31,7 @@ public class IndexController {
             var i = indexService.indexDocument(dto);
             return ResponseEntity.ok("Indexed successfully" + i);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Indexing failed: " + e.getMessage());
         }
