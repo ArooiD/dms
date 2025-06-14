@@ -2,7 +2,7 @@ import os
 import time
 
 import httpx
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Form
 import magic
 import io
 
@@ -69,9 +69,9 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: str = Query(..., description="pidr"),
-    did: str = Query(..., description="did inside"),
-    ver: int = Query(..., description="verMut"),
+    pid: str = Form(..., description="pidr"),
+    did: str = Form(..., description="did inside"),
+    ver: int = Form(..., description="verMut"),
     file: UploadFile = File(...)):
     time_parse = time.time()
     if not file.filename:
