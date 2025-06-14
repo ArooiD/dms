@@ -358,10 +358,10 @@ public class DocumentFileService {
         HttpHeaders fileHeaders = new HttpHeaders();
         fileHeaders.setContentType(MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new HttpEntity<>(fileAsResource, fileHeaders));
-        body.add("did", did);
-        body.add("ver", version);
         body.add("pid", pid);
+        body.add("ver", version);
+        body.add("did", did);
+        body.add("file", new HttpEntity<>(fileAsResource, fileHeaders));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
