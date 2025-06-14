@@ -2,6 +2,7 @@ package ru.mirea.designvault.search.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +42,13 @@ public class DocumentIndexService {
             try {
                 float[] embedding = getEmbeddingVector(text);
                 if (embedding != null) {
-                    saveChunkEmbedding(pid, did, ver, i, text, embedding);
+                    var res = saveChunkEmbedding(pid, did, ver, i, text, embedding);
+                    log.info("Saved embedding {} to {}", i, res);
                 } else {
-                    log.warn("Empty embedding received for fragment " + i);
+                    log.warn("Empty embedding received for fragment {}", i);
                 }
             } catch (Exception e) {
-                log.error("Error generating embedding for fragment " + i + ": " + e.getMessage());
+                log.error("Error generating embedding for fragment {}: {}", i, e.getMessage());
             }
         }
     }
@@ -73,7 +75,8 @@ public class DocumentIndexService {
         }
     }
 
-    private void saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
+    @Transactional
+    public DocumentVersionChunk saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
         DocumentVersionChunk chunk = DocumentVersionChunk.builder()
                 .pid(pid)
                 .did(did)
@@ -82,7 +85,7 @@ public class DocumentIndexService {
                 .content(text)
                 .embedding(embedding)
                 .build();
-        documentChunkRepository.save(chunk);
+        return documentChunkRepository.save(chunk);
     }
 
     public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
