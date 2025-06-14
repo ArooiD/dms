@@ -88,8 +88,8 @@ async def upload_file(
     if file_extension in [".docx"] and mime == "text/html":
         mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     print(f"BEFORE pid:{pid} did:{did}")
-    pid = uuid.UUID(pid)
-    did = uuid.UUID(did)
+    pid = uuid.UUID(str(pid))
+    did = uuid.UUID(str(did))
     print(f"pid:{pid} did:{did}")
 
     try:
@@ -131,4 +131,9 @@ def is_empty(line: str):
 
 
 if __name__ == '__main__':
-    print(uuid.UUID("123e4567-e89b-12d3-a456-426655440000"))
+    # BEFORE
+    pid = "84055427-00ea-41e0-800a-e3e31f8acefc"
+    did = "db2663b1-c0c8-448d-a83d-b9406039f86d"
+
+    print(uuid.UUID(pid))
+    print(uuid.UUID(did))
