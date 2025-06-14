@@ -47,8 +47,7 @@ public class DocumentFileService {
     private final RestTemplate transformClient;
 
 
-    public DocumentFileService(MinioClient minio,
-                               @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionPreviewRepository documentVersionPreviewRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
+    public DocumentFileService(MinioClient minio, @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionPreviewRepository documentVersionPreviewRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
         this.minio = minio;
         this.bucket = bucket;
         this.documentRepository = documentRepository;
@@ -69,22 +68,11 @@ public class DocumentFileService {
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
             }
-            InputStream is = minio.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectPath)
-                            .build()
-            );
+            InputStream is = minio.getObject(GetObjectArgs.builder().bucket(bucket).object(objectPath).build());
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
-            String name = Optional.ofNullable(document.getFilename()).orElse("document") +
-                    "." +
-                    Optional.ofNullable(document.getExt()).orElse("bin");
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + Optional.ofNullable(document.getExt()).orElse("bin");
             log.info(name);
-            return DocumentFile.builder()
-                    .name(name)
-                    .contentType(document.getContentType())
-                    .stream(is)
-                    .build();
+            return DocumentFile.builder().name(name).contentType(document.getContentType()).stream(is).build();
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
@@ -99,22 +87,11 @@ public class DocumentFileService {
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
             }
-            InputStream is = minio.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectPath)
-                            .build()
-            );
+            InputStream is = minio.getObject(GetObjectArgs.builder().bucket(bucket).object(objectPath).build());
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
-            String name = Optional.ofNullable(document.getFilename()).orElse("document") +
-                    "." +
-                    Optional.ofNullable(document.getExt()).orElse("bin");
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + Optional.ofNullable(document.getExt()).orElse("bin");
             log.info(name);
-            return DocumentFile.builder()
-                    .name(name)
-                    .contentType(document.getContentType())
-                    .stream(is)
-                    .build();
+            return DocumentFile.builder().name(name).contentType(document.getContentType()).stream(is).build();
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
@@ -154,14 +131,7 @@ public class DocumentFileService {
 
     private Integer resolveVersion(UUID cid, UUID did, Integer version) throws Exception {
         String basePrefix = String.format("%s/%s/", cid, did);
-        Iterable<Result<Item>> results = minio.listObjects(
-                ListObjectsArgs.builder()
-                        .bucket(bucket)
-                        .prefix(basePrefix)
-                        .delimiter("/")
-                        .recursive(false)
-                        .build()
-        );
+        Iterable<Result<Item>> results = minio.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(basePrefix).delimiter("/").recursive(false).build());
         int maxVersion = -1;
         for (Result<Item> result : results) {
             Item item = result.get();
@@ -228,32 +198,61 @@ public class DocumentFileService {
     @Transactional
     public DocumentVersionResponse addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
         String hash = calculateHash(file.getInputStream());
-        if (did == null) {
-            Optional<DocumentVersion> existingDoc = documentVersionRepository.findByPidAndHash(pid, hash);
-            if (existingDoc.isPresent()) {
-                return new DocumentVersionResponse(pid, existingDoc.get().getDid(), "Документ с таким содержимым уже существует");
+        String originalFilename = file.getOriginalFilename();
+        int version = 1;
+        List<String> uploadedObjects = new ArrayList<>();
+        try {
+            if (did == null) {
+                Optional<DocumentVersion> existingDoc = documentVersionRepository.findByPidAndHash(pid, hash);
+                if (existingDoc.isPresent()) {
+                    return new DocumentVersionResponse(pid, existingDoc.get().getDid(), "Документ с таким содержимым уже существует");
+                }
+                did = createNewDocument(pid, uid, originalFilename);
+                createDocumentNewVersion(pid, did, uid, file, hash, version);
+                uploadedObjects.add(buildDocumentPath(pid, did, version)); // сохранение пути
+                var res = generatePreview(pid, did, file);
+                var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
+                assert res.getBody() != null;
+                createPreviewNewVersion(pid, did, originalFilename, res.getBody(), contentType, version);
+                uploadedObjects.add(buildPreviewPath(pid, did, version));
+
+                ocrFile(pid, did, version, file);
+
+                return new DocumentVersionResponse(pid, did, "Создан новый документ и версия 1");
             }
-            did = createNewDocument(pid, uid, file.getOriginalFilename());
-            createDocumentNewVersion(pid, did, uid, file, hash, 1);
+            if (documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash)) {
+                return new DocumentVersionResponse(pid, did, "Такая версия уже существует, ничего не делаем");
+            }
+            version = resolveVersion(pid, did, null) + 1;
+            createDocumentNewVersion(pid, did, uid, file, hash, version);
+            uploadedObjects.add(buildDocumentPath(pid, did, version));
             var res = generatePreview(pid, did, file);
             var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
             assert res.getBody() != null;
-            createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, 1);
-            ocrFile(pid, did, 1, file);
-            return new DocumentVersionResponse(pid, did, "Создан новый документ и версия 1");
+            createPreviewNewVersion(pid, did, originalFilename, res.getBody(), contentType, version);
+            uploadedObjects.add(buildPreviewPath(pid, did, version));
+            ocrFile(pid, did, version, file);
+            return new DocumentVersionResponse(pid, did, "Создана новая версия " + version);
+        } catch (Exception ex) {
+            for (String path : uploadedObjects) {
+                try {
+                    minio.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(path).build());
+                } catch (Exception removeEx) {
+                    log.warn("Не удалось удалить объект из MinIO: {}", path, removeEx);
+                }
+            }
+            throw ex; // пробрасываем основное исключение дальше
         }
-        if (documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash)) {
-            return new DocumentVersionResponse(pid, did, "Такая версия уже существует, ничего не делаем");
-        }
-        int newVersion = resolveVersion(pid, did, null) + 1;
-        createDocumentNewVersion(pid, did, uid, file, hash, newVersion);
-        var res = generatePreview(pid, did, file);
-        var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
-        assert res.getBody() != null;
-        createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, newVersion);
-        ocrFile(pid, did, newVersion, file);
-        return new DocumentVersionResponse(pid, did, "Создана новая версия " + newVersion);
     }
+
+    private String buildDocumentPath(UUID pid, UUID did, int version) {
+        return String.format("%s/%s/%d/content", pid, did, version);
+    }
+
+    private String buildPreviewPath(UUID pid, UUID did, int version) {
+        return String.format("%s/%s/%d/preview", pid, did, version);
+    }
+
 
     private UUID createNewDocument(UUID pid, UUID uid, String name) {
         Document doc = new Document();
@@ -269,14 +268,7 @@ public class DocumentFileService {
 
     private void createDocumentNewVersion(UUID pid, UUID did, UUID uid, MultipartFile file, String hash, int version) throws Exception {
         String objectPath = String.format("%s/%s/%d/content", pid, did, version);
-        minio.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectPath)
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .contentType(file.getContentType())
-                        .build()
-        );
+        minio.putObject(PutObjectArgs.builder().bucket(bucket).object(objectPath).stream(file.getInputStream(), file.getSize(), -1).contentType(file.getContentType()).build());
         DocumentVersion dv = new DocumentVersion();
         dv.setPid(pid);
         dv.setDid(did);
@@ -296,14 +288,7 @@ public class DocumentFileService {
 
         InputStream inputStream = new ByteArrayInputStream(bytes);
         String objectPath = String.format("%s/%s/%d/preview", pid, did, version);
-        minio.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectPath)
-                        .stream(inputStream, bytes.length, -1)
-                        .contentType(contentType)
-                        .build()
-        );
+        minio.putObject(PutObjectArgs.builder().bucket(bucket).object(objectPath).stream(inputStream, bytes.length, -1).contentType(contentType).build());
         DocumentVersionPreview dvp = new DocumentVersionPreview();
         dvp.setPid(pid);
         dvp.setDid(did);
@@ -333,12 +318,7 @@ public class DocumentFileService {
     }
 
     public String generateSlug(String input, Function<String, Boolean> isUniqueSlug) {
-        String base = Normalizer.normalize(input, Normalizer.Form.NFD)
-                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "")
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+        String base = Normalizer.normalize(input, Normalizer.Form.NFD).replaceAll("[\\p{InCombiningDiacriticalMarks}]", "").toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-").replaceAll("-{2,}", "-").replaceAll("^-|-$", "");
         String slug = base;
         int suffix = 1;
         while (!isUniqueSlug.apply(slug)) {
