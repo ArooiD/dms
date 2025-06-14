@@ -101,14 +101,43 @@ async def upload_file(
             "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
         }
 
-        request = httpx.post("http://core.search:8000/index/document", json=data, timeout=3.0)
+        try:
+            with httpx.Client(timeout=None) as client:
+                request = client.post(
+                    "http://core.search:8000/index/document",
+                    json=data
+                )
+
+            # Проверяем, успешен ли запрос
+            request.raise_for_status()  # выбросит исключение для 4xx/5xx
+
+        except httpx.RequestError as exc:
+            # Любая сетевая ошибка (например, нет соединения)
+            raise HTTPException(
+                status_code=502,
+                detail=f"Request to external service failed: {exc}"
+            )
+
+        except httpx.HTTPStatusError as exc:
+            # Сервис вернул 4xx или 5xx
+            raise HTTPException(
+                status_code=exc.response.status_code,
+                detail=f"External service returned error: {exc.response.text}"
+            )
+
+        # Формируем frags
+        frags = (
+            parse_text(text, _split_symbol=" . \n")
+            if file_extension == ".pdf"
+            else parse_text(text, _split_symbol="\n")
+        )
 
         return {
             "pid": pid,
             "did": did,
             "ver": ver,
             "status_request_code": request.status_code,
-            "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
+            "frags": frags
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error parsing file: {str(e)}")
