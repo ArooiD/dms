@@ -1,7 +1,15 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import io.minio.*;
 import io.minio.messages.Item;
@@ -12,6 +20,7 @@ import ru.mirea.designvault.storage.exception.DocumentRetrievalException;
 import ru.mirea.designvault.storage.model.Document;
 import ru.mirea.designvault.storage.model.DocumentFile;
 import ru.mirea.designvault.storage.model.DocumentVersion;
+import ru.mirea.designvault.storage.model.DocumentVersionPreview;
 import ru.mirea.designvault.storage.repository.DocumentRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionPreviewRepository;
 import ru.mirea.designvault.storage.repository.DocumentVersionRepository;
@@ -23,13 +32,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.time.Instant;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 
 @Slf4j
@@ -40,6 +44,8 @@ public class DocumentFileService {
     private final DocumentRepository documentRepository;
     private final DocumentVersionPreviewRepository documentVersionPreviewRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final RestTemplate transformClient;
+
 
     public DocumentFileService(MinioClient minio,
                                @Value("${minio.bucket}") String bucket, DocumentRepository documentRepository, DocumentVersionPreviewRepository documentVersionPreviewRepository, DocumentVersionRepository documentVersionRepository) throws Exception {
@@ -48,6 +54,7 @@ public class DocumentFileService {
         this.documentRepository = documentRepository;
         this.documentVersionPreviewRepository = documentVersionPreviewRepository;
         this.documentVersionRepository = documentVersionRepository;
+        this.transformClient = new RestTemplate();
         boolean exists = minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!exists) {
             minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
@@ -115,35 +122,35 @@ public class DocumentFileService {
     }
 
 
-    public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-            for (DocumentFile file : files) {
-                String entryName = file.getFullName() != null ? file.getFullName() : file.getName();
-                if (entryName == null) {
-                    entryName = "unnamed_file_" + UUID.randomUUID();
-                }
-                zos.putNextEntry(new ZipEntry(entryName));
-                try (InputStream is = file.getStream()) {
-                    if (is != null) {
-                        byte[] buffer = new byte[8192];
-                        int len;
-                        while ((len = is.read(buffer)) > 0) {
-                            zos.write(buffer, 0, len);
-                        }
-                    }
-                }
-                zos.closeEntry();
-            }
-        }
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        return DocumentFile.builder()
-                .contentType("application/zip")
-                .name("archive")
-                .ext("zip")
-                .stream(bais)
-                .build();
-    }
+//    public DocumentFile makeArchive(List<DocumentFile> files) throws IOException {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+//            for (DocumentFile file : files) {
+//                String entryName = file.getFullName() != null ? file.getFullName() : file.getName();
+//                if (entryName == null) {
+//                    entryName = "unnamed_file_" + UUID.randomUUID();
+//                }
+//                zos.putNextEntry(new ZipEntry(entryName));
+//                try (InputStream is = file.getStream()) {
+//                    if (is != null) {
+//                        byte[] buffer = new byte[8192];
+//                        int len;
+//                        while ((len = is.read(buffer)) > 0) {
+//                            zos.write(buffer, 0, len);
+//                        }
+//                    }
+//                }
+//                zos.closeEntry();
+//            }
+//        }
+//        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+//        return DocumentFile.builder()
+//                .contentType("application/zip")
+//                .name("archive")
+//                .ext("zip")
+//                .stream(bais)
+//                .build();
+//    }
 
     private Integer resolveVersion(UUID cid, UUID did, Integer version) throws Exception {
         String basePrefix = String.format("%s/%s/", cid, did);
@@ -221,30 +228,30 @@ public class DocumentFileService {
     @Transactional
     public DocumentVersionResponse addDocumentVersion(UUID pid, UUID did, UUID uid, MultipartFile file) throws Exception {
         String hash = calculateHash(file.getInputStream());
-        String status;
-
         if (did == null) {
             Optional<DocumentVersion> existingDoc = documentVersionRepository.findByPidAndHash(pid, hash);
             if (existingDoc.isPresent()) {
-                did = existingDoc.get().getDid();
-                status = "Документ с таким содержимым уже существует";
-                return new DocumentVersionResponse(pid, did, status);
+                return new DocumentVersionResponse(pid, existingDoc.get().getDid(), "Документ с таким содержимым уже существует");
             }
             did = createNewDocument(pid, uid, file.getOriginalFilename());
-            createNewVersion(pid, did, uid, file, hash, 1);
-            status = "Создан новый документ и версия 1";
-            return new DocumentVersionResponse(pid, did, status);
-        } else {
-            boolean versionExists = documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash);
-            if (versionExists) {
-                status = "Такая версия уже существует, ничего не делаем";
-                return new DocumentVersionResponse(pid, did, status);
-            }
-            int newVersion = resolveVersion(pid, did, null) + 1;
-            createNewVersion(pid, did, uid, file, hash, newVersion);
-            status = "Создана новая версия " + newVersion;
-            return new DocumentVersionResponse(pid, did, status);
+            createDocumentNewVersion(pid, did, uid, file, hash, 1);
+            var res = generatePreview(pid, did, file);
+            var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
+            assert res.getBody() != null;
+            createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, 1);
+            return new DocumentVersionResponse(pid, did, "Создан новый документ и версия 1");
         }
+        if (documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash)) {
+            return new DocumentVersionResponse(pid, did, "Такая версия уже существует, ничего не делаем");
+        }
+        int newVersion = resolveVersion(pid, did, null) + 1;
+        createDocumentNewVersion(pid, did, uid, file, hash, newVersion);
+        var res = generatePreview(pid, did, file);
+        var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
+        assert res.getBody() != null;
+        createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, newVersion);
+
+        return new DocumentVersionResponse(pid, did, "Создана новая версия " + newVersion);
     }
 
     private UUID createNewDocument(UUID pid, UUID uid, String name) {
@@ -259,7 +266,7 @@ public class DocumentFileService {
         return doc.getDid();
     }
 
-    private void createNewVersion(UUID pid, UUID did, UUID uid, MultipartFile file, String hash, int version) throws Exception {
+    private void createDocumentNewVersion(UUID pid, UUID did, UUID uid, MultipartFile file, String hash, int version) throws Exception {
         String objectPath = String.format("%s/%s/%d/content", pid, did, version);
         minio.putObject(
                 PutObjectArgs.builder()
@@ -281,6 +288,41 @@ public class DocumentFileService {
         dv.setSize(file.getSize());
         dv.setCreated(Instant.now());
         documentVersionRepository.save(dv);
+    }
+
+    private void createPreviewNewVersion(UUID pid, UUID did, String filename, Resource file, String contentType, int version) throws Exception {
+        String objectPath = String.format("%s/%s/%d/preview", pid, did, version);
+        minio.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectPath)
+                        .stream(file.getInputStream(), file.getFile().length(), -1)
+                        .contentType(contentType)
+                        .build()
+        );
+        DocumentVersionPreview dvp = new DocumentVersionPreview();
+        dvp.setPid(pid);
+        dvp.setDid(did);
+        dvp.setVer(version);
+        dvp.setFilename(extractFilename(filename));
+        dvp.setContentType(contentType);
+        documentVersionPreviewRepository.save(dvp);
+    }
+
+
+    public ResponseEntity<Resource> generatePreview(UUID pid, UUID did, MultipartFile file) throws Exception {
+        String url = "http://core.transform:8000/generate/preview";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.parseMediaType(file.getContentType()));
+        HttpEntity<byte[]> filePart = new HttpEntity<>(file.getBytes(), fileHeaders);
+        body.add("file", filePart);
+        body.add("pid", pid.toString());
+        body.add("did", did.toString());
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        return transformClient.postForEntity(url, requestEntity, Resource.class);
     }
 
     public String generateSlug(String input, Function<String, Boolean> isUniqueSlug) {
