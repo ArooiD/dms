@@ -315,15 +315,6 @@ public class DocumentFileService {
 
     public ResponseEntity<String> generatePreview(UUID pid, UUID did, MultipartFile file) throws Exception {
         String url = "http://core.transform:8000/generate/preview";
-
-
-//        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-//        HttpHeaders fileHeaders = new HttpHeaders();
-//        fileHeaders.setContentType(MediaType.parseMediaType(file.getContentType()));
-//        HttpEntity<byte[]> filePart = new HttpEntity<>(file.getBytes(), fileHeaders);
-//        body.add("file", filePart);
-//        body.add("pid", pid.toString());
-//        body.add("did", did.toString());
         ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
             @Override
             public String getFilename() {
