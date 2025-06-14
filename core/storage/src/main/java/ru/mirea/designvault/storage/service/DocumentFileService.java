@@ -1,7 +1,6 @@
 package ru.mirea.designvault.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -290,13 +289,16 @@ public class DocumentFileService {
         documentVersionRepository.save(dv);
     }
 
-    private void createPreviewNewVersion(UUID pid, UUID did, String filename, Resource file, String contentType, int version) throws Exception {
+    private void createPreviewNewVersion(UUID pid, UUID did, String filename, String html, String contentType, int version) throws Exception {
+        byte[] bytes = html.getBytes();
+
+        InputStream inputStream = new ByteArrayInputStream(bytes);
         String objectPath = String.format("%s/%s/%d/preview", pid, did, version);
         minio.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucket)
                         .object(objectPath)
-                        .stream(file.getInputStream(), file.getFile().length(), -1)
+                        .stream(inputStream, bytes.length, -1)
                         .contentType(contentType)
                         .build()
         );
@@ -310,7 +312,7 @@ public class DocumentFileService {
     }
 
 
-    public ResponseEntity<Resource> generatePreview(UUID pid, UUID did, MultipartFile file) throws Exception {
+    public ResponseEntity<String> generatePreview(UUID pid, UUID did, MultipartFile file) throws Exception {
         String url = "http://core.transform:8000/generate/preview";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -322,7 +324,7 @@ public class DocumentFileService {
         body.add("pid", pid.toString());
         body.add("did", did.toString());
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        return transformClient.postForEntity(url, requestEntity, Resource.class);
+        return transformClient.postForEntity(url, requestEntity, String.class);
     }
 
     public String generateSlug(String input, Function<String, Boolean> isUniqueSlug) {
