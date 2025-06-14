@@ -70,9 +70,9 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: str = Form(..., description="pidr"),
-    did: str = Form(..., description="did inside"),
-    ver: int = Form(..., description="verMut"),
+    pid: str = Query(..., description="pidr"),
+    did: str = Query(..., description="did inside"),
+    ver: int = Query(..., description="verMut"),
     file: UploadFile = File(...)
 ):
 
