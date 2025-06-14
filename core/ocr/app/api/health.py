@@ -1,7 +1,8 @@
 import os
 import time
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+import httpx
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 import magic
 import io
 
@@ -67,7 +68,11 @@ def root():
 
 
 @router.post(BASE_PATH+"/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    pid: str = Query(..., description="pidr"),
+    did: str = Query(..., description="did inside"),
+    ver: int = Query(..., description="verMut"),
+    file: UploadFile = File(...)):
     time_parse = time.time()
     if not file.filename:
         raise HTTPException(status_code=400, detail="Empty file")
@@ -83,12 +88,21 @@ async def upload_file(file: UploadFile = File(...)):
 
     try:
         text = await parse_file(io.BytesIO(contents), mime)
+        data = {
+            "pid": pid,
+            "did": did,
+            "ver": ver,
+            "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
+        }
+
+        request = httpx.post("http://core.search:8000/index/document", json=data, timeout=3.0)
+
         return {
-            "message": "File parsed successfully (no disk saved)",
-            "filename": file.filename,
-            "mime_type": mime,
-            "time_parse": time.time() - time_parse,
-            "text": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
+            "pid": pid,
+            "did": did,
+            "ver": ver,
+            "status_request_code": request.status_code,
+            "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error parsing file: {str(e)}")
