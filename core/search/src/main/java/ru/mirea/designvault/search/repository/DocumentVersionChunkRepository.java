@@ -16,17 +16,16 @@ import java.util.UUID;
 public interface DocumentVersionChunkRepository extends CrudRepository<DocumentVersionChunk, DocumentChunkId> {
     @Query(nativeQuery = true,
             value = """
-                      WITH q AS (SELECT plainto_tsquery('russian', ?2) AS query)
-                      SELECT pid, did, content,
-                             embedding <-> cast(?1 AS vector) AS distance,
-                             ts_rank(tsv, q.query) AS rank
-                      FROM document_version_chunk, q
-                      WHERE tsv @@ q.query
-                      ORDER BY distance ASC, rank DESC
-                      LIMIT ?3
+                    WITH q AS (SELECT plainto_tsquery('russian', ?1) AS query)
+                    SELECT pid, did, content,
+                           ts_rank(tsv, q.query) AS rank
+                    FROM document_version_chunk, q
+                    WHERE tsv @@ q.query
+                    ORDER BY rank DESC
+                    LIMIT ?2
                     """
     )
-    List<DocumentVersionChunkProjection> findNearestNeighborsWithFullText(String vector, String textQuery, int limit);
+    List<DocumentVersionChunkProjection> findNearestNeighborsWithFullText(String textQuery, int limit);
 
     @Modifying
     @Transactional

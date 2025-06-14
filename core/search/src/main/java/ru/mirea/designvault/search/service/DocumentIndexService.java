@@ -47,19 +47,20 @@ public class DocumentIndexService {
             futures.add(executor.submit(() -> {
                 String text = frags.get(index);
                 try {
-                    float[] embedding = getEmbeddingVector(text); // REST call
-                    if (embedding != null) {
-                        return DocumentVersionChunk.builder()
-                                .pid(pid)
-                                .did(did)
-                                .ver(ver)
-                                .cid(index)
-                                .content(text.replaceAll("\\x00", ""))
-                                .embedding(embedding)
-                                .build();
-                    } else {
-                        log.warn("Empty embedding for fragment {}", index);
-                    }
+                    return DocumentVersionChunk.builder()
+                            .pid(pid)
+                            .did(did)
+                            .ver(ver)
+                            .cid(index)
+                            .content(text.replaceAll("\\x00", ""))
+//                            .embedding(embedding)
+                            .build();
+////                    float[] embedding = getEmbeddingVector(text); // REST call
+////                    if (embedding != null) {
+//
+//                    } else {
+//                        log.warn("Empty embedding for fragment {}", index);
+//                    }
                 } catch (Exception e) {
                     log.error("Error generating embedding for fragment {}: {}", index, e.getMessage());
                 }
@@ -97,7 +98,6 @@ public class DocumentIndexService {
         String url = "http://core.transform:8000/generate/embedding";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         Map<String, String> body = Map.of("text", text);
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
         ResponseEntity<EmbeddingDto> response = restTemplate.postForEntity(url, request, EmbeddingDto.class);
@@ -118,7 +118,6 @@ public class DocumentIndexService {
                 .ver(ver)
                 .cid(cid)
                 .content(text)
-                .embedding(embedding)
                 .build();
         return documentChunkRepository.save(chunk);
     }
@@ -130,14 +129,14 @@ public class DocumentIndexService {
 
 
     public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
-        float[] vector = getEmbeddingVector(text);
-        StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < vector.length; i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(vector[i]);
-        }
-        sb.append("]");
-        String vectorString = sb.toString();
+//        float[] vector = getEmbeddingVector(text);
+//        StringBuilder sb = new StringBuilder("[");
+//        for (int i = 0; i < vector.length; i++) {
+//            if (i > 0) sb.append(", ");
+//            sb.append(vector[i]);
+//        }
+//        sb.append("]");
+//        String vectorString = sb.toString();
         String[] words = text.trim().split("\\s+");
         StringBuilder tsquery = new StringBuilder();
         for (int i = 0; i < words.length; i++) {
@@ -145,7 +144,7 @@ public class DocumentIndexService {
             tsquery.append(words[i]).append(":*");
         }
         String tsQueryString = tsquery.toString();
-        return documentChunkRepository.findNearestNeighborsWithFullText(vectorString, tsQueryString, limit)
+        return documentChunkRepository.findNearestNeighborsWithFullText(tsQueryString, limit)
                 .stream()
                 .map(chunk -> SearchSnippetDto.builder()
                         .pid(chunk.getPid())
