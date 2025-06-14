@@ -11,7 +11,7 @@ from docx import Document
 from PyPDF2 import PdfReader
 
 router = APIRouter()
-BASE_PATH = "/analyze"
+BASE_PATH = "/analyse"
 STOP = set("""и в не на с к по для от что это как он она они из у о""".split())
 
 
