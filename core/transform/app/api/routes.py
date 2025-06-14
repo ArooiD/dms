@@ -117,7 +117,7 @@ async def generate_preview(file: UploadFile = File(...)):
             os.unlink(input_path)
         if output_path and os.path.exists(output_path):
             try:
-                os.unlink(output_path)
+                # os.unlink(output_path)
                 logger.info(f"[8] Удаляем сгенерированное превью: {output_path}")
             except Exception:
                 pass
