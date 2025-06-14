@@ -239,6 +239,7 @@ public class DocumentFileService {
             var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
             assert res.getBody() != null;
             createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, 1);
+            ocrFile(pid, did, 1, file);
             return new DocumentVersionResponse(pid, did, "Создан новый документ и версия 1");
         }
         if (documentVersionRepository.existsByPidAndDidAndHash(pid, did, hash)) {
@@ -250,7 +251,7 @@ public class DocumentFileService {
         var contentType = Objects.requireNonNull(res.getHeaders().getContentType()).toString();
         assert res.getBody() != null;
         createPreviewNewVersion(pid, did, file.getOriginalFilename(), res.getBody(), contentType, newVersion);
-
+        ocrFile(pid, did, newVersion, file);
         return new DocumentVersionResponse(pid, did, "Создана новая версия " + newVersion);
     }
 
@@ -345,6 +346,28 @@ public class DocumentFileService {
         }
         return slug;
     }
+
+    public ResponseEntity<String> ocrFile(UUID pid, UUID did, Integer version, MultipartFile file) throws IOException {
+        String url = "http://core.ocr:8000/analyse/upload";
+        ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        };
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new HttpEntity<>(fileAsResource, fileHeaders));
+        body.add("did", did);
+        body.add("ver", version);
+        body.add("pid", pid);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        return transformClient.postForEntity(url, requestEntity, String.class);
+    }
+
 
     public boolean isSlugUnique(String slug) {
         return !documentRepository.existsBySlug(slug);
