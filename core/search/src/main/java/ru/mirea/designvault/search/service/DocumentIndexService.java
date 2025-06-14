@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.search.dto.EmbeddingDto;
 import ru.mirea.designvault.search.dto.IndexDto;
@@ -11,10 +12,13 @@ import ru.mirea.designvault.search.dto.SearchSnippetDto;
 import ru.mirea.designvault.search.model.DocumentVersionChunk;
 import ru.mirea.designvault.search.repository.DocumentVersionChunkRepository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -29,29 +33,62 @@ public class DocumentIndexService {
         this.documentChunkRepository = repository;
     }
 
-    public void indexDocument(IndexDto dto) {
-        UUID pid = dto.getPid();
-        UUID did = dto.getDid();
-        Integer ver = dto.getVer();
+    @Transactional
+    public int indexDocument(IndexDto dto) {
+        UUID pid = UUID.fromString(dto.getPid().replace("\"", ""));
+        UUID did = UUID.fromString(dto.getDid().replace("\"", ""));
+        Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
+        log.info("HERE -> 1");
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<Future<DocumentVersionChunk>> futures = new ArrayList<>();
         for (int i = 0; i < frags.size(); i++) {
-            String text = frags.get(i);
+            final int index = i;
+            futures.add(executor.submit(() -> {
+                String text = frags.get(index);
+                try {
+                    float[] embedding = getEmbeddingVector(text); // REST call
+                    if (embedding != null) {
+                        return DocumentVersionChunk.builder()
+                                .pid(pid)
+                                .did(did)
+                                .ver(ver)
+                                .cid(index)
+                                .content(text)
+                                .embedding(embedding)
+                                .build();
+                    } else {
+                        log.warn("Empty embedding for fragment {}", index);
+                    }
+                } catch (Exception e) {
+                    log.error("Error generating embedding for fragment {}: {}", index, e.getMessage());
+                }
+                return null;
+            }));
+        }
+        List<DocumentVersionChunk> chunks = new ArrayList<>();
+        for (Future<DocumentVersionChunk> future : futures) {
             try {
-                float[] embedding = getEmbeddingVector(text);
-                if (embedding != null) {
-                    saveChunkEmbedding(pid, did, ver, i, text, embedding);
-                } else {
-                    log.warn("Empty embedding received for fragment " + i);
+                DocumentVersionChunk chunk = future.get();
+                if (chunk != null) {
+                    chunks.add(chunk);
                 }
             } catch (Exception e) {
-                log.error("Error generating embedding for fragment " + i + ": " + e.getMessage());
+                log.error("Error retrieving future result: {}", e.getMessage());
             }
         }
+        executor.shutdown();
+        if (!chunks.isEmpty()) {
+            var e = documentChunkRepository.saveAll(chunks);
+            log.info("Saved {} chunks to database", chunks.size());
+            return List.of(e).size();
+        }
+        return frags.size();
     }
 
     public void cleanIndex(IndexDto dto) {
-        UUID pid = dto.getPid();
-        UUID did = dto.getDid();
+        UUID pid = UUID.fromString(dto.getPid());
+        UUID did = UUID.fromString(dto.getDid());
         documentChunkRepository.deleteAllByPidAndDid(pid, did);
     }
 
@@ -66,11 +103,14 @@ public class DocumentIndexService {
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return response.getBody().getEmbedding();
         } else {
-            throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
+            log.error("Error generating embedding for text " + text);
+            return null;
+//            throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
         }
     }
 
-    private void saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
+    @Transactional
+    public DocumentVersionChunk saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
         DocumentVersionChunk chunk = DocumentVersionChunk.builder()
                 .pid(pid)
                 .did(did)
@@ -79,8 +119,14 @@ public class DocumentIndexService {
                 .content(text)
                 .embedding(embedding)
                 .build();
-        documentChunkRepository.save(chunk);
+        return documentChunkRepository.save(chunk);
     }
+
+    @Transactional
+    public Iterable<DocumentVersionChunk> saveChunkEmbeddingBatch(List<DocumentVersionChunk> batch) {
+        return documentChunkRepository.saveAll(batch);
+    }
+
 
     public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
         float[] vector = getEmbeddingVector(text);
