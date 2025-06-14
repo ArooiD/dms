@@ -1,3 +1,4 @@
+import os
 import time
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
@@ -21,28 +22,29 @@ def keywords(text, k=10):
     return [w for w, _ in most]
 
 
-async def parse_file(file: UploadFile, mime_type: str):
-    print(f"[INFO] Parsing file: {file.filename}")
+async def parse_file(file: io.BytesIO, mime_type: str):
+    print(f"[INFO] Parsing file")
     print(f"[INFO] MIME type: {mime_type}")
 
-    contents = await file.read()
     text = ""
 
     if mime_type == "text/plain":
-        text = contents.decode("utf-8")
+        text = file.read().decode("utf-8", errors="ignore")
 
     elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        f = io.BytesIO(contents)
-        doc = Document(f)
-        text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+        try:
+            doc = Document(file)
+            text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+        except KeyError as e:
+            # DOCX может содержать нестандартные XML теги
+            raise Exception(f"Invalid or corrupted .docx file: {e}")
 
     elif mime_type == "application/pdf":
-        f = io.BytesIO(contents)
-        reader = PdfReader(f)
+        reader = PdfReader(file)
         for page in reader.pages:
             extracted = page.extract_text()
             if extracted:
-                text += extracted + "\n"
+                text += extracted + "\n"\
 
     else:
         raise Exception(f"Unsupported file type: {mime_type}")
@@ -70,17 +72,23 @@ async def upload_file(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Empty file")
 
-    mime = magic.from_buffer(await file.read(2048), mime=True)
+    contents = await file.read()
     await file.seek(0)
 
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    mime = magic.from_buffer(contents, mime=True)
+
+    if file_extension in [".docx"] and mime == "text/html":
+        mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
     try:
-        text = await parse_file(file, mime)
+        text = await parse_file(io.BytesIO(contents), mime)
         return {
             "message": "File parsed successfully (no disk saved)",
             "filename": file.filename,
             "mime_type": mime,
             "time_parse": time.time() - time_parse,
-            "text_lvl2": parse_text(text, _split_symbol=" . \n"),
+            "text": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error parsing file: {str(e)}")
@@ -94,7 +102,7 @@ def parse_text(text: str, _split_symbol):
         elif line[0].islower() and len(array) != 0:
             array[-1] += f' {line.strip()}'.replace("\n", "")
         else:
-            array.append(line.strip().replace("\n", "") + ".")
+            array.append(line.strip().replace("\n", ""))
     return array
 
 
