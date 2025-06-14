@@ -33,13 +33,14 @@ public class DocumentIndexService {
     public void indexDocument(IndexDto dto) {
         UUID pid = dto.getPid();
         UUID did = dto.getDid();
+        Integer ver = dto.getVer();
         List<String> frags = dto.getFrags();
         for (int i = 0; i < frags.size(); i++) {
             String text = frags.get(i);
             try {
                 float[] embedding = getEmbeddingVector(text);
                 if (embedding != null) {
-                    saveChunkEmbedding(pid, did, i, text, embedding);
+                    saveChunkEmbedding(pid, did, ver, i, text, embedding);
                 } else {
                     log.warn("Empty embedding received for fragment " + i);
                 }
@@ -72,10 +73,11 @@ public class DocumentIndexService {
     }
 
 
-    private void saveChunkEmbedding(UUID pid, UUID did, int cid, String text, float[] embedding) {
+    private void saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
         DocumentVersionChunk chunk = DocumentVersionChunk.builder()
                 .pid(pid)
                 .did(did)
+                .ver(ver)
                 .cid(cid)
                 .content(text)
                 .embedding(embedding)
