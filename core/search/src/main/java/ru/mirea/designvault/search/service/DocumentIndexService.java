@@ -72,7 +72,8 @@ public class DocumentIndexService {
             return response.getBody().getEmbedding();
         } else {
             log.error("Error generating embedding for text " + text);
-            throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
+            return null;
+//            throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
         }
     }
 
