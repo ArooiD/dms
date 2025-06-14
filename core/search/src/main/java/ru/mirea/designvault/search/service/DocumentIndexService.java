@@ -54,7 +54,7 @@ public class DocumentIndexService {
                                 .did(did)
                                 .ver(ver)
                                 .cid(index)
-                                .content(text)
+                                .content(text.replaceAll("\\x00", ""))
                                 .embedding(embedding)
                                 .build();
                     } else {
