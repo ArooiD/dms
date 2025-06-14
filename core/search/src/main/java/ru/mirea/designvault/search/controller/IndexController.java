@@ -1,6 +1,7 @@
 package ru.mirea.designvault.search.controller;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "index")
 public class IndexController {
@@ -25,6 +27,7 @@ public class IndexController {
     @PostMapping("document")
     public ResponseEntity<String> indexChunk(@RequestBody IndexDto dto) {
         try {
+            log.info("Index chunk: {}", dto);
             indexService.indexDocument(dto);
             return ResponseEntity.ok("Indexed successfully");
         } catch (Exception e) {
