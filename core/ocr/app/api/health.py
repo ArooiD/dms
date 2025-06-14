@@ -70,8 +70,8 @@ def root():
 
 @router.post(BASE_PATH+"/upload")
 async def upload_file(
-    pid: uuid.UUID = Form(..., description="pidr"),
-    did: uuid.UUID = Form(..., description="did inside"),
+    pid: str = Form(..., description="pidr"),
+    did: str = Form(..., description="did inside"),
     ver: int = Form(..., description="verMut"),
     file: UploadFile = File(...)):
     time_parse = time.time()
@@ -90,8 +90,8 @@ async def upload_file(
     try:
         text = await parse_file(io.BytesIO(contents), mime)
         data = {
-            "pid": pid,
-            "did": did,
+            "pid": uuid.UUID(pid),
+            "did": uuid.UUID(did),
             "ver": ver,
             "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
         }
