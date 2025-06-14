@@ -1,4 +1,4 @@
-package ru.mirea.designvault.storage.model;
+package ru.mirea.designvault.search.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import ru.mirea.designvault.storage.key.DocumentChunkId;
+import ru.mirea.designvault.search.key.DocumentChunkId;
 
 import java.util.UUID;
 

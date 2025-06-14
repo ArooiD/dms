@@ -1,13 +1,12 @@
-package ru.mirea.designvault.storage.controller;
+package ru.mirea.designvault.search.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.mirea.designvault.storage.dto.IndexDto;
-import ru.mirea.designvault.storage.dto.SearchSnippetDto;
-import ru.mirea.designvault.storage.service.DocumentIndexService;
+import ru.mirea.designvault.search.dto.IndexDto;
+import ru.mirea.designvault.search.dto.SearchSnippetDto;
+import ru.mirea.designvault.search.service.DocumentIndexService;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +46,7 @@ public class IndexController {
 
 
     @GetMapping("search")
-    public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) throws JsonProcessingException {
+    public ResponseEntity<List<SearchSnippetDto>> search(@RequestBody Map<String, String> query) {
         String text = query.get("query");
         Integer count = Integer.parseInt(query.get("count"));
         if (text == null || text.isBlank()) {

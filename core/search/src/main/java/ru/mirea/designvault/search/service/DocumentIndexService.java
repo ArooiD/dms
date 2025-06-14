@@ -1,31 +1,31 @@
-package ru.mirea.designvault.storage.service;
+package ru.mirea.designvault.search.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.mirea.designvault.storage.dto.EmbeddingDto;
-import ru.mirea.designvault.storage.dto.IndexDto;
-import ru.mirea.designvault.storage.dto.SearchSnippetDto;
-import ru.mirea.designvault.storage.model.DocumentVersionChunk;
-import ru.mirea.designvault.storage.repository.DocumentVersionChunkRepository;
+import ru.mirea.designvault.search.dto.EmbeddingDto;
+import ru.mirea.designvault.search.dto.IndexDto;
+import ru.mirea.designvault.search.dto.SearchSnippetDto;
+import ru.mirea.designvault.search.model.DocumentVersionChunk;
+import ru.mirea.designvault.search.repository.DocumentVersionChunkRepository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Slf4j
 @Service
 public class DocumentIndexService {
     private final RestTemplate transformClient;
-    private final DocumentVersionChunkRepository repository;
     private final DocumentVersionChunkRepository documentChunkRepository;
 
-    public DocumentIndexService(RestTemplateBuilder builder, DocumentVersionChunkRepository repository, DocumentVersionChunkRepository documentChunkRepository) {
+    public DocumentIndexService(RestTemplateBuilder builder, DocumentVersionChunkRepository repository) {
         this.transformClient = builder
                 .rootUri("http://core.transform:8000")
                 .build();
-        this.repository = repository;
         this.documentChunkRepository = documentChunkRepository;
     }
 
@@ -99,7 +99,7 @@ public class DocumentIndexService {
             tsquery.append(words[i]).append(":*");
         }
         String tsQueryString = tsquery.toString();
-        return repository.findNearestNeighborsWithFullText(vectorString, tsQueryString, limit)
+        return documentChunkRepository.findNearestNeighborsWithFullText(vectorString, tsQueryString, limit)
                 .stream()
                 .map(chunk -> SearchSnippetDto.builder()
                         .pid(chunk.getPid())
