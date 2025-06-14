@@ -35,8 +35,8 @@ public class DocumentIndexService {
 
     @Transactional
     public int indexDocument(IndexDto dto) {
-        UUID pid = UUID.fromString(dto.getPid());
-        UUID did = UUID.fromString(dto.getDid());
+        UUID pid = UUID.fromString(dto.getPid().replace("\"", ""));
+        UUID did = UUID.fromString(dto.getDid().replace("\"", ""));
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
         log.info("HERE -> 1");
