@@ -14,8 +14,11 @@ import ru.mirea.designvault.search.repository.DocumentVersionChunkRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -36,22 +39,38 @@ public class DocumentIndexService {
         UUID did = UUID.fromString(dto.getDid());
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
-        int i;
-        for (i = 0; i < frags.size(); i++) {
-            String text = frags.get(i);
-            try {
-                float[] embedding = getEmbeddingVector(text);
-                if (embedding != null) {
-                    var res = saveChunkEmbedding(pid, did, ver, i, text, embedding);
-                    log.info("Saved embedding {} to {}", i, res);
-                } else {
-                    log.warn("Empty embedding received for fragment {}", i);
-                }
-            } catch (Exception e) {
-                log.error("Error generating embedding for fragment {}: {}", i, e.getMessage());
-            }
+
+        List<DocumentVersionChunk> chunks = IntStream.range(0, frags.size())
+                .mapToObj(i -> {
+                    String text = frags.get(i);
+                    try {
+                        float[] embedding = getEmbeddingVector(text);
+                        if (embedding != null) {
+                            return DocumentVersionChunk.builder()
+                                    .pid(pid)
+                                    .did(did)
+                                    .ver(ver)
+                                    .cid(i)
+                                    .content(text)
+                                    .embedding(embedding)
+                                    .build();
+                        } else {
+                            log.warn("Empty embedding received for fragment {}", i);
+                        }
+                    } catch (Exception e) {
+                        log.error("Error generating embedding for fragment {}: {}", i, e.getMessage());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (!chunks.isEmpty()) {
+            var e = documentChunkRepository.saveAll(chunks);
+            log.info("Saved {} chunks to database", chunks.size());
+            return List.of(e).size();
         }
-        return i;
+
+        return frags.size();
     }
 
     public void cleanIndex(IndexDto dto) {
@@ -89,6 +108,12 @@ public class DocumentIndexService {
                 .build();
         return documentChunkRepository.save(chunk);
     }
+
+    @Transactional
+    public Iterable<DocumentVersionChunk> saveChunkEmbeddingBatch(List<DocumentVersionChunk> batch) {
+        return documentChunkRepository.saveAll(batch);
+    }
+
 
     public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
         float[] vector = getEmbeddingVector(text);
