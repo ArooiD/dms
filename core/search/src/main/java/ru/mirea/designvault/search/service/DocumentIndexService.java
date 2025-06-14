@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.search.dto.EmbeddingDto;
 import ru.mirea.designvault.search.dto.IndexDto;
@@ -29,6 +30,7 @@ public class DocumentIndexService {
         this.documentChunkRepository = repository;
     }
 
+    @Transactional
     public void indexDocument(IndexDto dto) {
         UUID pid = UUID.fromString(dto.getPid());
         UUID did = UUID.fromString(dto.getDid());
