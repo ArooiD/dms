@@ -29,7 +29,6 @@ public class DocumentIndexService {
         this.documentChunkRepository = repository;
     }
 
-
     public void indexDocument(IndexDto dto) {
         UUID pid = dto.getPid();
         UUID did = dto.getDid();
@@ -56,7 +55,6 @@ public class DocumentIndexService {
         documentChunkRepository.deleteAllByPidAndDid(pid, did);
     }
 
-
     public float[] getEmbeddingVector(String text) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://core.transform:8000/generate/embedding";
@@ -71,7 +69,6 @@ public class DocumentIndexService {
             throw new RuntimeException("Failed to get embedding, status: " + response.getStatusCode());
         }
     }
-
 
     private void saveChunkEmbedding(UUID pid, UUID did, Integer ver, int cid, String text, float[] embedding) {
         DocumentVersionChunk chunk = DocumentVersionChunk.builder()
