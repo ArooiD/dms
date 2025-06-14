@@ -8,9 +8,7 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6 \
     libxrender-dev \
-    gcc \
-    build-bace \
-    libmagic \
+    libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base AS dependency
