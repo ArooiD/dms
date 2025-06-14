@@ -97,6 +97,7 @@ public class DocumentIndexService {
         String url = "http://core.transform:8000/generate/embedding";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         Map<String, String> body = Map.of("text", text);
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
         ResponseEntity<EmbeddingDto> response = restTemplate.postForEntity(url, request, EmbeddingDto.class);
