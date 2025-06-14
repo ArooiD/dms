@@ -39,11 +39,12 @@ public class DocumentIndexService {
         UUID did = UUID.fromString(dto.getDid());
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
-
+        log.info("HERE -> 1");
         List<DocumentVersionChunk> chunks = IntStream.range(0, frags.size())
                 .mapToObj(i -> {
                     String text = frags.get(i);
                     try {
+                        log.info("HERE -> 2 {}", i);
                         float[] embedding = getEmbeddingVector(text);
                         if (embedding != null) {
                             return DocumentVersionChunk.builder()
@@ -64,6 +65,7 @@ public class DocumentIndexService {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        log.info("HERE -> 3");
         if (!chunks.isEmpty()) {
             var e = documentChunkRepository.saveAll(chunks);
             log.info("Saved {} chunks to database", chunks.size());
