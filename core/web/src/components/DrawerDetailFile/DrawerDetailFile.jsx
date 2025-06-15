@@ -189,7 +189,7 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
                                 </Flex>}
                             </Flex>
                             <Flex gap={'small'}>
-                                <Button size={'large'} onClick={() => getFile()}>Скачать</Button>
+                                <Button size={'large'} onClick={() => getFile()}>Предпросмотр</Button>
                                 <Upload disabled={isPending || isPendingUpload} beforeUpload={handleUpdateFile} showUploadList={false}>
                                     <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'} size={'large'}>Обновить</Button>
                                 </Upload>

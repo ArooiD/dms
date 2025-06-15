@@ -76,12 +76,20 @@ const ModalPreviewFile = observer(({callback_open, callback_close, previewFileUr
 
     return (
         <Modal
+            width={'80%'}
             title={'Предпросмотр файла'}
             centered
             open={callback_open}
             onCancel={callback_close}
+            cancelText={'Закрыть'}
+            cancelButtonProps={{
+
+            }}
+            okButtonProps={{
+                style: {display: 'none'}
+            }}
         >
-            <Flex>
+            <Flex style={{border: '1px solid rgba(255,255,255,0.1)', padding: '24px', borderRadius: '8px', overflow: 'auto', maxHeight: '80vh'}}>
                 {previewFileUrl && <UniversalFileLoader url={previewFileUrl ?? ''} token={getToken()} />}
             </Flex>
         </Modal>
