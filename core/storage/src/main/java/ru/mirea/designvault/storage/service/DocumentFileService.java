@@ -82,19 +82,64 @@ public class DocumentFileService {
     public DocumentFile getDocumentPreviewVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
-            String objectPath = String.format("%s/%s/%d/preview", pid, did, targetVersion);
             DocumentVersionPreviewProjection document = documentVersionPreviewRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
             }
+            String objectPath;
+            String contentType = document.getContentType();
+            if (contentType != null && contentType.toLowerCase().startsWith("application/pdf")) {
+                objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
+            } else {
+                objectPath = String.format("%s/%s/%d/preview", pid, did, targetVersion);
+            }
+
             InputStream is = minio.getObject(GetObjectArgs.builder().bucket(bucket).object(objectPath).build());
-            log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
-            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + Optional.ofNullable(document.getExt()).orElse("bin");
+            log.debug("Версия документа получена: pid={}, did={}, version={}, path={}", pid, did, targetVersion, objectPath);
+
+            String ext = Optional.ofNullable(document.getExt())
+                    .filter(e -> !e.isEmpty())
+                    .orElseGet(() -> extensionFromContentType(contentType));
+
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + ext;
             log.info(name);
-            return DocumentFile.builder().name(name).contentType(document.getContentType()).stream(is).build();
+
+            return DocumentFile.builder()
+                    .name(name)
+                    .contentType(contentType)
+                    .stream(is)
+                    .build();
+
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
+        }
+    }
+
+
+    private String extensionFromContentType(String contentType) {
+        if (contentType == null) {
+            return "bin";
+        }
+        String baseType = contentType.split(";")[0].trim().toLowerCase();
+        switch (baseType) {
+            case "application/pdf":
+                return "pdf";
+            case "image/jpeg":
+                return "jpg";
+            case "image/png":
+                return "png";
+            case "text/plain":
+                return "txt";
+            case "text/html":
+                return "html";
+            case "application/msword":
+                return "doc";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return "docx";
+            // Добавь нужные типы здесь
+            default:
+                return "bin";
         }
     }
 
@@ -131,7 +176,13 @@ public class DocumentFileService {
 
     private Integer resolveVersion(UUID cid, UUID did, Integer version) throws Exception {
         String basePrefix = String.format("%s/%s/", cid, did);
-        Iterable<Result<Item>> results = minio.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(basePrefix).delimiter("/").recursive(false).build());
+        Iterable<Result<Item>> results = minio
+                .listObjects(ListObjectsArgs.builder()
+                        .bucket(bucket)
+                        .prefix(basePrefix)
+                        .delimiter("/")
+                        .recursive(false)
+                        .build());
         int maxVersion = -1;
         for (Result<Item> result : results) {
             Item item = result.get();

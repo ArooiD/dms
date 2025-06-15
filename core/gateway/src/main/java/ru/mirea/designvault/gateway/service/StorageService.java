@@ -108,6 +108,7 @@ public class StorageService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(response.getHeaders().getContentType());
+        headers.set("X-Frame-Options", "ALLOWALL");
         String contentDisposition = response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
         if (contentDisposition != null) {
             headers.set(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);

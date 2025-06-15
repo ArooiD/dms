@@ -1,0 +1,32 @@
+%%{init: {
+  "theme": "default",
+  "themeVariables": {
+    "fontSize": "18px",
+    "fontFamily": "Arial",
+    "fontWeight": "bold"
+  },
+  "flowchart": {
+    "nodeSpacing": 20,
+    "rankSpacing": 30
+  }
+}}%%
+flowchart TD
+    classDef startStop fill:#f9f,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    classDef process fill:#e1efff,stroke:#668cff,stroke-width:1.5px,color:#000
+
+    Start([Начало поиска]):::startStop
+    Receive[Получить запрос<br>/search?query,count]:::process
+    Decode[Декодировать строку<br>и определить limit]:::process
+    Build[Построить строку<br>полнотекстового запроса]:::process
+    Search[Выполнить поиск в БД<br>по tsvector]:::process
+    Highlight[Подсветить найденные<br>фрагменты текста]:::process
+    Respond[Сформировать ответ<br>список фрагментов]:::process
+    End([Завершение поиска]):::startStop
+
+    Start --> Receive
+    Receive --> Decode
+    Decode --> Build
+    Build --> Search
+    Search --> Highlight
+    Highlight --> Respond
+    Respond --> End
