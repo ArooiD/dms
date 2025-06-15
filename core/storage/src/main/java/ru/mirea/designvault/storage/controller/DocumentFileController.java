@@ -56,6 +56,13 @@ public class DocumentFileController {
     private String encodeFallbackName(String name) {
         return name.replaceAll("[^\\x20-\\x7E]", "_");
     }
+}
+
+
+
+
+
+
 
 //        return fileService.upload(pid, file);
 //    }
@@ -71,4 +78,3 @@ public class DocumentFileController {
 //        fileService.delete(pid, objectName);
 //        return ResponseEntity.noContent().build();
 //    }
-}

@@ -1,4 +1,4 @@
-package ru.mirea.designvault.storage.key;
+package ru.mirea.designvault.search.key;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DocumentChunkId extends DocumentId {
-    Integer cid;
+public class DocumentTagId extends DocumentId {
+    private UUID tid;
 }

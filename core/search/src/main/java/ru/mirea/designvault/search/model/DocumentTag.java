@@ -1,8 +1,8 @@
-package ru.mirea.designvault.storage.model;
+package ru.mirea.designvault.search.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import ru.mirea.designvault.storage.key.DocumentTagId;
+import ru.mirea.designvault.search.key.DocumentTagId;
 
 import java.util.UUID;
 

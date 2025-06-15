@@ -1,4 +1,4 @@
-package ru.mirea.designvault.storage.model;
+package ru.mirea.designvault.search.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import ru.mirea.designvault.storage.key.DocumentChunkId;
+import ru.mirea.designvault.search.key.DocumentChunkId;
 
 import java.util.UUID;
 
@@ -29,16 +29,20 @@ public class DocumentVersionChunk {
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID did;
     @Id
+    @Column(name = "ver")
+    @JdbcTypeCode(SqlTypes.INTEGER)
+    private Integer ver;
+    @Id
     @Column(name = "cid")
     @JdbcTypeCode(SqlTypes.INTEGER)
     private int cid;
     @Column(name = "content", columnDefinition = "text")
     @JdbcTypeCode(SqlTypes.LONGNVARCHAR)
     private String content;
-    @Column(name = "embedding")
-    @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = 384)
-    private float[] embedding;
+//    @Column(name = "embedding")
+//    @JdbcTypeCode(SqlTypes.VECTOR)
+//    @Array(length = 384)
+//    private float[] embedding;
     @Column(
             name = "tsv",
             columnDefinition = "tsvector GENERATED ALWAYS AS (to_tsvector('russian', content)) STORED",

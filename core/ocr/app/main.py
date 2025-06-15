@@ -8,11 +8,10 @@ from starlette.datastructures import State
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.db = get_postgres_connection()
-    app.state.rabbitmq = get_rabbitmq_connection()
+    # app.state.rabbitmq = get_rabbitmq_connection()
     yield
     app.state.db.close()
-    app.state.rabbitmq.close()
-
+    # app.state.rabbitmq.close()
 
 app = FastAPI(lifespan=lifespan)
 app.state: State  # type: ignore
