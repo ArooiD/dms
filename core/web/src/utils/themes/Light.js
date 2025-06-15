@@ -5,7 +5,7 @@ const COLOR_PALETTE = [
     '#0f1b2d',
     '#1c2a3a',
     '#274146',
-    '#35605a',
+    '#FFFFFF',
     '#4b8378',
     '#6ca68c',
     '#8cbf9f'
