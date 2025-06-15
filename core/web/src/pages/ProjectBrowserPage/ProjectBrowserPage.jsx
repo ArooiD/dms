@@ -27,6 +27,8 @@ import {useEffect, useState} from "react";
 import {useStores} from "../../utils/hooks/useStores.js";
 import DrawerDetailFile from "../../components/DrawerDetailFile/DrawerDetailFile.jsx";
 import SpinBlock from "../../components/SpinBlock/SpinBlock.jsx";
+import ModalPreviewFile from "../../components/ModalPreviewFile/ModalPreviewFile.jsx";
+
 
 
 function transformFolders(fileList) {
@@ -226,6 +228,35 @@ const ProjectBrowserPage = observer(() => {
         return false;
     };
 
+    const [previewFile, setPreviewFile] = useState(null)
+    const [previewFileUrl,setPreviewFileUrl] = useState('')
+
+    useEffect(() => {
+        if (previewFileUrl && !openDrawerDetailFile) {
+            setOpenModalPreviewFile(true)
+
+            // fetch(previewFileUrl, {
+            //     method: 'GET',
+            //     headers: {
+            //         authorization: `Bearer ${getToken()}`
+            //     }
+            // })
+            //     .then(response => {
+            //         if (response.status === 401) {
+            //             logout()
+            //             navigate('/login')
+            //         } else if (response.ok) return response.json()
+            //     })
+            //     .then(response => {
+            //         console.log('file => ', response)
+            //         setPreviewFile(response)
+            //     })
+            //     .catch(e => {
+            //         console.error(e)
+            //     })
+        }
+    }, [previewFileUrl, openDrawerDetailFile]);
+
     const deleteProject = (p_id) => {
         const externalHost = import.meta.env.VITE_DOMAIN || "";
         fetch(`${externalHost}/api/projects/${p_id}`, {
@@ -247,6 +278,10 @@ const ProjectBrowserPage = observer(() => {
                 console.error(e)
             })
     }
+
+    const [openModalPreviewFile, setOpenModalPreviewFile] = useState(false)
+    const handleCloseModalPreviewFile = () => { setOpenModalPreviewFile(false) }
+
 
     return (
         <Flex gap={'small'} vertical className={bbp.container}>
@@ -354,7 +389,13 @@ const ProjectBrowserPage = observer(() => {
                         dataSource={tableDocuments.sort(s => s.isFolder ? -1 : 1)}
                     />
 
-                    <DrawerDetailFile callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
+                    <ModalPreviewFile
+                        callback_open={openModalPreviewFile}
+                        callback_close={handleCloseModalPreviewFile}
+                        previewFileUrl={previewFileUrl}
+                    />
+
+                    <DrawerDetailFile setPreviewFileUrl={setPreviewFileUrl} updateProject={updateProject} callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
                 </Flex>
             </Flex>
             {/*<Flex className={bbp.footer}>*/}

@@ -6,6 +6,7 @@ import {MoonOutlined, QuestionOutlined, SunOutlined} from "@ant-design/icons";
 import {observer} from "mobx-react-lite";
 import ModalQuestion from "../../components/ModalQuestion/ModalQuestion.jsx";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const Header = observer(() => {
     const {
@@ -16,6 +17,8 @@ const Header = observer(() => {
         }
     } = useStores()
 
+    const navigate = useNavigate()
+
     const [openModalQuestion, setOpenModalQuestion] = useState(false)
     const handleCloseModalQuestion = () => { setOpenModalQuestion(false) }
 
@@ -25,7 +28,9 @@ const Header = observer(() => {
                 <Typography.Text style={{fontWeight: '500', fontSize: '20px'}}>{HEADER_TITLE}</Typography.Text>
             </Flex>
             <Flex style={{position: 'absolute', left: '50%', transform: 'translate(-50%,0)'}}>
-                <Input size={'large'} placeholder={'Поиск'} />
+                <Input.Search onSearch={(value) => {
+                    navigate(`/search/${value}`)
+                }} size={'large'} placeholder={'Поиск'} />
             </Flex>
             <Flex gap={'small'}>
                 <Button

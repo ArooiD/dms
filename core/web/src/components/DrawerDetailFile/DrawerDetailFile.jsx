@@ -1,4 +1,4 @@
-import {Button, Descriptions, Drawer, Flex, Segmented, Select, Typography} from "antd";
+import {App, Button, Descriptions, Drawer, Flex, Segmented, Select, Typography, Upload} from "antd";
 import SpinBlock from "../SpinBlock/SpinBlock.jsx";
 import {useEffect, useState} from "react";
 import {useStores} from "../../utils/hooks/useStores.js";
@@ -15,7 +15,7 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile, project_id}) => {
+const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile, project_id, updateProject, setPreviewFileUrl }) => {
     const [detailFile, setDetailFile] = useState([]);
     const navigate = useNavigate();
 
@@ -63,6 +63,85 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
         console.log(selectedVersion)
     }, [selectedVersion])
 
+    const [isPending, setIsPending] = useState(false)
+    const [isPendingUpload, setIsPendingUpload] = useState(false)
+
+    const {message} = App.useApp()
+
+    const getFile = () => {
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+
+        setPreviewFileUrl(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}`)
+        callback_close()
+        // fetch(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}`, {
+        //     method: 'GET',
+        //     headers: {
+        //         authorization: `Bearer ${getToken()}`
+        //     }
+        // })
+        //     .then(response => {
+        //         if (response.status === 401) {
+        //             logout()
+        //             navigate('/login')
+        //         } else if (response.ok) return response.json()
+        //     })
+        //     .then(response => {
+        //         console.log('file => ', response)
+        //         setPreviewFile(response)
+        //     })
+        //     .catch(e => {
+        //         console.error(e)
+        //     })
+    }
+
+    const handleUpdateFile = async (file) => {
+        setIsPendingUpload(true)
+        message.open({
+            key: 'updatable',
+            type: 'loading',
+            content: 'Загрузка новой версии файла',
+        });
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const externalHost = import.meta.env.VITE_DOMAIN || "";
+        try {
+            const response = await fetch(`${externalHost}/api/projects/${project_id}/documents/${selectedFile.slug}`, {
+                method: 'PUT',
+                body: formData,
+                headers: {
+                    authorization: `Bearer ${getToken()}`
+                }
+            });
+
+            if (response.ok) {
+                message.open({
+                    key: 'updatable',
+                    type: 'success',
+                    content: 'Файл успешно обновлен!',
+                });
+                callback_close()
+                updateProject()
+            } else {
+                message.open({
+                    key: 'updatable',
+                    type: 'error',
+                    content: 'Ошибка обновления файла!',
+                });
+            }
+            setIsPendingUpload(false)
+        } catch (error) {;
+            message.open({
+                key: 'updatable',
+                type: 'error',
+                content: 'Ошибка обновления файла!',
+            });
+            setIsPendingUpload(false)
+        }
+
+        return false;
+    };
+
     return (
         <Drawer
             width={700}
@@ -109,7 +188,12 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
                                     <Typography.Text>Пусто</Typography.Text>
                                 </Flex>}
                             </Flex>
-                            <Button size={'large'}>Скачать</Button>
+                            <Flex gap={'small'}>
+                                <Button size={'large'} onClick={() => getFile()}>Скачать</Button>
+                                <Upload disabled={isPending || isPendingUpload} beforeUpload={handleUpdateFile} showUploadList={false}>
+                                    <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'} size={'large'}>Обновить</Button>
+                                </Upload>
+                            </Flex>
                         </Flex>
                         <table>
                             <tbody>

@@ -12,6 +12,7 @@ import {useStores} from "./utils/hooks/useStores.js";
 import THEME_DARK from './utils/themes/Dark'
 import THEME_LIGHT from './utils/themes/Light'
 import {observer} from "mobx-react-lite";
+import SearchPage from "./pages/SearchPage/SearchPage.jsx";
 
 const App = observer(() => {
     const location = useLocation();
@@ -29,6 +30,8 @@ const App = observer(() => {
         const pathParts = location.pathname.split('/');
         if (pathParts[1] === 'browser' && pathParts.length === 3) {
             setHeaderTitle('Просмотр проекта');
+        } else if (pathParts[1] === 'search' && pathParts.length === 3) {
+            setHeaderTitle('Поиск')
         } else {
             setHeaderTitle('Все проекты');
         }
@@ -48,6 +51,7 @@ const App = observer(() => {
                         <Route index element={<MainPage />} />
                         <Route path={'/browser'} element={<MainPage />} />
                         <Route path={'/browser/:project_id'} element={<ProjectBrowserPage />} />
+                        <Route path={'/search/:query_string'} element={<SearchPage />} />
                         <Route path={'*'} element={<Navigate replace to={'/'} />} />
                     </Route>
                 )}

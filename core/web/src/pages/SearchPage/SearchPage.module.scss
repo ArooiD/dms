@@ -1,0 +1,55 @@
+
+
+.container {
+  height: 100%;
+
+  .header {
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 24px;
+    width: 100%;
+  }
+  .body {
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    height: 100%;
+    width: 100%;
+    padding: 24px;
+    overflow: auto;
+
+    .result {
+      overflow: auto;
+    }
+  }
+  .footer {
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 24px;
+
+  }
+
+  .si {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 24px;
+
+    transition: border 0.1s;
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .si_body {
+
+    }
+    .si_footer {
+
+      & span {
+        font-size: 12px;
+        font-family: Consolas, serif;
+        opacity: 0.5;
+      }
+    }
+  }
+}
