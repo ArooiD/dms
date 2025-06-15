@@ -87,7 +87,7 @@ const ProjectBrowserPage = observer(() => {
                 } else if (res.ok) return res.json()
             })
             .then(res => {
-                console.log('info => ',res)
+                console.log('info => ', res)
                 setProjectInfo(res)
 
                 fetch(`${externalHost}/api/projects/${project_id}/documents`, {
@@ -214,7 +214,8 @@ const ProjectBrowserPage = observer(() => {
                 });
             }
             setIsPendingUpload(false)
-        } catch (error) {;
+        } catch (error) {
+            ;
             message.open({
                 key: 'updatable',
                 type: 'error',
@@ -276,15 +277,19 @@ const ProjectBrowserPage = observer(() => {
                         })
                     }}>Удалить</Button>
                     <Button disabled size={'large'}>Откатить</Button>
-                    <Button disabled={isPending || isPendingUpload} size={'large'} onClick={() => {updateProject()}}>Обновить</Button>
+                    <Button disabled={isPending || isPendingUpload} size={'large'} onClick={() => {
+                        updateProject()
+                    }}>Обновить</Button>
                     <Upload disabled={isPending || isPendingUpload} beforeUpload={handleUpload} showUploadList={false}>
-                        <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'} size={'large'}>Загрузить</Button>
+                        <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'}
+                                size={'large'}>Загрузить</Button>
                     </Upload>
                 </Flex>
             </Flex>
             <Flex vertical className={bbp.body} gap={'middle'}>
                 <Flex gap={'small'} className={bbp.body_contentHeader}>
-                    <Button onClick={() => navigate('/browser')} size={'large'} className={bbp.contentHeader__backButton}
+                    <Button onClick={() => navigate('/browser')} size={'large'}
+                            className={bbp.contentHeader__backButton}
                             icon={<ArrowLeftOutlined/>}/>
                     <Flex className={bbp.containerHeader_pathBlock}>
                         <Breadcrumb
@@ -296,11 +301,13 @@ const ProjectBrowserPage = observer(() => {
                         />
                         <Button icon={<CopyOutlined/>} className={bbp.pathBlock__copyPathButton}/>
                     </Flex>
-                    <Button style={{aspectRatio: 1}} icon={<ArrowUpOutlined />} size={'large'} onClick={() => goUp()}></Button>
-                    <Button style={{aspectRatio: 1}} icon={<FolderAddOutlined />} size={'large'}></Button>
+                    <Button style={{aspectRatio: 1}} icon={<ArrowUpOutlined/>} size={'large'}
+                            onClick={() => goUp()}></Button>
+                    <Button style={{aspectRatio: 1}} icon={<FolderAddOutlined/>} size={'large'}></Button>
                 </Flex>
                 <Flex style={{position: 'relative', height: '100%', overflow: 'clip', borderRadius: '8px'}}>
-                    {(isPendingUpload || isPending) && <Flex style={{position: 'absolute', width: '100%', height: '100%'}}><SpinBlock /></Flex>}
+                    {(isPendingUpload || isPending) &&
+                        <Flex style={{position: 'absolute', width: '100%', height: '100%'}}><SpinBlock/></Flex>}
                     <Table
                         onRow={(record, rowIndex) => {
                             return {
@@ -354,7 +361,8 @@ const ProjectBrowserPage = observer(() => {
                         dataSource={tableDocuments.sort(s => s.isFolder ? -1 : 1)}
                     />
 
-                    <DrawerDetailFile callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
+                    <DrawerDetailFile callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile}
+                                      selectedFile={selectedFile} project_id={project_id}/>
                 </Flex>
             </Flex>
             {/*<Flex className={bbp.footer}>*/}
