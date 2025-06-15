@@ -131,7 +131,13 @@ public class DocumentFileService {
 
     private Integer resolveVersion(UUID cid, UUID did, Integer version) throws Exception {
         String basePrefix = String.format("%s/%s/", cid, did);
-        Iterable<Result<Item>> results = minio.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(basePrefix).delimiter("/").recursive(false).build());
+        Iterable<Result<Item>> results = minio
+                .listObjects(ListObjectsArgs.builder()
+                        .bucket(bucket)
+                        .prefix(basePrefix)
+                        .delimiter("/")
+                        .recursive(false)
+                        .build());
         int maxVersion = -1;
         for (Result<Item> result : results) {
             Item item = result.get();

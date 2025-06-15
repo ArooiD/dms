@@ -1,0 +1,39 @@
+%%{
+  init: {
+    "theme": "default",
+    "themeVariables": {
+      "fontSize": "18px",
+      "fontFamily": "Arial",
+      "fontWeight": "bold"
+    },
+    "flowchart": {
+      "nodeSpacing": 20,
+      "rankSpacing": 30
+    }
+  }
+}%%
+flowchart TD
+    classDef startStop fill:#f9f,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    classDef start fill:#52c41a,stroke:#237804,stroke-width:2px,color:#000,font-weight:bold
+    classDef process fill:#e1efff,stroke:#668cff,stroke-width:1.5px,color:#000
+    classDef parallel fill:#fff3cd,stroke:#ffec99,stroke-width:1.5px,color:#000
+    classDef db fill:#e0f7e0,stroke:#6ca66c,stroke-width:1.5px,color:#000
+    classDef endStop fill:#f87171,stroke:#b91c1c,stroke-width:2px,color:#000,font-weight:bold
+
+    Start(Начало):::start
+    Receive[Получить Объект<br>с фрагментами]:::process
+    Fork[Параллельная генерация<br>модели данных]:::parallel
+    Gather[Сбор результатов<br>из параллельных задач]:::process
+    Save[Сохранить все фрагменты<br>в БД]:::db
+    Respond(OK:<br>индексирование<br>завершено):::startStop
+    Error(Error):::startStop
+    End(Конец):::endStop
+
+    Start --> Receive
+    Receive --> Fork
+    Fork --> Gather
+    Gather --> Save
+    Save --> Respond
+    Save --> Error
+    Respond --> End
+    Error --> End

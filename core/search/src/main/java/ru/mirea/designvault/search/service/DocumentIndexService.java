@@ -39,7 +39,6 @@ public class DocumentIndexService {
         UUID did = UUID.fromString(dto.getDid().replace("\"", ""));
         Integer ver = Integer.parseInt(dto.getVer());
         List<String> frags = dto.getFrags();
-        log.info("HERE -> 1");
         ExecutorService executor = Executors.newFixedThreadPool(10);
         List<Future<DocumentVersionChunk>> futures = new ArrayList<>();
         for (int i = 0; i < frags.size(); i++) {
@@ -53,14 +52,7 @@ public class DocumentIndexService {
                             .ver(ver)
                             .cid(index)
                             .content(text.replaceAll("\\x00", ""))
-//                            .embedding(embedding)
                             .build();
-////                    float[] embedding = getEmbeddingVector(text); // REST call
-////                    if (embedding != null) {
-//
-//                    } else {
-//                        log.warn("Empty embedding for fragment {}", index);
-//                    }
                 } catch (Exception e) {
                     log.error("Error generating embedding for fragment {}: {}", index, e.getMessage());
                 }
@@ -129,14 +121,6 @@ public class DocumentIndexService {
 
 
     public List<SearchSnippetDto> vectorSearch(String text, Integer limit) {
-//        float[] vector = getEmbeddingVector(text);
-//        StringBuilder sb = new StringBuilder("[");
-//        for (int i = 0; i < vector.length; i++) {
-//            if (i > 0) sb.append(", ");
-//            sb.append(vector[i]);
-//        }
-//        sb.append("]");
-//        String vectorString = sb.toString();
         String[] words = text.trim().split("\\s+");
         StringBuilder tsquery = new StringBuilder();
         for (int i = 0; i < words.length; i++) {
@@ -157,11 +141,20 @@ public class DocumentIndexService {
 
     public String highlightText(String snippet, String query) {
         if (snippet == null || query == null) return snippet;
-        String[] words = query.trim().split("\\s+");
+        String[] words = query.trim().toLowerCase().split("\\s+");
+        String lowerSnippet = snippet.toLowerCase(); // Для поиска
+        StringBuilder result = new StringBuilder(snippet);
         for (String word : words) {
-            snippet = snippet.replaceAll("(?i)" + Pattern.quote(word), "<mark>$0</mark>");
+            int index = 0;
+            while ((index = lowerSnippet.indexOf(word, index)) >= 0) {
+                int end = index + word.length();
+                result.insert(end, "</mark>");
+                result.insert(index, "<mark>");
+                index = end + "<mark></mark>".length();
+                lowerSnippet = result.toString().toLowerCase(); // Обновляем строку
+            }
         }
-        return snippet;
+        return result.toString();
     }
 }
 
