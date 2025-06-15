@@ -1,4 +1,4 @@
-import {App, Button, Descriptions, Drawer, Flex, Segmented, Select, Typography, Upload} from "antd";
+import {App, Button, Descriptions, Drawer, Dropdown, Flex, Segmented, Select, Typography, Upload} from "antd";
 import SpinBlock from "../SpinBlock/SpinBlock.jsx";
 import {useEffect, useState} from "react";
 import {useStores} from "../../utils/hooks/useStores.js";
@@ -15,7 +15,7 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile, project_id, updateProject, setPreviewFileUrl }) => {
+const DrawerDetailFile = observer(({setOpenModalPreviewFile, callback_open, callback_close, selectedFile, project_id, updateProject, setPreviewFileUrl }) => {
     const [detailFile, setDetailFile] = useState([]);
     const navigate = useNavigate();
 
@@ -42,7 +42,6 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
                     } else if (response.ok) return response.json()
                 })
                 .then(response => {
-                    console.log('r => ', response)
                     setDetailFile(response)
                 })
                 .catch(e => {
@@ -59,9 +58,6 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
 
     const [selectedVersion, setSelectedVersion] = useState(0);
 
-    useEffect(() => {
-        console.log(selectedVersion)
-    }, [selectedVersion])
 
     const [isPending, setIsPending] = useState(false)
     const [isPendingUpload, setIsPendingUpload] = useState(false)
@@ -73,6 +69,7 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
 
         setPreviewFileUrl(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}`)
         callback_close()
+        setOpenModalPreviewFile(true)
         // fetch(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}`, {
         //     method: 'GET',
         //     headers: {
@@ -93,6 +90,53 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
         //         console.error(e)
         //     })
     }
+
+    const downloadFile = async (slug, extension, version) => {
+        message.open({
+            key: 'downloading',
+            type: 'loading',
+            content: 'Загрузка файла',
+        });
+        try {
+            const externalHost = import.meta.env.VITE_DOMAIN || "";
+            const response = await fetch(`${externalHost}/api/projects/${project_id}/preview/${slug}${version ? `/${version}` : ''}`, {
+                method: 'GET',
+                headers: {
+                    authorization: `Bearer ${getToken()}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Сетевая ошибка!');
+            }
+
+            const blob = await response.blob();
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${slug}.${extension}`);
+
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+
+            window.URL.revokeObjectURL(url);
+
+            message.open({
+                key: 'downloading',
+                type: 'success',
+                content: 'Успешное скачивание',
+            });
+        } catch (error) {
+            message.open({
+                key: 'downloading',
+                type: 'error',
+                content: 'Ошибка скачивания файла!',
+            });
+            console.error('Ошибка при скачивании файла:', error);
+        }
+    };
 
     const handleUpdateFile = async (file) => {
         setIsPendingUpload(true)
@@ -130,7 +174,7 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
                 });
             }
             setIsPendingUpload(false)
-        } catch (error) {;
+        } catch (error) {
             message.open({
                 key: 'updatable',
                 type: 'error',
@@ -190,6 +234,24 @@ const DrawerDetailFile = observer(({callback_open, callback_close, selectedFile,
                             </Flex>
                             <Flex gap={'small'}>
                                 <Button size={'large'} onClick={() => getFile()}>Предпросмотр</Button>
+                                <Dropdown menu={{items: [
+                                        {
+                                            key: '1',
+                                            label: <Typography.Text>Скачать последнюю версию</Typography.Text>,
+                                            onClick: () => {
+                                                downloadFile(selectedFile.slug, selectedFile.ext, detailFile.sort((a,b) => b.ver-a.ver)[0].ver)
+                                            }
+                                        },
+                                        detailFile?.sort((a,b) => b?.ver-a?.ver)[0]?.ver === selectedVersion ? {} : {
+                                            key: '2',
+                                            label: <Typography.Text>Скачать выбранную версию</Typography.Text>,
+                                            onClick: () => {
+                                                downloadFile(selectedFile.slug, selectedFile.ext, selectedVersion)
+                                            }
+                                        },,
+                                    ]}}>
+                                    <Button size={'large'} onClick={() => {}}>Скачать</Button>
+                                </Dropdown>
                                 <Upload disabled={isPending || isPendingUpload} beforeUpload={handleUpdateFile} showUploadList={false}>
                                     <Button loading={isPendingUpload} disabled={isPending || isPendingUpload} type={'primary'} size={'large'}>Обновить</Button>
                                 </Upload>

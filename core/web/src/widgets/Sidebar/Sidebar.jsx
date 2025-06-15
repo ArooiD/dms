@@ -49,7 +49,7 @@ const Sidebar = observer(() => {
                 } else if (res.ok) return res.json()
             })
             .then(res => {
-                console.log(res)
+                // console.log(res)
 
                 setProjectsList(res)
                 setIsPending(false)

@@ -34,7 +34,7 @@ import ModalPreviewFile from "../../components/ModalPreviewFile/ModalPreviewFile
 function transformFolders(fileList) {
     const result = [];
 
-    function findOrCreateFolder(folders, folderName) {
+    function findOrCreateFolder(folders, folderName = 'Корневая директория') {
         let folder = folders.find(item => item.slug === folderName && item.isFolder);
         if (!folder) {
             folder = {slug: folderName, isFolder: true, files: [], folders: []};
@@ -89,7 +89,6 @@ const ProjectBrowserPage = observer(() => {
                 } else if (res.ok) return res.json()
             })
             .then(res => {
-                console.log('info => ', res)
                 setProjectInfo(res)
 
                 fetch(`${externalHost}/api/projects/${project_id}/documents`, {
@@ -105,7 +104,6 @@ const ProjectBrowserPage = observer(() => {
                         } else if (response.ok) return response.json()
                     })
                     .then(response => {
-                        console.log(response)
                         setProjectDocuments(response)
                         setIsPending(false)
                     })
@@ -157,11 +155,6 @@ const ProjectBrowserPage = observer(() => {
     }, [projectDocuments])
 
     useEffect(() => {
-        console.log('table => ', tableDocuments)
-    }, [tableDocuments])
-
-    useEffect(() => {
-        console.log('global => ', globalDocuments)
         setTableDocuments(globalDocuments)
         setProjectPath([{
             title: project_id
@@ -230,32 +223,6 @@ const ProjectBrowserPage = observer(() => {
 
     const [previewFile, setPreviewFile] = useState(null)
     const [previewFileUrl,setPreviewFileUrl] = useState('')
-
-    useEffect(() => {
-        if (previewFileUrl && !openDrawerDetailFile) {
-            setOpenModalPreviewFile(true)
-
-            // fetch(previewFileUrl, {
-            //     method: 'GET',
-            //     headers: {
-            //         authorization: `Bearer ${getToken()}`
-            //     }
-            // })
-            //     .then(response => {
-            //         if (response.status === 401) {
-            //             logout()
-            //             navigate('/login')
-            //         } else if (response.ok) return response.json()
-            //     })
-            //     .then(response => {
-            //         console.log('file => ', response)
-            //         setPreviewFile(response)
-            //     })
-            //     .catch(e => {
-            //         console.error(e)
-            //     })
-        }
-    }, [previewFileUrl, openDrawerDetailFile]);
 
     const deleteProject = (p_id) => {
         const externalHost = import.meta.env.VITE_DOMAIN || "";
@@ -401,7 +368,7 @@ const ProjectBrowserPage = observer(() => {
                         previewFileUrl={previewFileUrl}
                     />
 
-                    <DrawerDetailFile setPreviewFileUrl={setPreviewFileUrl} updateProject={updateProject} callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
+                    <DrawerDetailFile setOpenModalPreviewFile={setOpenModalPreviewFile} setPreviewFileUrl={setPreviewFileUrl} updateProject={updateProject} callback_open={openDrawerDetailFile} callback_close={handleCloseDrawerDetailFile} selectedFile={selectedFile} project_id={project_id} />
                 </Flex>
             </Flex>
             {/*<Flex className={bbp.footer}>*/}

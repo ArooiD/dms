@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {Flex, Modal} from "antd";
 import {useStores} from "../../utils/hooks/useStores.js";
 import {observer} from "mobx-react-lite";
+import {Document, Page} from "react-pdf";
 
 
 const UniversalFileLoader = ({ url, token }) => {
@@ -50,16 +51,17 @@ const UniversalFileLoader = ({ url, token }) => {
     }, [url, token]);
 
     return (
-        <div>
+        <div style={{width: '100%', height: '100%'}}>
             {error && <p style={{ color: 'red' }}>Ошибка: {error}</p>}
             {isPDF ? (
-                fileContent && (
-                    <Document file={fileContent}>
-                        <Page pageNumber={1} />
-                    </Document>
-                )
+                fileContent && (<>
+                    <iframe src={url} width="100%" height="100%"></iframe>
+                    {/*<Document file={fileContent}>*/}
+                    {/*    <Page pageNumber={1} />*/}
+                    {/*</Document>*/}
+                </>)
             ) : isHTML ? (
-                <div dangerouslySetInnerHTML={{ __html: fileContent }} />
+                <div dangerouslySetInnerHTML={{__html: fileContent }} />
             ) : (
                 <pre>{fileContent}</pre>
             )}
@@ -88,6 +90,7 @@ const ModalPreviewFile = observer(({callback_open, callback_close, previewFileUr
             okButtonProps={{
                 style: {display: 'none'}
             }}
+            destroyOnHidden={true}
         >
             <Flex style={{border: '1px solid rgba(255,255,255,0.1)', padding: '24px', borderRadius: '8px', overflow: 'auto', maxHeight: '80vh'}}>
                 {previewFileUrl && <UniversalFileLoader url={previewFileUrl ?? ''} token={getToken()} />}
