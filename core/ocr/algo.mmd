@@ -1,0 +1,44 @@
+%%{init: {
+  "theme": "default",
+  "themeVariables": {
+    "fontSize": "20px",
+    "fontFamily": "Arial",
+    "fontWeight": "bold"
+  },
+  "flowchart": {
+    "nodeSpacing": 15,
+    "rankSpacing": 25
+  }
+}}%%
+flowchart TD
+        classDef startStop fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+        classDef process fill:#e1efff,stroke:#668cff,stroke-width:1.5px,color:#000
+        classDef decision fill:#fff9d6,stroke:#d1c04d,stroke-width:1.5px,color:#000
+
+        OCRStart([Начало<br>OCR]):::startStop
+        CheckFile{"Файл пуст?"}:::decision
+        ReadFile["Считать<br>содержимое<br>файла"]:::process
+        DetectType["Определить<br>расширение<br>и тип файла"]:::process
+        ParseFile["Обработать файл<br>и получить<br>текст"]:::process
+        PrepareData["Подготовить данные<br>для индексации"]:::process
+        SendIndex{"Отправить<br>данные<br>в Search"}:::decision
+        HandleSuccess["Успешный ответ<br>от Search"]:::process
+        HandleNetworkError["Ошибка сети,<br>вернуть 502"]:::process
+        HandleHTTPError["Ошибка HTTP,<br>вернуть код<br>ошибки"]:::process
+        HandleOtherError["Другая ошибка,<br>вернуть 500"]:::process
+        OCREnd([Завершение<br>OCR]):::startStop
+
+        OCRStart -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Старт</font>" --> CheckFile
+        CheckFile -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Ошибка</font>" --> HandleOtherError
+        CheckFile -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Продолжить</font>" --> ReadFile
+        ReadFile -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Далее</font>" --> DetectType
+        DetectType -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Далее</font>" --> ParseFile
+        ParseFile -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Далее</font>" --> PrepareData
+        PrepareData -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Далее</font>" --> SendIndex
+        SendIndex -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>ОК</font>" --> HandleSuccess
+        SendIndex -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Ошибка сети</font>" --> HandleNetworkError
+        SendIndex -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>HTTP ошибка</font>" --> HandleHTTPError
+        HandleSuccess -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Завершить</font>" --> OCREnd
+        HandleNetworkError -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Завершить</font>" --> OCREnd
+        HandleHTTPError -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Завершить</font>" --> OCREnd
+        HandleOtherError -- "<font face='Arial' color='black' style='font-weight:bold; font-size:20px;'>Завершить</font>" --> OCREnd

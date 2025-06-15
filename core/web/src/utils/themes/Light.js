@@ -2,13 +2,13 @@ import {theme} from "antd";
 
 
 const COLOR_PALETTE = [
-    '#ffe5ff',
-    '#ebcdfd',
-    '#d3b5e5',
-    '#bb9dcd',
-    '#a385b5',
-    '#200232',
-    '#130025'
+    '#0f1b2d',
+    '#1c2a3a',
+    '#274146',
+    '#35605a',
+    '#4b8378',
+    '#6ca68c',
+    '#8cbf9f'
 ]
 
 const THEME_LIGHT = {
