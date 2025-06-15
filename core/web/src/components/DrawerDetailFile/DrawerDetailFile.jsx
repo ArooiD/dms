@@ -99,7 +99,7 @@ const DrawerDetailFile = observer(({setOpenModalPreviewFile, callback_open, call
         });
         try {
             const externalHost = import.meta.env.VITE_DOMAIN || "";
-            const response = await fetch(`${externalHost}/api/projects/${project_id}/preview/${slug}${version ? `/${version}` : ''}`, {
+            const response = await fetch(`${externalHost}/api/projects/${project_id}/documents/${slug}${version ? `/${version}` : ''}`, {
                 method: 'GET',
                 headers: {
                     authorization: `Bearer ${getToken()}`
