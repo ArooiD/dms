@@ -67,7 +67,7 @@ const DrawerDetailFile = observer(({setOpenModalPreviewFile, callback_open, call
     const getFile = () => {
         const externalHost = import.meta.env.VITE_DOMAIN || "";
 
-        setPreviewFileUrl(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}/${selectedFile.version}`)
+        setPreviewFileUrl(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}/${selectedVersion}`)
         callback_close()
         setOpenModalPreviewFile(true)
         // fetch(`${externalHost}/api/projects/${project_id}/preview/${selectedFile.slug}`, {
