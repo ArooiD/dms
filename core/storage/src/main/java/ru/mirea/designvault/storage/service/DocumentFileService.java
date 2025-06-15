@@ -82,25 +82,40 @@ public class DocumentFileService {
     public DocumentFile getDocumentPreviewVersion(UUID pid, UUID did, Integer ver) {
         try {
             Integer targetVersion = resolveVersion(pid, did, ver);
-            String objectPath = String.format("%s/%s/%d/preview", pid, did, targetVersion);
             DocumentVersionPreviewProjection document = documentVersionPreviewRepository.findByPidAndDidAndVer(pid, did, targetVersion);
             if (document == null) {
                 throw new DocumentRetrievalException("Документ не найден по заданной версии", null);
             }
+            String objectPath;
+            String contentType = document.getContentType();
+            if (contentType != null && contentType.toLowerCase().startsWith("application/pdf")) {
+                objectPath = String.format("%s/%s/%d/content", pid, did, targetVersion);
+            } else {
+                objectPath = String.format("%s/%s/%d/preview", pid, did, targetVersion);
+            }
+
             InputStream is = minio.getObject(GetObjectArgs.builder().bucket(bucket).object(objectPath).build());
-            log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
+            log.debug("Версия документа получена: pid={}, did={}, version={}, path={}", pid, did, targetVersion, objectPath);
+
             String ext = Optional.ofNullable(document.getExt())
                     .filter(e -> !e.isEmpty())
-                    .orElseGet(() -> extensionFromContentType(document.getContentType()));
+                    .orElseGet(() -> extensionFromContentType(contentType));
 
             String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + ext;
             log.info(name);
-            return DocumentFile.builder().name(name).contentType(document.getContentType()).stream(is).build();
+
+            return DocumentFile.builder()
+                    .name(name)
+                    .contentType(contentType)
+                    .stream(is)
+                    .build();
+
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
         }
     }
+
 
     private String extensionFromContentType(String contentType) {
         if (contentType == null) {
