@@ -36,6 +36,7 @@ public class DocumentPreviewController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
+                .header("X-Frame-Options", "ALLOWALL")
                 .contentType(object.getMediaType())
                 .body(object.getInputStreamResource());
     }
