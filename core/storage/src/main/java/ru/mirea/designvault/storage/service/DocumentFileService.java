@@ -241,7 +241,7 @@ public class DocumentFileService {
                     log.warn("Не удалось удалить объект из MinIO: {}", path, removeEx);
                 }
             }
-            throw ex; // пробрасываем основное исключение дальше
+            throw ex;
         }
     }
 

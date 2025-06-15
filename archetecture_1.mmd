@@ -1,0 +1,70 @@
+flowchart LR
+
+%% === Уровень 1: Легенда ===
+
+
+%% === Уровень 2: Пользовательский уровень ===
+    subgraph UI["<font color='black'><b>🔵 Пользовательский уровень<b>"]
+        direction TB
+        U1(["Модуль\nWEB (UI)"]):::highlight
+    end
+
+%% === Уровень 3: Сервер и логика ===
+    subgraph Backend["<font color='black'><b>🟡 Сервер и логика<b>"]
+        direction TB
+        S1(["Модуль\nGateway"]):::logic
+        S2(["Модуль\nIdentity"]):::logic
+        S3(["Модуль\nOCR"]):::highlight
+        S4(["Модуль\nSearch"]):::highlight
+        S5(["Модуль\nStorage"]):::highlight
+        S6(["Модуль\nTransform"]):::logic
+    end
+
+%% === Уровень 4: Инфраструктура и данные ===
+    subgraph Infra["<font color='black'><b>🟢 Инфраструктура и данные<b>"]
+        direction TB
+        I1[(База данных\nPostgreSQL<br><i>Структурированные<br>данные<br>)]:::infra
+        I2[(База данных\nMinIO\n\nФайлы)]:::infra
+    end
+
+%% === Уровень 5: Интеграции и расширения ===
+    subgraph Ext["<font color='black'><b>🟣 Интеграции и расширения<b>"]
+        direction TB
+        E1["Сервис Keycloak<br><i>Пользователи<br> и их данные"]:::ext
+        E2["Сервис RabbitMQ<br><i>Рассылка<br>сообщений"]:::ext
+    end
+
+%% === Связи с подписями ===
+    U1 <-- "<font color='black'> Запросы\nпользователей " --> S1
+    S1 <-- "<font color='black'> Аутентификация\nи авторизация " --> S2
+    S1 <-- "<font color='black'> Обработка\nизображений " --> S3
+    S1 <-- "<font color='black'> Поисковой\nзапрос " --> S4
+    S1 <-- "<font color='black'> Хранение\nданных " --> S5
+    S1 <-- "<font color='black'> Преобразование\nданных " --> S6
+    S2 <-- "<font color='black'> Сервис\nавторизации " --> E1
+    S3 <-. "<font color='black'> Событие " .-> E2
+    S5 <-- "<font color='black'> Объекты\nхранения " --> I2
+    S6 <-. "<font color='black'> Событие " .-> E2
+    S4 <-. "<font color='black'> Событие " .-> E2
+    S5 <-. "<font color='black'> Событие " .-> E2
+    S4 <-- "<font color='black'> Данные\nпоиска " --> I1
+    S5 <-- "<font color='black'> Объекты\nхранения " --> I1
+
+%% === Стили ===
+    linkStyle default stroke: #000, stroke-width: 1.5px, color: #000
+    linkStyle 6 stroke: #000, stroke-width: 1.5px, color: #000
+    linkStyle 7 stroke: #000, stroke-width: 1.5px, color: #000
+    linkStyle 9 stroke: #000, stroke-width: 1.5px, color: #000
+    linkStyle 10 stroke: #000, stroke-width: 1.5px, color: #000
+    linkStyle 11 stroke: #000, stroke-width: 1.5px, color: #000
+    style UI fill: none, stroke: #6ba9f2, stroke-width: 2px
+    style Backend fill: none, stroke: #d1c04d, stroke-width: 2px
+    style Ext fill: none, stroke: #6ba9f2, stroke-width: 2px
+    style Infra fill: none, stroke: #e0f7e0, stroke-width: 2px
+
+    classDef user fill: #e1efff, stroke: #668cff, color: #000, stroke-width: 1.5px
+    classDef logic fill: #fff9d6, stroke: #d1c04d, color: #000, stroke-width: 1.5px
+    classDef infra fill: #e0f7e0, stroke: #6ca66c, color: #000, stroke-width: 1.5px
+    classDef ext fill: #f1e7ff, stroke: #9477d9, color: #000, stroke-width: 1.5px
+
+    classDef highlight fill: #52c41a, stroke: #237804, color: #000, stroke-width: 2px;
