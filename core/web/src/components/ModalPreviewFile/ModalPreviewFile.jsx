@@ -51,7 +51,7 @@ const UniversalFileLoader = ({ url, token }) => {
     }, [url, token]);
 
     return (
-        <div style={{width: '100%', height: '100%'}}>
+        <div style={{width: '100%', display: 'flex'}}>
             {error && <p style={{ color: 'red' }}>Ошибка: {error}</p>}
             {isPDF ? (
                 fileContent && (<>
@@ -92,7 +92,7 @@ const ModalPreviewFile = observer(({callback_open, callback_close, previewFileUr
             }}
             destroyOnHidden={true}
         >
-            <Flex style={{border: '1px solid rgba(255,255,255,0.1)', padding: '24px', borderRadius: '8px', overflow: 'auto', maxHeight: '80vh'}}>
+            <Flex style={{border: '1px solid rgba(255,255,255,0.1)', padding: '24px', borderRadius: '8px', overflow: 'auto', minHeight: '80vh', maxHeight: '80vh'}}>
                 {previewFileUrl && <UniversalFileLoader url={previewFileUrl ?? ''} token={getToken()} />}
             </Flex>
         </Modal>
