@@ -9,6 +9,10 @@ import ru.mirea.designvault.search.dto.IndexDto;
 import ru.mirea.designvault.search.dto.SearchSnippetDto;
 import ru.mirea.designvault.search.service.DocumentIndexService;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +56,8 @@ public class IndexController {
     @GetMapping("search")
     public ResponseEntity<List<SearchSnippetDto>> search(
             @RequestParam(name = "query") String query,
-            @RequestParam(name = "count") String count) {
+            @RequestParam(name = "count") String count) throws UnsupportedEncodingException {
+        query = URLDecoder.decode(query, StandardCharsets.UTF_8);
         List<SearchSnippetDto> result = indexService.vectorSearch(query, Integer.parseInt(count));
         return ResponseEntity.ok(result);
     }
