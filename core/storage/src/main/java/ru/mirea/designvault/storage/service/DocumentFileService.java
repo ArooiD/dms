@@ -89,12 +89,42 @@ public class DocumentFileService {
             }
             InputStream is = minio.getObject(GetObjectArgs.builder().bucket(bucket).object(objectPath).build());
             log.debug("Версия документа получена: pid={}, did={}, version={}", pid, did, targetVersion);
-            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + Optional.ofNullable(document.getExt()).orElse("bin");
+            String ext = Optional.ofNullable(document.getExt())
+                    .filter(e -> !e.isEmpty())
+                    .orElseGet(() -> extensionFromContentType(document.getContentType()));
+
+            String name = Optional.ofNullable(document.getFilename()).orElse("document") + "." + ext;
             log.info(name);
             return DocumentFile.builder().name(name).contentType(document.getContentType()).stream(is).build();
         } catch (Exception e) {
             log.error("Ошибка при получении версии документа: cid={}, did={}, version={}", pid, did, ver, e);
             throw new DocumentRetrievalException("Ошибка при получении версии документа", e);
+        }
+    }
+
+    private String extensionFromContentType(String contentType) {
+        if (contentType == null) {
+            return "bin";
+        }
+        String baseType = contentType.split(";")[0].trim().toLowerCase();
+        switch (baseType) {
+            case "application/pdf":
+                return "pdf";
+            case "image/jpeg":
+                return "jpg";
+            case "image/png":
+                return "png";
+            case "text/plain":
+                return "txt";
+            case "text/html":
+                return "html";
+            case "application/msword":
+                return "doc";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return "docx";
+            // Добавь нужные типы здесь
+            default:
+                return "bin";
         }
     }
 
