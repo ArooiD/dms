@@ -35,7 +35,7 @@ public class DocumentPreviewController {
         DocumentFile object = documentFileService.getDocumentPreviewVersion(pid, did, ver);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
+                        "inline; filename=\"" + encodeFallbackName(object.getName()) + "\"; filename*=UTF-8''" + URLEncoder.encode(object.getName(), StandardCharsets.UTF_8))
                 .contentType(object.getMediaType())
                 .body(object.getInputStreamResource());
     }
