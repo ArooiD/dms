@@ -29,31 +29,30 @@ def keywords(text, k=10):
 async def parse_file(file: io.BytesIO, mime_type: str):
     print(f"[INFO] Parsing file")
     print(f"[INFO] MIME type: {mime_type}")
+
     text = ""
-    file.seek(0)
+
     if mime_type == "text/plain":
         text = file.read().decode("utf-8", errors="ignore")
+
     elif mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         try:
-            file.seek(0)
             doc = Document(file)
             text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
         except KeyError as e:
             raise Exception(f"Invalid or corrupted .docx file: {e}")
+
     elif mime_type == "application/pdf":
-        file.seek(0)
         reader = PdfReader(file)
         for page in reader.pages:
             extracted = page.extract_text()
             if extracted:
                 text += extracted + "\n"
+
     elif mime_type == "image/png":
         try:
-            file.seek(0)
             image = Image.open(file)
             text = pytesseract.image_to_string(image, lang="rus+eng")
-        except pytesseract.TesseractError as e:
-            raise Exception(f"OCR language error: {e}")
         except Exception as e:
             raise Exception(f"OCR failed: {e}")
 
