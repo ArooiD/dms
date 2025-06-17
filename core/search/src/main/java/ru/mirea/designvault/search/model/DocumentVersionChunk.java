@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mirea.designvault.search.key.DocumentChunkId;
 
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class DocumentVersionChunk {
     @Column(name = "content", columnDefinition = "text")
     @JdbcTypeCode(SqlTypes.LONGNVARCHAR)
     private String content;
+    @Transient
     @Column(
             name = "tsv",
             columnDefinition = "tsvector GENERATED ALWAYS AS (to_tsvector('russian', content)) STORED",
