@@ -170,19 +170,39 @@ public class DocumentIndexService {
 
     public String highlightText(String snippet, String query) {
         if (snippet == null || query == null) return snippet;
-        String[] words = query.trim().toLowerCase().split("\\s+");
+
         String lowerSnippet = snippet.toLowerCase();
-        StringBuilder result = new StringBuilder(snippet);
+        String[] words = query.trim().toLowerCase().split("\\s+");
+        List<int[]> highlightPositions = new ArrayList<>();
+
         for (String word : words) {
             int index = 0;
             while ((index = lowerSnippet.indexOf(word, index)) >= 0) {
-                int end = index + word.length();
-                result.insert(end, "</mark>");
-                result.insert(index, "<mark>");
-                index = end + "<mark></mark>".length();
-                lowerSnippet = result.toString().toLowerCase();
+                highlightPositions.add(new int[]{index, index + word.length()});
+                index += 1;
             }
         }
+        highlightPositions.sort(Comparator.comparingInt(a -> a[0]));
+        List<int[]> mergedPositions = new ArrayList<>();
+        for (int[] pos : highlightPositions) {
+            if (mergedPositions.isEmpty()) {
+                mergedPositions.add(pos);
+            } else {
+                int[] last = mergedPositions.get(mergedPositions.size() - 1);
+                if (pos[0] <= last[1]) {
+                    last[1] = Math.max(last[1], pos[1]);
+                } else {
+                    mergedPositions.add(pos);
+                }
+            }
+        }
+        StringBuilder result = new StringBuilder(snippet);
+        for (int i = mergedPositions.size() - 1; i >= 0; i--) {
+            int[] pos = mergedPositions.get(i);
+            result.insert(pos[1], "</mark>");
+            result.insert(pos[0], "<mark>");
+        }
+
         return result.toString();
     }
 
