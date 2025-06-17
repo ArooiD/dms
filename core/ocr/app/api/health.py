@@ -70,7 +70,7 @@ async def parse_file(file: io.BytesIO, mime_type: str):
     print("[INFO] Extracted keywords:")
     print(keywords_list)
 
-    return text
+    return text, keywords_list
 
 
 @router.get(BASE_PATH + "/health")
@@ -102,13 +102,14 @@ async def upload_file(
     if file_extension in [".docx"] and mime == "text/html":
         mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     try:
-        text = await parse_file(io.BytesIO(contents), mime)
+        text, keywords_list = await parse_file(io.BytesIO(contents), mime)
         print("[DEBUG] Parsed text content:")
         print(text)
         data = {
             "pid": pid,
             "did": did,
             "ver": ver,
+            "tags": keywords_list,
             "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text,
                                                                                                          _split_symbol="\n"),
         }
