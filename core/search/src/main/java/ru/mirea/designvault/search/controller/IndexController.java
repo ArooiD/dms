@@ -57,8 +57,8 @@ public class IndexController {
 
     @GetMapping("search")
     public ResponseEntity<List<SearchSnippetDto>> search(
-            @RequestParam(name = "query") String query,
-            @RequestParam(name = "count") String count) throws UnsupportedEncodingException {
+            @RequestParam(name = "query", required = false, defaultValue = "") String query,
+            @RequestParam(name = "count", required = false, defaultValue = "10") String count) throws UnsupportedEncodingException {
         query = URLDecoder.decode(query, StandardCharsets.UTF_8);
         List<SearchSnippetDto> result = indexService.vectorSearch(query, Integer.parseInt(count));
         return ResponseEntity.ok(result);
