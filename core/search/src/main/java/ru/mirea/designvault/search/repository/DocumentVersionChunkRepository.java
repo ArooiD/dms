@@ -16,17 +16,13 @@ import java.util.UUID;
 public interface DocumentVersionChunkRepository extends CrudRepository<DocumentVersionChunk, DocumentChunkId> {
     @Query(nativeQuery = true,
             value = """
-                    WITH q AS (
+                           WITH q AS (
                         SELECT plainto_tsquery('russian', ?1) AS query
-                    ), latest_docs AS (
-                        SELECT DISTINCT ON (pid, did) pid, did, ver, content, tsv
-                        FROM document_version_chunk
-                        ORDER BY pid, did, ver DESC
                     )
-                    SELECT ld.pid, ld.did, ld.ver, ld.content,
-                           ts_rank_cd(ld.tsv, q.query) AS score
-                    FROM latest_docs ld, q
-                    WHERE ld.tsv @@ q.query
+                    SELECT pid, did, ver, content,
+                           ts_rank_cd(tsv, q.query) AS score
+                    FROM document_version_chunk, q
+                    WHERE tsv @@ q.query
                     ORDER BY score DESC
                     LIMIT ?2
                     """
