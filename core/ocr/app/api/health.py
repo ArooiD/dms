@@ -17,6 +17,7 @@ from PIL import Image
 router = APIRouter()
 BASE_PATH = "/analyse"
 STOP = set("""и в не на с к по для от что это как он она они из у о""".split())
+CONFIG = r'--oem 3 --psm 6'
 
 
 def keywords(text, k=10):
@@ -52,7 +53,7 @@ async def parse_file(file: io.BytesIO, mime_type: str):
     elif mime_type == "image/png":
         try:
             image = Image.open(file)
-            text = pytesseract.image_to_string(image, lang="rus")
+            text = pytesseract.image_to_string(image, lang="rus", config=CONFIG)
         except Exception as e:
             raise Exception(f"OCR failed: {e}")
 
