@@ -12,12 +12,13 @@ from collections import Counter
 from docx import Document
 from PyPDF2 import PdfReader
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageOps
 
 router = APIRouter()
 BASE_PATH = "/analyse"
 STOP = set("""и в не на с к по для от что это как он она они из у о""".split())
 CONFIG = r'--oem 3 --psm 6'
+MAX_WIDTH = 1024
 
 
 def keywords(text, k=10):
@@ -53,7 +54,12 @@ async def parse_file(file: io.BytesIO, mime_type: str):
     elif mime_type == "image/png":
         try:
             image = Image.open(file)
-            text = pytesseract.image_to_string(image, lang="rus", config=CONFIG)
+            if image.width > MAX_WIDTH:
+                ratio = MAX_WIDTH / image.width
+                new_size = (MAX_WIDTH, int(image.height * ratio))
+                image = image.resize(new_size, Image.ANTIALIAS)
+            bw_image = ImageOps.grayscale(image).point(lambda x: 0 if x < 140 else 255, '1')
+            text = pytesseract.image_to_string(bw_image, lang="rus", config=CONFIG)
         except Exception as e:
             raise Exception(f"OCR failed: {e}")
 
