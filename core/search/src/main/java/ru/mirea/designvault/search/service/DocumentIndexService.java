@@ -161,8 +161,9 @@ public class DocumentIndexService {
                 .map(chunk -> SearchSnippetDto.builder()
                         .pid(chunk.getPid())
                         .did(chunk.getDid())
+                        .ver(chunk.getVer())
                         .snippet(highlightText(chunk.getContent(), text))
-                        .score(chunk.getDistance())
+                        .score(chunk.getScore())
                         .build())
                 .toList();
     }

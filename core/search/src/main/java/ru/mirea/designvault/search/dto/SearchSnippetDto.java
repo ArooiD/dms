@@ -10,6 +10,7 @@ import java.util.UUID;
 public class SearchSnippetDto {
     private UUID pid;
     private UUID did;
+    private Integer ver;
     private String snippet;
     private Float score;
 }

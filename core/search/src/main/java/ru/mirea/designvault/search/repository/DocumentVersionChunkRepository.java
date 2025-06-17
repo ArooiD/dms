@@ -17,12 +17,12 @@ public interface DocumentVersionChunkRepository extends CrudRepository<DocumentV
     @Query(nativeQuery = true,
             value = """
                     WITH q AS (SELECT plainto_tsquery('russian', ?1) AS query)
-                    SELECT pid, did, content,
-                           ts_rank(tsv, q.query) AS rank
-                    FROM document_version_chunk, q
-                    WHERE tsv @@ q.query
-                    ORDER BY rank DESC
-                    LIMIT ?2
+                            SELECT pid, did, ver, content,
+                                   ts_rank(tsv, q.query) AS score
+                            FROM document_version_chunk, q
+                            WHERE tsv @@ q.query
+                            ORDER BY score DESC
+                            LIMIT ?2
                     """
     )
     List<DocumentVersionChunkProjection> findNearestNeighborsWithFullText(String textQuery, int limit);
