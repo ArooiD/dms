@@ -186,7 +186,7 @@ public class DocumentIndexService {
     }
 
     public List<DocumentTagId> findDocumentsByTags(List<String> tags) {
-        return documentTagRepository.findIdByTag();
+        return documentTagRepository.findIdByTag(tags);
     }
 }
 
