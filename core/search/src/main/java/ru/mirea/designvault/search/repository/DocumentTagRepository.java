@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface DocumentTagRepository extends JpaRepository<DocumentVersionTag, DocumentTagId> {
-    @Query("select distinct t.pid, t.did, t.ver from DocumentVersionTag t where t.name in :tags")
+    @Query(nativeQuery = true, value = "select distinct t.pid, t.did, t.ver from document_version_tag t where t.name in :tags")
     List<DocumentTagId> findIdByTag(@Param("tags") List<String> tags);
 }
