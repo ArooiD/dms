@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mirea.designvault.search.dto.IndexDto;
 import ru.mirea.designvault.search.dto.SearchSnippetDto;
 import ru.mirea.designvault.search.key.DocumentTagId;
+import ru.mirea.designvault.search.key.DocumentVersionId;
 import ru.mirea.designvault.search.service.DocumentIndexService;
 
 import java.io.UnsupportedEncodingException;
@@ -64,8 +65,8 @@ public class IndexController {
     }
 
     @GetMapping("tags")
-    public ResponseEntity<List<DocumentTagId>> getDocumentsByTags(@RequestParam(name = "word") List<String> tags) {
-        List<DocumentTagId> documents = indexService.findDocumentsByTags(tags);
+    public ResponseEntity<List<DocumentVersionId>> getDocumentsByTags(@RequestParam(name = "word") List<String> tags) {
+        List<DocumentVersionId> documents = indexService.findDocumentsByTags(tags);
         return ResponseEntity.ok(documents);
     }
 
