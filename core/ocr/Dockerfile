@@ -2,6 +2,7 @@ FROM python:3.9-slim AS base
 
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-rus \
     poppler-utils \
     curl \
     libglib2.0-0 \

@@ -29,6 +29,7 @@ def keywords(text, k=10):
 import pytesseract
 from PIL import Image
 
+
 async def parse_file(file: io.BytesIO, mime_type: str):
     print(f"[INFO] Parsing file")
     print(f"[INFO] MIME type: {mime_type}")
@@ -54,6 +55,7 @@ async def parse_file(file: io.BytesIO, mime_type: str):
 
     elif mime_type == "image/png":
         try:
+            file.seek(0)
             image = Image.open(file)
             text = pytesseract.image_to_string(image, lang="rus+eng")
         except Exception as e:
