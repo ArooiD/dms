@@ -46,8 +46,7 @@ async def parse_file(file: io.BytesIO, mime_type: str):
         for page in reader.pages:
             extracted = page.extract_text()
             if extracted:
-                text += extracted + "\n"\
-
+                text += extracted + "\n"
     else:
         raise Exception(f"Unsupported file type: {mime_type}")
 
@@ -58,24 +57,23 @@ async def parse_file(file: io.BytesIO, mime_type: str):
     return text
 
 
-@router.get(BASE_PATH+"/health")
+@router.get(BASE_PATH + "/health")
 def health_check():
     return {"status": "ok"}
 
 
-@router.get(BASE_PATH+"/")
+@router.get(BASE_PATH + "/")
 def root():
     return {"status": "hello"}
 
 
-@router.post(BASE_PATH+"/upload")
+@router.post(BASE_PATH + "/upload")
 async def upload_file(
-    pid: str = Form(..., description="pidr"),
-    did: str = Form(..., description="did inside"),
-    ver: int = Form(..., description="verMut"),
-    file: UploadFile = File(...)
+        pid: str = Form(..., description="pidr"),
+        did: str = Form(..., description="did inside"),
+        ver: int = Form(..., description="verMut"),
+        file: UploadFile = File(...)
 ):
-
     if not file.filename:
         raise HTTPException(status_code=400, detail="Empty file")
 
@@ -98,7 +96,8 @@ async def upload_file(
             "pid": pid,
             "did": did,
             "ver": ver,
-            "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text, _split_symbol="\n"),
+            "frags": parse_text(text, _split_symbol=" . \n") if file_extension == ".pdf" else parse_text(text,
+                                                                                                         _split_symbol="\n"),
         }
 
         try:
