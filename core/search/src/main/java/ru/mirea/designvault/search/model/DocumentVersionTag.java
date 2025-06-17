@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(DocumentVersionTag.class)
+@IdClass(DocumentTagId.class)
 @Table(schema = "public", name = "document_version_tag")
 public class DocumentVersionTag {
     @Id

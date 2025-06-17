@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DocumentTagId extends DocumentVersionTag {
+public class DocumentTagId extends DocumentVersionId {
     private String name;
 }
