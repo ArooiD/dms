@@ -9,5 +9,5 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DocumentTagId extends DocumentId {
-    private UUID tid;
+    private Integer ver;
 }

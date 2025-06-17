@@ -10,5 +10,6 @@ public class IndexDto {
     private String pid;
     private String did;
     private String ver;
+    private List<String> tags;
     private List<String> frags;
 }
