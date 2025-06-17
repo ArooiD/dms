@@ -26,6 +26,9 @@ def keywords(text, k=10):
     return [w for w, _ in most]
 
 
+import pytesseract
+from PIL import Image
+
 async def parse_file(file: io.BytesIO, mime_type: str):
     print(f"[INFO] Parsing file")
     print(f"[INFO] MIME type: {mime_type}")
