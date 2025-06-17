@@ -69,9 +69,9 @@ def root():
 
 @router.post(BASE_PATH + "/upload")
 async def upload_file(
-        pid: str = Form(..., description="pidr"),
-        did: str = Form(..., description="did inside"),
-        ver: int = Form(..., description="verMut"),
+        pid: str = Form(..., description="pid"),
+        did: str = Form(..., description="did"),
+        ver: int = Form(..., description="ver"),
         file: UploadFile = File(...)
 ):
     if not file.filename:
@@ -106,24 +106,20 @@ async def upload_file(
                     "http://core.search:8000/index/document",
                     json=data
                 )
-
             # Проверяем, успешен ли запрос
             request.raise_for_status()  # выбросит исключение для 4xx/5xx
-
         except httpx.RequestError as exc:
             # Любая сетевая ошибка (например, нет соединения)
             raise HTTPException(
                 status_code=502,
                 detail=f"Request to external service failed: {exc}"
             )
-
         except httpx.HTTPStatusError as exc:
             # Сервис вернул 4xx или 5xx
             raise HTTPException(
                 status_code=exc.response.status_code,
                 detail=f"External service returned error: {exc.response.text}"
             )
-
         # Формируем frags
         frags = (
             parse_text(text, _split_symbol=" . \n")
