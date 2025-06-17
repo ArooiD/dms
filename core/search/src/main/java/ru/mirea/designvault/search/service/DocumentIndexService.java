@@ -50,7 +50,9 @@ public class DocumentIndexService {
         UUID pid = UUID.fromString(dto.getPid().replace("\"", ""));
         UUID did = UUID.fromString(dto.getDid().replace("\"", ""));
         Integer ver = Integer.parseInt(dto.getVer());
-        return dto.getTags().stream()
+        return Optional.ofNullable(dto.getTags())
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(key -> DocumentVersionTag.builder()
                         .pid(pid)
                         .did(did)
