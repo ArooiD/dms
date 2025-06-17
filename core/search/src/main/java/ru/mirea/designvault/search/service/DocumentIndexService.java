@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.mirea.designvault.search.dto.EmbeddingDto;
 import ru.mirea.designvault.search.dto.IndexDto;
 import ru.mirea.designvault.search.dto.SearchSnippetDto;
+import ru.mirea.designvault.search.key.DocumentTagId;
 import ru.mirea.designvault.search.model.DocumentVersionTag;
 import ru.mirea.designvault.search.model.DocumentVersionChunk;
 import ru.mirea.designvault.search.repository.DocumentTagRepository;
@@ -182,6 +183,10 @@ public class DocumentIndexService {
             }
         }
         return result.toString();
+    }
+
+    public List<DocumentTagId> findDocumentsByTags(List<String> tags) {
+        return documentTagRepository.findIdByTag();
     }
 }
 
