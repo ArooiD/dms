@@ -1,6 +1,6 @@
 import httpx
 
-def check_service_health(url: str = "http://localhost:8000/health"):
+def check_service_health(url: str = "http://localhost:8000/analyse/health"):
     try:
         response = httpx.get(url, timeout=3.0)
         if response.status_code == 200 and response.json().get("status") == "ok":

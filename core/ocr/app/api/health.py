@@ -145,6 +145,7 @@ async def upload_file(
             "pid": pid,
             "did": did,
             "ver": ver,
+            "tags": keywords_list,
             "status_request_code": request.status_code,
             "frags": frags
         }
@@ -166,12 +167,3 @@ def parse_text(text: str, _split_symbol):
 
 def is_empty(line: str):
     return not line or line.strip() == ""
-
-
-if __name__ == '__main__':
-    # BEFORE
-    pid = "84055427-00ea-41e0-800a-e3e31f8acefc"
-    did = "db2663b1-c0c8-448d-a83d-b9406039f86d"
-
-    print(uuid.UUID(pid))
-    print(uuid.UUID(did))
