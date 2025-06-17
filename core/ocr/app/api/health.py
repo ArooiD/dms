@@ -52,7 +52,7 @@ async def parse_file(file: io.BytesIO, mime_type: str):
     elif mime_type == "image/png":
         try:
             image = Image.open(file)
-            text = pytesseract.image_to_string(image, lang="rus+eng")
+            text = pytesseract.image_to_string(image, lang="rus")
         except Exception as e:
             raise Exception(f"OCR failed: {e}")
 
