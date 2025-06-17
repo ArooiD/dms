@@ -11,6 +11,8 @@ import re
 from collections import Counter
 from docx import Document
 from PyPDF2 import PdfReader
+import pytesseract
+from PIL import Image
 
 router = APIRouter()
 BASE_PATH = "/analyse"
@@ -38,7 +40,6 @@ async def parse_file(file: io.BytesIO, mime_type: str):
             doc = Document(file)
             text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
         except KeyError as e:
-            # DOCX может содержать нестандартные XML теги
             raise Exception(f"Invalid or corrupted .docx file: {e}")
 
     elif mime_type == "application/pdf":
@@ -47,6 +48,14 @@ async def parse_file(file: io.BytesIO, mime_type: str):
             extracted = page.extract_text()
             if extracted:
                 text += extracted + "\n"
+
+    elif mime_type == "image/png":
+        try:
+            image = Image.open(file)
+            text = pytesseract.image_to_string(image, lang="rus+eng")
+        except Exception as e:
+            raise Exception(f"OCR failed: {e}")
+
     else:
         raise Exception(f"Unsupported file type: {mime_type}")
 

@@ -142,7 +142,7 @@ public class DocumentIndexService {
     public String highlightText(String snippet, String query) {
         if (snippet == null || query == null) return snippet;
         String[] words = query.trim().toLowerCase().split("\\s+");
-        String lowerSnippet = snippet.toLowerCase(); // Для поиска
+        String lowerSnippet = snippet.toLowerCase();
         StringBuilder result = new StringBuilder(snippet);
         for (String word : words) {
             int index = 0;
@@ -151,7 +151,7 @@ public class DocumentIndexService {
                 result.insert(end, "</mark>");
                 result.insert(index, "<mark>");
                 index = end + "<mark></mark>".length();
-                lowerSnippet = result.toString().toLowerCase(); // Обновляем строку
+                lowerSnippet = result.toString().toLowerCase();
             }
         }
         return result.toString();
