@@ -39,10 +39,6 @@ public class DocumentVersionChunk {
     @Column(name = "content", columnDefinition = "text")
     @JdbcTypeCode(SqlTypes.LONGNVARCHAR)
     private String content;
-//    @Column(name = "embedding")
-//    @JdbcTypeCode(SqlTypes.VECTOR)
-//    @Array(length = 384)
-//    private float[] embedding;
     @Column(
             name = "tsv",
             columnDefinition = "tsvector GENERATED ALWAYS AS (to_tsvector('russian', content)) STORED",
