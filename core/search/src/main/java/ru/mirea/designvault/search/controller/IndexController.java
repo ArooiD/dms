@@ -64,7 +64,7 @@ public class IndexController {
     }
 
     @GetMapping("tags")
-    public ResponseEntity<List<DocumentTagId>> getDocumentsByTags(@RequestParam(name = "tags") List<String> tags) {
+    public ResponseEntity<List<DocumentTagId>> getDocumentsByTags(@RequestParam(name = "word") List<String> tags) {
         List<DocumentTagId> documents = indexService.findDocumentsByTags(tags);
         return ResponseEntity.ok(documents);
     }
