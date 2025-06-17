@@ -26,6 +26,7 @@ public class DocumentVersionTag {
     @Id
     @Column(name = "ver")
     private Integer ver;
+    @Id
     @Column(name = "name")
     private String name;
 }
