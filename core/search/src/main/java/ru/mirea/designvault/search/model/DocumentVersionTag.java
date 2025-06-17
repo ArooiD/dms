@@ -14,8 +14,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(DocumentTagId.class)
-@Table(schema = "public", name = "document_tag")
+@IdClass(DocumentVersionTag.class)
+@Table(schema = "public", name = "document_version_tag")
 public class DocumentVersionTag {
     @Id
     @Column(name = "pid")
